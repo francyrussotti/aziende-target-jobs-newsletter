@@ -12,6 +12,7 @@ Ogni lettore restituisce una lista di offerte nel formato comune:
      "url", "data" (AAAA-MM-GG o "")}
 e solleva FonteErrore se la fonte non risponde (≠ "0 offerte").
 """
+import html as html_lib
 import re
 import threading
 import unicodedata
@@ -95,11 +96,31 @@ def _iso(valore):
     return m.group(1) if m else ""
 
 
-def _offerta(titolo, url, location="", paese="", remoto=False, data=""):
-    return {"titolo": re.sub(r"\s+", " ", str(titolo or "")).strip(),
-            "location": re.sub(r"\s+", " ", str(location or "")).strip(),
-            "paese": (paese or "").upper()[:2], "remoto": bool(remoto),
-            "url": url or "", "data": data or ""}
+def _offerta(titolo, url, location="", paese="", remoto=False, data="", testo=None, dettaglio=""):
+    """testo = descrizione dell'annuncio (per il filtro lingua), se il portale la dà
+    già nell'elenco; dettaglio = indirizzo API da cui leggerla (Workday, SmartRecruiters)."""
+    o = {"titolo": re.sub(r"\s+", " ", str(titolo or "")).strip(),
+         "location": re.sub(r"\s+", " ", str(location or "")).strip(),
+         "paese": (paese or "").upper()[:2], "remoto": bool(remoto),
+         "url": url or "", "data": data or ""}
+    if testo is not None:
+        o["testo"] = _testo(testo)
+    if dettaglio:
+        o["dettaglio"] = dettaglio
+    return o
+
+
+MAX_TESTO = 8000
+
+
+def _testo(html_o_testo):
+    """Testo semplice (a capo tra i blocchi) da HTML o testo, tagliato a MAX_TESTO."""
+    t = html_lib.unescape(str(html_o_testo or ""))
+    if "<" in t:
+        t = re.sub(r"(?i)<\s*(br|/p|/li|/div|/h\d|li)[^>]*>", "\n", t)
+        t = re.sub(r"<[^>]+>", " ", t)
+    t = re.sub(r"[ \t\xa0]+", " ", t)
+    return re.sub(r"\n\s*", "\n", t).strip()[:MAX_TESTO]
 
 
 # ============================================================
@@ -115,29 +136,33 @@ def lever(slug, eu=False, **_):
     for j in dati:
         cat = j.get("categories") or {}
         luoghi = cat.get("allLocations") or [cat.get("location")]
+        testo = "\n".join([j.get("descriptionPlain") or ""]
+                          + [f"{x.get('text', '')}\n{x.get('content', '')}" for x in j.get("lists") or []]
+                          + [j.get("additionalPlain") or ""])
         out.append(_offerta(j.get("text"), j.get("hostedUrl"),
                             " / ".join(x for x in luoghi if x), j.get("country"),
-                            j.get("workplaceType") == "remote", _iso(j.get("createdAt"))))
+                            j.get("workplaceType") == "remote", _iso(j.get("createdAt")), testo))
     return out
 
 
 def greenhouse(slug, **_):
-    dati = _json(f"https://boards-api.greenhouse.io/v1/boards/{slug}/jobs")
+    dati = _json(f"https://boards-api.greenhouse.io/v1/boards/{slug}/jobs", params={"content": "true"})
     return [_offerta(j.get("title"), j.get("absolute_url"), (j.get("location") or {}).get("name"),
-                     data=_iso(j.get("first_published") or j.get("updated_at")))
+                     data=_iso(j.get("first_published") or j.get("updated_at")), testo=j.get("content"))
             for j in dati.get("jobs", [])]
 
 
 def workable(slug, **_):
-    dati = _json(f"https://apply.workable.com/api/v1/widget/accounts/{slug}")
+    dati = _json(f"https://apply.workable.com/api/v1/widget/accounts/{slug}", params={"details": "true"})
     out = []
     for j in dati.get("jobs", []):
         luoghi = j.get("locations") or [j]
         loc = " / ".join(", ".join(x for x in (l.get("city"), l.get("country")) if x) for l in luoghi)
         paese = (luoghi[0].get("countryCode") or "") if luoghi else ""
         url = j.get("url") or (f"https://apply.workable.com/j/{j['shortcode']}" if j.get("shortcode") else "")
+        testo = " ".join(j.get(k) or "" for k in ("description", "requirements", "benefits")) or None
         out.append(_offerta(j.get("title"), url, loc, paese, j.get("telecommuting"),
-                            _iso(j.get("published_on") or j.get("created_at"))))
+                            _iso(j.get("published_on") or j.get("created_at")), testo))
     return out
 
 
@@ -151,7 +176,8 @@ def smartrecruiters(slug, **_):
             l = j.get("location") or {}
             loc = l.get("fullLocation") or ", ".join(x for x in (l.get("city"), l.get("country")) if x)
             out.append(_offerta(j.get("name"), f"https://jobs.smartrecruiters.com/{slug}/{j.get('id')}",
-                                loc, l.get("country"), l.get("remote"), _iso(j.get("releasedDate"))))
+                                loc, l.get("country"), l.get("remote"), _iso(j.get("releasedDate")),
+                                dettaglio=f"https://api.smartrecruiters.com/v1/companies/{slug}/postings/{j.get('id')}"))
         offset += 100
         if not pagina or offset >= (dati.get("totalFound") or 0):
             break
@@ -166,7 +192,7 @@ def ashby(slug, **_):
         paese = ((j.get("address") or {}).get("postalAddress") or {}).get("addressCountry", "")
         out.append(_offerta(j.get("title"), j.get("jobUrl"), " / ".join(x for x in luoghi if x),
                             paese if len(paese) == 2 else "", j.get("isRemote"),
-                            _iso(j.get("publishedAt"))))
+                            _iso(j.get("publishedAt")), j.get("descriptionPlain") or j.get("descriptionHtml")))
     return out
 
 
@@ -178,7 +204,8 @@ def recruitee(slug, **_):
             continue
         out.append(_offerta(j.get("title"), j.get("careers_url"),
                             j.get("location") or ", ".join(x for x in (j.get("city"), j.get("country")) if x),
-                            j.get("country_code"), j.get("remote"), _iso(j.get("published_at"))))
+                            j.get("country_code"), j.get("remote"), _iso(j.get("published_at")),
+                            f"{j.get('description') or ''}\n{j.get('requirements') or ''}"))
     return out
 
 
@@ -199,8 +226,10 @@ def personio(slug, dominio="jobs.personio.de", **_):
         sedi = [testo("office")] + [(o.text or "").strip() for o in p.iter("office")
                                     if o is not p.find("office")]
         sedi = list(dict.fromkeys(s for s in sedi if s))
+        descr = "\n".join(f"{d.findtext('name') or ''}\n{d.findtext('value') or ''}"
+                          for d in p.iter("jobDescription"))
         out.append(_offerta(testo("name"), f"https://{slug}.{dominio}/job/{testo('id')}",
-                            " / ".join(sedi), data=_iso(testo("createdAt"))))
+                            " / ".join(sedi), data=_iso(testo("createdAt")), testo=descr))
     return out
 
 
@@ -298,7 +327,9 @@ def workday(url, **_):
                     continue
                 visti.add(url_j)
                 out.append(_offerta(j.get("title"), url_j, j.get("locationsText"),
-                                    data=_workday_data(j.get("postedOn"))))
+                                    data=_workday_data(j.get("postedOn")),
+                                    dettaglio=f"https://{u.netloc}/wday/cxs/{tenant}/{sito}{j.get('externalPath') or ''}"
+                                    if j.get("externalPath") else ""))
             offset += 20
             if not righe or offset >= min(totale, WORKDAY_MAX):
                 break
@@ -499,6 +530,28 @@ def _html_con_browser(url):
 LETTORI = {"lever": lever, "greenhouse": greenhouse, "workable": workable,
            "smartrecruiters": smartrecruiters, "ashby": ashby, "recruitee": recruitee,
            "personio": personio, "workday": workday, "wttj": wttj, "pagina": pagina}
+
+
+def descrizione(o: dict) -> str:
+    """Descrizione dell'annuncio per il filtro lingua: quella già letta dal
+    portale, altrimenti dall'API di dettaglio (Workday, SmartRecruiters) o dalla
+    pagina dell'annuncio. "" se non leggibile (l'offerta allora resta)."""
+    if o.get("testo") is not None:
+        return o["testo"]
+    try:
+        if "/wday/cxs/" in o.get("dettaglio", ""):
+            info = (_json(o["dettaglio"], rapida=True) or {}).get("jobPostingInfo") or {}
+            return _testo(info.get("jobDescription"))
+        if "api.smartrecruiters.com" in o.get("dettaglio", ""):
+            sezioni = ((_json(o["dettaglio"], rapida=True) or {}).get("jobAd") or {}).get("sections") or {}
+            return _testo("\n".join((v or {}).get("text", "") for v in sezioni.values()))
+        if o.get("url", "").startswith("http") and "welcometothejungle.com" not in o["url"]:
+            html = _get(o["url"], rapida=True, headers={"Accept": "text/html"}).text
+            html = re.sub(r"(?is)<(script|style|nav|footer|header)[^>]*>.*?</\1>", " ", html)
+            return _testo(html)
+    except FonteErrore:
+        pass
+    return ""
 
 
 def leggi_fonte(fonte: dict) -> list:

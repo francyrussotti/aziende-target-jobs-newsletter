@@ -739,5 +739,72 @@ class TestInvioEmail(unittest.TestCase):
         ok.login.assert_called_once_with("fra@gmail.com", "abcdefghijklmnop")
 
 
+class TestFiltroLingua(unittest.TestCase):
+    """Fra parla italiano, inglese, spagnolo; francese di base (si segnala, non si esclude)."""
+
+    def v(self, titolo, testo=""):
+        import lingue
+        return lingue.valuta(titolo, testo)
+
+    def test_richieste_escluse(self):
+        self.assertEqual(self.v("PM", "Requirements: fluent German and English are required.")[:2],
+                         (True, "richiesto tedesco"))
+        self.assertTrue(self.v("Sales", "Native Dutch speaker")[0])
+        self.assertTrue(self.v("C", "Uitstekende beheersing van het Nederlands en Engels.")[0])
+        self.assertTrue(self.v("C", "Deutsch fließend in Wort und Schrift")[0])
+        self.assertTrue(self.v("Projektleiter (m/w/d)")[0])
+
+    def test_facoltative_o_alternative_restano(self):
+        self.assertFalse(self.v("PM", "Languages: English (fluent), German is a plus.")[0])
+        self.assertFalse(self.v("C", "You speak English or German fluently.")[0])
+        self.assertFalse(self.v("I", "Anglais courant exigé, allemand apprécié.")[0])
+        self.assertFalse(self.v("C", "Ottima conoscenza dell'inglese; il tedesco costituisce titolo preferenziale.")[0])
+        self.assertFalse(self.v("A", "We are a German company with offices in Paris. You are curious.")[0])
+        self.assertFalse(self.v("Pre-sales", "You will polish our documents, fluent English required.")[0])
+
+    def test_francese_solo_segnalato(self):
+        self.assertEqual(self.v("Ingénieur", "Maîtrise du français et de l'anglais indispensable."),
+                         (False, "", True))
+
+    def test_annuncio_scritto_in_tedesco(self):
+        de = ("Wir suchen eine engagierte Person für unser Team in München. Du bist verantwortlich für "
+              "die Planung und Umsetzung von Projekten mit unseren Kunden. Wir bieten dir ein spannendes "
+              "Umfeld, flexible Arbeitszeiten und die Möglichkeit, dich weiterzuentwickeln. Deine Aufgaben "
+              "sind vielfältig und du arbeitest eng mit den Kollegen zusammen. Wir freuen uns auf deine "
+              "Bewerbung und sind gespannt auf dich und deine Ideen für das Team bei uns.")
+        self.assertEqual(self.v("Projektmanager", de)[:2], (True, "annuncio in tedesco"))
+
+    def test_filtra_lingue(self):
+        nuove = [{"azienda": "a", "titolo": "PM", "testo": "Fluent German required."},
+                 {"azienda": "a", "titolo": "Chef de projet", "testo": "Français courant exigé."},
+                 {"azienda": "a", "titolo": "Analyst", "testo": "", "dettaglio": "x"},
+                 {"azienda": "a", "titolo": "Engineer", "url": "https://x/1", "dettaglio": "d"}]
+        stat = {}
+        with mock.patch.object(tf, "descrizione", return_value="Fluent Dutch required") as d:
+            tenute = tn.filtra_lingue(nuove, stat)
+        d.assert_called_once()                       # solo l'offerta senza testo
+        self.assertEqual([o["titolo"] for o in tenute], ["Chef de projet", "Analyst"])
+        self.assertTrue(tenute[0]["francese"])
+        self.assertNotIn("testo", tenute[1])
+        self.assertNotIn("dettaglio", tenute[1])
+        self.assertEqual((stat["lingua"], stat["senza_testo"]), (2, 1))
+
+    def test_lettori_con_descrizione(self):
+        lever = [{"text": "PM", "hostedUrl": "u", "categories": {"location": "Paris"},
+                  "descriptionPlain": "Intro", "lists": [{"text": "Requirements", "content": "<li>Fluent German</li>"}],
+                  "additionalPlain": ""}]
+        with mock.patch.object(tf, "_json", return_value=lever):
+            o = tf.lever("acme")[0]
+        self.assertIn("Fluent German", o["testo"])
+        wd = {"total": 1, "facets": [], "jobPostings": [{"title": "Ing", "externalPath": "/job/Paris/Ing_R1",
+                                                          "locationsText": "Paris", "postedOn": "Posted Today"}]}
+        with mock.patch.object(tf, "_json", return_value=wd):
+            o = tf.workday("https://thales.wd3.myworkdayjobs.com/fr-FR/Careers")[0]
+        self.assertEqual(o["dettaglio"], "https://thales.wd3.myworkdayjobs.com/wday/cxs/thales/Careers/job/Paris/Ing_R1")
+        self.assertNotIn("testo", o)
+        with mock.patch.object(tf, "_json", return_value={"jobPostingInfo": {"jobDescription": "<p>Fluent <b>German</b></p>"}}):
+            self.assertEqual(tf.descrizione(o), "Fluent German")
+
+
 if __name__ == "__main__":
     unittest.main()

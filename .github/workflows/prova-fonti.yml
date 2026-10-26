@@ -13,6 +13,10 @@ on:
         description: "Leggi i candidati 'da verificare' invece delle fonti in uso"
         type: boolean
         default: false
+      lingua:
+        description: "Prova anche il filtro lingua (legge le descrizioni, max 30 offerte per fonte)"
+        type: boolean
+        default: false
   push:
     paths: ["dati/fonti_manuali.json"]
 
@@ -38,4 +42,4 @@ jobs:
       - run: playwright install chromium
       - if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: sudo $(which playwright) install-deps chromium
-      - run: python -u newsletter.py --prova ${{ inputs.dubbi && '--dubbi' || '' }} ${{ inputs.aziende }}
+      - run: python -u newsletter.py --prova ${{ inputs.dubbi && '--dubbi' || '' }} ${{ inputs.lingua && '--lingua' || '' }} ${{ inputs.aziende }}

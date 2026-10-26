@@ -22,6 +22,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 import fonti as tf
+import lingue
 
 DIR = "dati"
 AZIENDE_FILE = os.path.join(DIR, "aziende.json")
@@ -45,6 +46,9 @@ SEZIONI_MOSTRATE = {"PAR", "IT", "REMOTO", "FR", "ND"}
 # Gmail taglia i messaggi oltre ~102 KB ("[Messaggio troncato]"): si riducono
 # le offerte mostrate per azienda finché l'email sta sotto questo limite.
 MAX_EMAIL_BYTES = 95_000
+# Filtro lingua: descrizioni da scaricare al massimo per run (Workday, SmartRecruiters,
+# pagine). Oltre il limite le offerte restano senza controllo (la prima run è la più pesante).
+MAX_DETTAGLI = 1200
 STORICO_MAX_RUN = 14
 
 ETICHETTE_LIVELLO = [
@@ -222,6 +226,37 @@ def seleziona(aziende, risultati, seen, oggi):
     return nuove, stat
 
 
+def filtra_lingue(nuove, stat):
+    """Toglie le offerte che chiedono una lingua che Fra non parla (lingue.py) e
+    segna quelle che chiedono francese fluente. Le escluse restano nello storico
+    (seen), quindi non tornano domani."""
+    senza = [o for o in nuove if o.get("testo") is None][:MAX_DETTAGLI]
+    stat["lingua_non_controllate"] = sum(1 for o in nuove if o.get("testo") is None) - len(senza)
+
+    def leggi(o):
+        o["testo"] = tf.descrizione(o)
+
+    with ThreadPoolExecutor(max_workers=8) as ex:
+        list(ex.map(leggi, senza))
+    tenute, esempi = [], []
+    stat["lingua"], stat["senza_testo"] = 0, 0
+    for o in nuove:
+        testo = o.pop("testo", None)
+        o.pop("dettaglio", None)
+        if not testo:
+            stat["senza_testo"] += 1
+        escludi, motivo, francese = lingue.valuta(o["titolo"], testo or "")
+        if escludi:
+            stat["lingua"] += 1
+            esempi.append((o["azienda"], o["titolo"], motivo))
+            continue
+        if francese:
+            o["francese"] = True
+        tenute.append(o)
+    stat["lingua_esempi"] = esempi
+    return tenute
+
+
 def controlli(risultati, storico):
     """Problemi da segnalare: fonti in errore e fonti scese a 0 offerte."""
     problemi = []
@@ -302,6 +337,9 @@ def genera_html(nuove, aziende, fonti, stat, problemi, n_fonti, max_per_azienda=
                 meta = [esc(x) for x in (o.get("location"), _quando(o.get("data"))) if x]
                 meta += [f'<span style="padding:0 6px;border:1px solid {linea};border-radius:9px;'
                          f'font-size:11px;">{e}</span>' for e in etichette(o["titolo"])]
+                if o.get("francese"):
+                    meta.append(f'<span style="padding:0 6px;border:1px solid #f59e0b;border-radius:9px;'
+                                f'font-size:11px;color:#92400e;">francese fluente</span>')
                 if o.get("gia_aperta"):
                     meta.append(f'<span style="color:{chiaro};">già aperta</span>')
                 voci += f"""
@@ -346,6 +384,10 @@ def genera_html(nuove, aziende, fonti, stat, problemi, n_fonti, max_per_azienda=
                    "azienda e sezione: le altre sono nel link «vedi tutte»."
                    if any(sum(1 for o in nuove if o["azienda"] == a and o["luogo"] == l) > max_per_azienda
                           for a, l in {(o["azienda"], o["luogo"]) for o in nuove}) else "")
+    nota_lingua = (f"Escluse {stat['lingua']} offerte che chiedono lingue che non parli (tedesco, "
+                   "olandese…); «francese fluente» segnala quelle che chiedono il francese. "
+                   if stat.get("lingua") else "Offerte con «francese fluente»: chiedono il francese. "
+                   if any(o.get("francese") for o in nuove) else "")
     return f"""<!DOCTYPE html>
 <html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light"></head>
@@ -364,7 +406,7 @@ def genera_html(nuove, aziende, fonti, stat, problemi, n_fonti, max_per_azienda=
         Solo aziende della lista Aziende Target Europa ({len(aziende)} aziende, {aziende_con_fonte} con una
         fonte di annunci, {n_fonti} fonti lette). {stat['trovate']} offerte lette oggi, di cui
         {stat['fuori_focus']} fuori da Parigi/Italia/remoto (non mostrate).
-        Livello (Stage, Junior…) dedotto dal titolo.{nota_taglio}</div></td></tr>
+        {nota_lingua}Livello (Stage, Junior…) dedotto dal titolo.{nota_taglio}</div></td></tr>
     </table>
   </td></tr>
 </table></body></html>"""
@@ -453,7 +495,7 @@ def oggetto(nuove):
 #  Main
 # ------------------------------------------------------------
 
-def prova(solo_ids=None, dubbi=False):
+def prova(solo_ids=None, dubbi=False, lingua=False):
     """Legge le fonti e stampa cosa trova, senza email e senza toccare lo
     storico. Serve a verificare fonti nuove o sospette (workflow prova-fonti).
     dubbi=True legge invece i candidati "da_verificare" (per deciderli a mano)."""
@@ -479,13 +521,21 @@ def prova(solo_ids=None, dubbi=False):
         print(f"   ✅ {len(offerte)} offerte · " + ", ".join(f"{k} {v}" for k, v in sorted(conta.items())))
         for o in ([o for o in offerte if o["luogo"] in SEZIONI_MOSTRATE] or offerte)[:5]:
             print(f"      - {o['titolo'][:70]} | {o['location'][:30]} | {o['data']} | {o['url'][:80]}")
+        if lingua:
+            campione = [{**o, "azienda": aid} for o in offerte if o["luogo"] in SEZIONI_MOSTRATE][:30]
+            st = {}
+            tenute = filtra_lingue([dict(o) for o in campione], st)
+            print(f"      🗣️  lingua su {len(campione)}: escluse {st['lingua']}, francese fluente "
+                  f"{sum(1 for o in tenute if o.get('francese'))}, senza descrizione {st['senza_testo']}")
+            for _, titolo, motivo in st["lingua_esempi"][:5]:
+                print(f"         ✂️  {titolo[:60]} → {motivo}")
     print(f"\n🧪 {ok} fonti funzionanti su {sum(len(v) for v in fonti.values())}")
 
 
 def main():
     if "--prova" in sys.argv:
         ids = [a for a in sys.argv[1:] if not a.startswith("--")]
-        return prova(set(ids) or None, dubbi="--dubbi" in sys.argv)
+        return prova(set(ids) or None, dubbi="--dubbi" in sys.argv, lingua="--lingua" in sys.argv)
     oggi = datetime.now().strftime("%Y-%m-%d")
     print(f"\n🎯 NEWSLETTER AZIENDE TARGET  {datetime.now():%d/%m/%Y %H:%M}\n")
     try:
@@ -512,6 +562,14 @@ def main():
 
     problemi = controlli(risultati, seen["storico"])
     nuove, stat = seleziona(aziende, risultati, seen, oggi)
+    prima_filtro = len(nuove)
+    nuove = filtra_lingue(nuove, stat)
+    print(f"🗣️  Filtro lingua: {prima_filtro - len(nuove)} escluse su {prima_filtro} · "
+          f"{sum(1 for o in nuove if o.get('francese'))} con francese fluente · "
+          f"{stat['senza_testo']} senza descrizione leggibile (tenute)"
+          + (f" · {stat['lingua_non_controllate']} oltre il limite (tenute)" if stat["lingua_non_controllate"] else ""))
+    for aid, titolo, motivo in stat["lingua_esempi"][:15]:
+        print(f"   ✂️  {aziende[aid]['n'][:30]} · {titolo[:60]} → {motivo}")
     seen["storico"].append({"data": oggi, "conteggi": {
         tf.chiave_fonte(f): (len(o) if o is not None else None) for _, f, o, _ in risultati}})
     print(f"\n📊 {stat['trovate']} offerte · {len(nuove)} nuove da mostrare · "

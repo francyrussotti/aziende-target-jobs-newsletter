@@ -45,6 +45,16 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
   `dati/aziende.json` solo se cambia. Il push avvia `scopri-fonti.yml`: siti CORDIS aggiornati +
   `scopri_fonti.py --nuove` (solo aziende mai controllate). Le aziende uscite spariscono subito
   dalla newsletter (`carica_fonti` ignora gli ID fuori lista).
+- Filtro lingua (`lingue.py`, chiesto dall'utente 26/10): Fra parla italiano, inglese, spagnolo,
+  francese di base. Esclusa un'offerta scritta in un'altra lingua (es. tedesco, titoli "(m/w/d)")
+  o che CHIEDE una lingua non parlata (fluent/native/courant/fließend… entro 60 caratteri dal nome
+  della lingua), salvo se facoltativa ("a plus", "un atout", "titolo preferenziale") o in alternativa
+  a una parlata ("English or German"). Il francese non esclude: chip «francese fluente» nell'email.
+  Senza descrizione leggibile l'offerta resta. Descrizioni: già nell'elenco per lever/greenhouse
+  (content=true)/workable (details=true)/ashby/recruitee/personio XML; per Workday e SmartRecruiters
+  dall'API di dettaglio, per le pagine dalla pagina dell'annuncio, solo per le offerte da mostrare
+  (max MAX_DETTAGLI=1200 per run). Le escluse restano in seen.json (non tornano). Verifica:
+  prova-fonti con opzione "lingua" (max 30 offerte per fonte).
 - `dati/fonti_manuali.json` vince su `dati/fonti.json`; `dati/siti_manuali.json` corregge i siti
   CORDIS vecchi (vince su `dati/siti.json`). Workflow ricerca: input "aziende" per rifarla su pochi ID.
 - Prima lettura di una fonte: portale strutturato → tutte le offerte aperte in focus ("già aperta");
@@ -128,5 +138,6 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
 - [x] EMAIL_DESTINATARIO era sbagliato (mail non arrivata a francy.russotti@gmail.com): corretto
       dall'utente, seen.json azzerato (cb310ba) e newsletter reinviata.
 - [x] Aggiornamento automatico della lista aziende (routine + push → ricerca solo nuove). 63 test.
+- [ ] Filtro lingua: da verificare con prova-fonti (lingua=true) sulle fonti reali e leggere le esclusioni.
 - [ ] Aziende prioritarie (Parigi/Italia, classe A o open innovation) ancora senza fonte:
       elencarle per l'utente.
