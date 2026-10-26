@@ -31,11 +31,15 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
 ## Stato e cose da fare
 
 - [x] Repo creato, secret Gmail aggiunti dall'utente, test verdi su GitHub.
-- [x] Fonti manuali verificate su GitHub (prova 26/10): PNO 14, Novaspace 25, Thales, Starburst 6,
+- [x] Fonti manuali verificate su GitHub (prova 26/10): PNO 14, Novaspace 25, Starburst 5,
       Hello Tomorrow 1, Commpla 1, LGI 0 (WTTJ, nessuna offerta aperta).
-- [ ] Verificare su GitHub il fix Workday per paese (Thales: attese molte più offerte in Île-de-France).
-- [ ] Scoperta fonti completa su tutte le 1040 aziende (siti ufficiali CORDIS + slug); controllare
-      nel log i falsi positivi, soprattutto sulle aziende prioritarie (Parigi / Italia).
+- [x] Workday per paese: Thales 2000 offerte lette (686 Parigi/IDF, 25 Italia); ora un paese
+      alla volta per non perdere offerte oltre il limite di 2000 di Workday (da riverificare).
+- [x] Prima ricerca automatica (26/10) scartata: troppi falsi positivi su nomi comuni
+      (Alliance, Space, Advanced, Hive, Amplitude…). Ora: nome compatibile + annunci in un paese
+      dell'azienda (o nome identico). dati/fonti.json cancellato per ripartire da zero.
+- [ ] Nuova ricerca fonti completa (siti ufficiali CORDIS + slug); leggere nel log tutte le fonti
+      trovate e verificare a mano quelle delle aziende prioritarie.
 - [ ] Prova fonti su tutte le fonti trovate; correggere quelle rotte o sbagliate.
 - [ ] Prima newsletter reale (workflow "🎯 Newsletter Aziende Target") e controllo dell'email.
 - [ ] Aziende prioritarie (Parigi/Italia, classe A o open innovation) ancora senza fonte:

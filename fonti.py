@@ -31,6 +31,7 @@ HEADERS = {
 # Tetto per fonte: i grandi gruppi (Workday, SmartRecruiters) hanno migliaia
 # di annunci nel mondo; oltre questo numero ci si ferma.
 MAX_OFFERTE_FONTE = 3000
+WORKDAY_MAX = 2000          # limite di Workday per una singola ricerca
 
 
 class FonteErrore(Exception):
@@ -258,19 +259,26 @@ def workday(url, **_):
 
     primo = pagina(0, {})
     facet = _workday_facet(primo.get("facets"))
-    if facet:
-        primo = pagina(0, facet)
-    totale = primo.get("total") or 0
-    out, offset, dati = [], 0, primo
-    while True:
-        righe = dati.get("jobPostings") or []
-        for j in righe:
-            out.append(_offerta(j.get("title"), base + (j.get("externalPath") or ""),
-                                j.get("locationsText"), data=_workday_data(j.get("postedOn"))))
-        offset += 20
-        if not righe or offset >= min(totale, MAX_OFFERTE_FONTE):
-            break
-        dati = pagina(offset, facet)
+    # Un paese alla volta: Workday restituisce al massimo 2000 risultati per
+    # ricerca e la Francia da sola può superarli (Thales).
+    ricerche = [{k: [v]} for k, valori in facet.items() for v in valori] or [{}]
+    out, visti = [], set()
+    for filtro in ricerche:
+        dati = pagina(0, filtro) if filtro else primo
+        totale, offset = dati.get("total") or 0, 0
+        while True:
+            righe = dati.get("jobPostings") or []
+            for j in righe:
+                url_j = base + (j.get("externalPath") or "")
+                if url_j in visti:
+                    continue
+                visti.add(url_j)
+                out.append(_offerta(j.get("title"), url_j, j.get("locationsText"),
+                                    data=_workday_data(j.get("postedOn"))))
+            offset += 20
+            if not righe or offset >= min(totale, WORKDAY_MAX):
+                break
+            dati = pagina(offset, filtro)
     return out
 
 
@@ -497,77 +505,148 @@ def slug_candidati(nome: str) -> list:
     return [s for s in dict.fromkeys(c) if len(s) >= 3][:5]
 
 
+def _distintive(nome):
+    tutte = parole(nome)
+    return [w for w in tutte if w not in GENERICHE] or tutte
+
+
 def nome_corrisponde(nostro: str, loro: str) -> bool:
-    """Il nome restituito dal portale è quello dell'azienda della lista?
-    Le parole distintive del nostro nome devono comparire nel loro, e la
-    prima parola distintiva del loro nel nostro (evita "Innova" ↔ "Innovaphone")."""
-    a = [w for w in parole(nostro) if w not in GENERICHE] or parole(nostro)
-    b_tutte = parole(loro)
-    b = [w for w in b_tutte if w not in GENERICHE] or b_tutte
+    """Il nome restituito dal portale è compatibile con quello in lista?
+    Tutte le parole distintive del loro nome devono comparire nel nostro e la
+    prima deve coincidere ("Innova" ≠ "Innovaphone", "Space Applications" ≠
+    "Space Programs"). Un nome più corto del nostro ("Alliance" per "Alliance
+    Europeenne De Recherche…") è solo compatibile: serve anche il controllo
+    del paese (vedi annunci_nei_paesi)."""
+    a, b = _distintive(nostro), _distintive(loro)
     if not a or not b:
         return False
-    if a[0] not in b_tutte and "".join(a) not in "".join(b_tutte):
-        return False
-    return b[0] in parole(nostro) or b[0] == "".join(a)
+    if "".join(a) == "".join(b):
+        return True
+    return a[0] == b[0] and set(b) <= set(parole(nostro))
+
+
+def nome_uguale(nostro: str, loro: str) -> bool:
+    return bool(_distintive(nostro)) and "".join(_distintive(nostro)) == "".join(_distintive(loro))
 
 
 def testo_cita_nome(nostro: str, testi: list) -> bool:
     """Per i portali che non danno il nome dell'azienda (Lever, Ashby): il nome
-    deve comparire nel testo degli annunci."""
-    a = [w for w in parole(nostro) if w not in GENERICHE] or parole(nostro)
+    completo (parole distintive) deve comparire nel testo degli annunci."""
+    a = _distintive(nostro)
     if not a:
         return False
-    frase = r"\b" + r"[\s\-]*".join(map(re.escape, a[:3])) + r"\b"
+    frase = r"\b" + r"[\s\-]*".join(map(re.escape, a[:4])) + r"\b"
     return any(re.search(frase, _ascii(t)) for t in testi if t)
 
 
-def _prova(tipo, slug, nome):
-    """Fonte se lo slug esiste ED è dell'azienda, altrimenti None."""
-    _json = lambda url, **kw: globals()["_json"](url, rapida=True, timeout=8, **kw)
-    _get = lambda url, **kw: globals()["_get"](url, rapida=True, timeout=8, **kw)
+# Paesi delle aziende in lista (codici CORDIS) → nomi e città principali
+PAESI_RE = {k: re.compile(r"\b(" + v + r")\b", re.I) for k, v in {
+    "FR": r"france|francia|paris|lyon|marseille|toulouse|bordeaux|lille|nantes|strasbourg|montpellier|"
+          r"rennes|grenoble|nice|sophia[- ]antipolis|brest|cannes|aix[- ]en[- ]provence|[ée]lancourt|v[ée]lizy|"
+          r"massy|saclay|la d[ée]fense|cergy|gennevilliers|valence|orl[ée]ans|tours|pau|metz|nancy|dijon|caen",
+    "IT": r"ital(y|ia|ie|ien)|milan[oe]?|rom[ae]|turin|torino|genova|genoa|bologna|firenze|florence|napoli|"
+          r"naples|padova|venezia|venice|verona|bari|pisa|trento|trieste|bergamo|brescia|modena|parma|"
+          r"cagliari|palermo|catania|lecce|ancona|perugia|pescara|udine|la spezia|fano|ivrea|siena",
+    "ES": r"spain|espa[ñn]a|espagne|spagna|madrid|barcelona|valencia|sevilla|seville|bilbao|zaragoza|"
+          r"m[áa]laga|pamplona|san sebasti[áa]n|donostia|vigo|a coru[ñn]a|valladolid|granada|murcia|santander",
+    "DE": r"germany|deutschland|allemagne|germania|berlin|munich|m[üu]nchen|hamburg|frankfurt|cologne|"
+          r"k[öo]ln|stuttgart|d[üu]sseldorf|dresden|leipzig|hannover|bremen|karlsruhe|aachen|bonn|darmstadt",
+    "BE": r"belgium|belgique|belgi[eë]|belgio|brussels|bruxelles|brussel|antwerp|antwerpen|anvers|ghent|gent|"
+          r"li[èe]ge|leuven|louvain|namur|mons|charleroi|mechelen|hasselt",
+    "NL": r"netherlands|nederland|pays[- ]bas|paesi bassi|holland|amsterdam|rotterdam|the hague|den haag|"
+          r"utrecht|eindhoven|delft|leiden|groningen|rijswijk|enschede|nijmegen|wageningen",
+    "EL": r"greece|hellas|gr[eè]ce|grecia|athens|ath[iè]nes|atene|thessaloniki|patras|heraklion|larissa|volos",
+    "UK": r"united kingdom|\buk\b|england|scotland|wales|great britain|london|manchester|edinburgh|bristol|"
+          r"cambridge|oxford|birmingham|glasgow|leeds|belfast|cardiff|newcastle|reading|sheffield",
+    "PT": r"portugal|portogallo|lisbon|lisboa|porto|oporto|coimbra|braga|aveiro|faro",
+    "AT": r"austria|[öo]sterreich|autriche|vienna|wien|graz|linz|salzburg|innsbruck",
+    "IE": r"ireland|irlanda|irlande|dublin|cork|galway|limerick",
+    "CY": r"cyprus|chypre|cipro|nicosia|limassol|larnaca",
+    "CH": r"switzerland|schweiz|suisse|svizzera|zurich|z[üu]rich|geneva|gen[èe]ve|ginevra|basel|bern|lausanne|lugano",
+    "RO": r"romania|roumanie|bucharest|bucure[șs]ti|cluj|timi[șs]oara|ia[șs]i|bra[șs]ov",
+    "DK": r"denmark|danmark|danemark|danimarca|copenhagen|k[øo]benhavn|aarhus|odense|aalborg",
+    "SE": r"sweden|sverige|su[èe]de|svezia|stockholm|gothenburg|g[öo]teborg|malm[öo]|uppsala|lund|link[öo]ping",
+    "BG": r"bulgaria|bulgarie|sofia|plovdiv|varna",
+    "FI": r"finland|suomi|finlande|finlandia|helsinki|espoo|tampere|oulu|turku",
+    "NO": r"norway|norge|norv[èe]ge|norvegia|oslo|bergen|trondheim|stavanger",
+    "SI": r"slovenia|slov[ée]nie|ljubljana|maribor",
+    "CZ": r"czech|czechia|[čc]esko|r[ée]publique tch[èe]que|prague|praha|brno|ostrava",
+    "HU": r"hungary|magyarorsz[áa]g|hongrie|ungheria|budapest|debrecen|szeged",
+    "PL": r"poland|polska|pologne|polonia|warsaw|warszawa|krak[óo]w|wroc[łl]aw|pozna[ńn]|gda[ńn]sk|[łl][óo]d[źz]",
+    "HR": r"croatia|hrvatska|croatie|zagreb|split|rijeka",
+    "EE": r"estonia|eesti|tallinn|tartu",
+    "SK": r"slovakia|slovensko|slovaquie|bratislava|ko[šs]ice",
+    "LU": r"luxembourg|lussemburgo",
+    "LT": r"lithuania|lietuva|vilnius|kaunas",
+    "RS": r"serbia|srbija|belgrade|beograd|novi sad",
+    "MT": r"malta|valletta",
+    "LV": r"latvia|latvija|riga",
+    "MK": r"north macedonia|macedonia|skopje",
+}.items()}
+ISO = {"UK": "GB", "EL": "GR"}
+
+
+def annunci_nei_paesi(offerte: list, codici: list) -> bool:
+    """Almeno un annuncio è in uno dei paesi dell'azienda (codici CORDIS)."""
+    attesi = {c.upper() for c in codici if c}
+    iso = attesi | {ISO[c] for c in attesi if c in ISO}
+    for o in offerte:
+        if (o.get("paese") or "").upper() in iso:
+            return True
+        testo = (o.get("location") or "")
+        if any(PAESI_RE[c].search(testo) for c in attesi if c in PAESI_RE):
+            return True
+    return False
+
+
+def _prova(tipo, slug, azienda):
+    """Fonte se lo slug esiste ED è dell'azienda della lista, altrimenti None.
+    Due controlli: il nome (dal portale o citato negli annunci) e il paese
+    (almeno un annuncio in uno dei paesi dell'azienda). Senza annunci da
+    controllare si accetta solo il nome identico."""
+    rapido = dict(rapida=True, timeout=8)
+    nome, paesi = azienda["n"], (azienda.get("p") or "").split(",")
     try:
         if tipo == "greenhouse":
-            b = _json(f"https://boards-api.greenhouse.io/v1/boards/{slug}")
-            if nome_corrisponde(nome, b.get("name", "")):
-                return {"tipo": tipo, "slug": slug, "verifica": f"nome: {b.get('name')}"}
+            loro = _json(f"https://boards-api.greenhouse.io/v1/boards/{slug}", **rapido).get("name", "")
         elif tipo == "workable":
-            b = _json(f"https://apply.workable.com/api/v1/widget/accounts/{slug}")
-            if nome_corrisponde(nome, b.get("name", "")):
-                return {"tipo": tipo, "slug": slug, "verifica": f"nome: {b.get('name')}"}
+            loro = _json(f"https://apply.workable.com/api/v1/widget/accounts/{slug}", **rapido).get("name", "")
         elif tipo == "smartrecruiters":
-            b = _json(f"https://api.smartrecruiters.com/v1/companies/{slug}/postings", params={"limit": 1})
+            b = _json(f"https://api.smartrecruiters.com/v1/companies/{slug}/postings", params={"limit": 1}, **rapido)
             loro = ((b.get("content") or [{}])[0].get("company") or {}).get("name", "")
-            if loro and nome_corrisponde(nome, loro):
-                return {"tipo": tipo, "slug": slug, "verifica": f"nome: {loro}"}
         elif tipo == "recruitee":
-            b = _json(f"https://{slug}.recruitee.com/api/offers/")
+            b = _json(f"https://{slug}.recruitee.com/api/offers/", **rapido)
             loro = ((b.get("offers") or [{}])[0]).get("company_name", "")
-            if loro and nome_corrisponde(nome, loro):
-                return {"tipo": tipo, "slug": slug, "verifica": f"nome: {loro}"}
         elif tipo in ("lever", "lever-eu"):
-            eu = tipo == "lever-eu"
-            b = _json(f"https://{'api.eu' if eu else 'api'}.lever.co/v0/postings/{slug}?mode=json")
-            testi = [j.get("descriptionPlain", "") + " " + j.get("additionalPlain", "") for j in b[:20]]
-            if b and testo_cita_nome(nome, testi):
-                f = {"tipo": "lever", "slug": slug, "verifica": "nome citato negli annunci"}
-                if eu:
-                    f["eu"] = True
-                return f
+            b = _json(f"https://{'api.eu' if tipo == 'lever-eu' else 'api'}.lever.co/v0/postings/{slug}?mode=json", **rapido)
+            testi = [j.get("descriptionPlain", "") + " " + j.get("additionalPlain", "") for j in b[:30]]
+            loro = nome if (b and testo_cita_nome(nome, testi)) else ""
         elif tipo == "ashby":
-            b = _json(f"https://api.ashbyhq.com/posting-api/job-board/{slug}")
-            testi = [j.get("descriptionPlain", "") for j in (b.get("jobs") or [])[:20]]
-            if testo_cita_nome(nome, testi):
-                return {"tipo": tipo, "slug": slug, "verifica": "nome citato negli annunci"}
+            b = _json(f"https://api.ashbyhq.com/posting-api/job-board/{slug}", **rapido)
+            testi = [j.get("descriptionPlain", "") for j in (b.get("jobs") or [])[:30]]
+            loro = nome if testo_cita_nome(nome, testi) else ""
         elif tipo == "wttj":
             html = _get(f"https://www.welcometothejungle.com/fr/companies/{slug}",
-                        headers={"Accept": "text/html"}).text
+                        headers={"Accept": "text/html"}, **rapido).text
             m = re.search(r"<title>(.*?)</title>", html, re.S | re.I)
             loro = re.split(r"\s[\|:–-]\s", (m.group(1) if m else "").strip())[0]
-            if loro and nome_corrisponde(nome, loro):
-                return {"tipo": tipo, "slug": slug, "verifica": f"nome: {loro}"}
-    except (FonteErrore, ValueError, AttributeError, TypeError, IndexError):
+        else:
+            return None
+        if not loro or not nome_corrisponde(nome, loro):
+            return None
+        f = {"tipo": "lever" if tipo == "lever-eu" else tipo, "slug": slug}
+        if tipo == "lever-eu":
+            f["eu"] = True
+        offerte = leggi_fonte(f)
+        if offerte and annunci_nei_paesi(offerte, paesi):
+            f["verifica"] = f"nome '{loro}' + annunci in {'/'.join(p for p in paesi if p)}"
+        elif nome_uguale(nome, loro) and tipo not in ("lever", "lever-eu", "ashby"):
+            f["verifica"] = f"nome identico '{loro}'"
+        else:
+            return None
+        return f
+    except (FonteErrore, ValueError, AttributeError, TypeError, IndexError, KeyError):
         return None
-    return None
 
 
 TIPI_SCOPERTA = ["greenhouse", "lever", "lever-eu", "workable", "smartrecruiters", "ashby", "recruitee"]
@@ -580,7 +659,7 @@ def scopri(azienda: dict) -> list:
     trovate, usati = [], set()
     for tipo in tipi:
         for slug in slug_candidati(azienda["n"]):
-            f = _prova(tipo, slug, azienda["n"])
+            f = _prova(tipo, slug, azienda)
             if f and f["tipo"] not in usati:
                 trovate.append(f)
                 usati.add(f["tipo"])

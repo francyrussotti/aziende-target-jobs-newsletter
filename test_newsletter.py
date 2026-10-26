@@ -38,9 +38,39 @@ class TestNomi(unittest.TestCase):
         self.assertTrue(tf.nome_corrisponde("Rina Consulting SPA", "RINA"))
         self.assertTrue(tf.nome_corrisponde("Engie", "ENGIE Italia"))
         self.assertTrue(tf.nome_corrisponde("Hello Tomorrow", "Hello Tomorrow"))
+        self.assertTrue(tf.nome_corrisponde("Csc-Tieteen Tietotekniikan Keskus OY", "CSC Tieteen Tietotekniikan Keskus"))
         self.assertFalse(tf.nome_corrisponde("Innova SRL", "Innovaphone"))
         self.assertFalse(tf.nome_corrisponde("Gac", "Gucci"))
         self.assertFalse(tf.nome_corrisponde("Erdyn Consultants SAS", "Capgemini Consulting"))
+        # Falsi positivi visti nella prima ricerca (26/10/2026)
+        self.assertFalse(tf.nome_corrisponde("Space Applications Services NV", "Space Programs"))
+        self.assertFalse(tf.nome_corrisponde("Advanced Computing Spain SL", "Advanced Schema"))
+        self.assertFalse(tf.nome_corrisponde("Iris Technology Solutions", "Iris North America"))
+        self.assertFalse(tf.nome_corrisponde("Impact Hub GMBH", "impact.com"))
+        self.assertFalse(tf.nome_uguale("Alliance For New Mobility Europe", "Alliance"))
+        self.assertTrue(tf.nome_uguale("Agorize", "Agorize"))
+
+    def test_annunci_nei_paesi(self):
+        self.assertTrue(tf.annunci_nei_paesi([{"location": "Paris, France"}], ["FR"]))
+        self.assertTrue(tf.annunci_nei_paesi([{"location": "", "paese": "GB"}], ["UK"]))
+        self.assertTrue(tf.annunci_nei_paesi([{"location": "Athens"}], ["EL"]))
+        self.assertFalse(tf.annunci_nei_paesi([{"location": "San Francisco, CA", "paese": "US"}], ["FR"]))
+        self.assertFalse(tf.annunci_nei_paesi([], ["FR"]))
+
+    def test_prova_scarta_omonimi_di_altri_paesi(self):
+        az = {"n": "Hive Power SA", "p": "CH"}
+        usa = [tf._offerta("Engineer", "https://x/1", "New York, NY", "US")]
+        with mock.patch.object(tf, "_json", return_value={"name": "Hive"}), \
+             mock.patch.object(tf, "leggi_fonte", return_value=usa):
+            self.assertIsNone(tf._prova("greenhouse", "hive", az))
+        svizzera = [tf._offerta("Engineer", "https://x/1", "Lugano")]
+        with mock.patch.object(tf, "_json", return_value={"name": "Hive Power"}), \
+             mock.patch.object(tf, "leggi_fonte", return_value=svizzera):
+            self.assertEqual(tf._prova("greenhouse", "hivepower", az)["tipo"], "greenhouse")
+        # Nome identico ma nessun annuncio: si tiene (si leggerà ogni giorno)
+        with mock.patch.object(tf, "_json", return_value={"name": "Agorize"}), \
+             mock.patch.object(tf, "leggi_fonte", return_value=[]):
+            self.assertIsNotNone(tf._prova("workable", "agorize", {"n": "Agorize", "p": "FR"}))
 
     def test_testo_cita_nome(self):
         self.assertTrue(tf.testo_cita_nome("Novaspace GMBH", ["At Novaspace, we advise…"]))
@@ -99,21 +129,31 @@ class TestLettori(unittest.TestCase):
         self.assertEqual(o[0]["location"], "Paris / Milan")
         self.assertEqual(o[0]["data"], "2026-10-01")
 
-    def test_workday_facet_e_pagine(self):
+    def test_workday_un_paese_alla_volta(self):
         facets = [{"facetParameter": "locationCountry", "values": [
             {"id": "fr1", "descriptor": "France"}, {"id": "de1", "descriptor": "Germany"},
             {"id": "it1", "descriptor": "Italy"}]}]
-        righe = lambda n: [{"title": f"Job {i}", "externalPath": f"/job/{i}",
-                            "locationsText": "Paris", "postedOn": "Posted 2 Days Ago"} for i in range(n)]
-        risposte = [{"total": 9999, "facets": facets, "jobPostings": righe(20)},
-                    {"total": 25, "jobPostings": righe(20)}, {"jobPostings": righe(5)}]
-        with mock.patch.object(tf, "_json", side_effect=risposte) as j:
+        righe = lambda pref, n, da=0: [{"title": f"{pref} {i}", "externalPath": f"/job/{pref}{i}",
+                                        "locationsText": "Paris", "postedOn": "Posted 2 Days Ago"}
+                                       for i in range(da, da + n)]
+        chiamate = []
+
+        def finto(url, **kw):
+            corpo = kw["json"]
+            chiamate.append((corpo["appliedFacets"], corpo["offset"]))
+            filtro = corpo["appliedFacets"].get("locationCountry", [None])[0]
+            if filtro is None:
+                return {"total": 9999, "facets": facets, "jobPostings": righe("x", 20)}
+            if filtro == "fr1":
+                return {"total": 25, "jobPostings": righe("fr", 20)} if corpo["offset"] == 0 \
+                    else {"jobPostings": righe("fr", 5, 20)}
+            return {"total": 3, "jobPostings": righe("it", 3)}
+
+        with mock.patch.object(tf, "_json", side_effect=finto):
             o = tf.workday("https://thales.wd3.myworkdayjobs.com/fr-FR/Careers")
-        self.assertEqual(len(o), 25)
-        api, kw = j.call_args_list[1][0][0], j.call_args_list[1][1]
-        self.assertEqual(api, "https://thales.wd3.myworkdayjobs.com/wday/cxs/thales/Careers/jobs")
-        self.assertEqual(kw["json"]["appliedFacets"], {"locationCountry": ["fr1", "it1"]})
-        self.assertEqual(o[0]["url"], "https://thales.wd3.myworkdayjobs.com/fr-FR/Careers/job/0")
+        self.assertEqual(len(o), 28)                      # 25 Francia + 3 Italia
+        self.assertNotIn({"locationCountry": ["de1"]}, [c[0] for c in chiamate])
+        self.assertEqual(o[0]["url"], "https://thales.wd3.myworkdayjobs.com/fr-FR/Careers/job/fr0")
         self.assertEqual(o[0]["data"], giorni_fa(2))
 
     def test_workday_preferisce_il_paese_alle_sedi(self):
