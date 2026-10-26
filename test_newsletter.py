@@ -580,5 +580,41 @@ class TestScopriFonti(unittest.TestCase):
         self.assertEqual(d["fonti"], {})
 
 
+class TestErroriProvaCompleta(unittest.TestCase):
+    """Dalla prova di tutte le fonti del 26/10/2026 (102 fonti, 3090 offerte)."""
+
+    def test_pagine_dei_grandi_gruppi_senza_spazzatura(self):
+        html = """<a href="/careers/life-at-nokia/">Life at Nokia</a>
+          <a href="/careers/students-and-graduates/">Students and graduates</a>
+          <a href="/careers/our-locations/portugal/">Portugal</a>
+          <a href="https://jobs.siemens.com/en_US/externaljobs">Explore all jobs</a>
+          <a href="/careers/job/123">Ingénieur système F/H</a>
+          <a href="/careers/job/124">Chargé de projets européens</a>
+          <a href="/jobs/werkstudent-5">Werkstudent Marketing (m/w/d)</a>"""
+        o = tf.estrai_link_annunci(html, "https://www.nokia.com/careers/")
+        self.assertEqual([x["titolo"] for x in o], ["Ingénieur système F/H", "Chargé de projets européens",
+                                                     "Werkstudent Marketing (m/w/d)"])
+
+    def test_workday_lingua_breve(self):
+        import siti
+        self.assertIsNone(siti.fonte_da_url("https://repsol.wd3.myworkdayjobs.com/es"))
+        self.assertEqual(siti.fonte_da_url("https://repsol.wd3.myworkdayjobs.com/es/Repsol/job/x"),
+                         {"tipo": "workday", "url": "https://repsol.wd3.myworkdayjobs.com/es/Repsol"})
+        with self.assertRaises(tf.FonteErrore):
+            tf.workday("https://repsol.wd3.myworkdayjobs.com/es")
+        self.assertEqual(tf.chiave_fonte({"tipo": "workday", "url": "https://a.wd3.myworkdayjobs.com/es/Ext"}),
+                         tf.chiave_fonte({"tipo": "workday", "url": "https://a.wd3.myworkdayjobs.com/Ext"}))
+
+    def test_personio_senza_xml(self):
+        html = """<a href="/job/111?language=de"><span>Referent*in Öko-Landbau</span><span>Gräfelfing</span></a>
+                  <a href="/job/111">doppione</a>"""
+        risposte = [tf.NonTrovata("404"), FintaRisposta(testo=html)]
+        with mock.patch.object(tf, "_get", side_effect=risposte):
+            o = tf.personio("naturland-e-v")
+        self.assertEqual(len(o), 1)
+        self.assertEqual((o[0]["titolo"], o[0]["location"]), ("Referent*in Öko-Landbau", "Gräfelfing"))
+        self.assertEqual(o[0]["url"], "https://naturland-e-v.jobs.personio.de/job/111")
+
+
 if __name__ == "__main__":
     unittest.main()

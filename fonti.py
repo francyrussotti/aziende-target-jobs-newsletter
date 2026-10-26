@@ -31,6 +31,8 @@ HEADERS = {
 # Tetto per fonte: i grandi gruppi (Workday, SmartRecruiters) hanno migliaia
 # di annunci nel mondo; oltre questo numero ci si ferma.
 MAX_OFFERTE_FONTE = 3000
+# Lingua nei percorsi Workday: "fr-FR", "en-US", ma anche solo "es" (Repsol)
+RE_LINGUA = re.compile(r"[a-z]{2}(?:-[A-Za-z]{2})?")
 WORKDAY_MAX = 2000          # limite di Workday per una singola ricerca
 
 
@@ -180,7 +182,12 @@ def recruitee(slug, **_):
 
 
 def personio(slug, dominio="jobs.personio.de", **_):
-    r = _get(f"https://{slug}.{dominio}/xml")
+    try:
+        r = _get(f"https://{slug}.{dominio}/xml")
+    except NonTrovata:
+        # Feed XML disattivato dall'azienda (Naturland): si legge la pagina pubblica
+        html = _get(f"https://{slug}.{dominio}/", headers={"Accept": "text/html"}).text
+        return _personio_html(slug, dominio, html)
     try:
         radice = ET.fromstring(r.content)
     except ET.ParseError as e:
@@ -193,6 +200,20 @@ def personio(slug, dominio="jobs.personio.de", **_):
         sedi = list(dict.fromkeys(s for s in sedi if s))
         out.append(_offerta(testo("name"), f"https://{slug}.{dominio}/job/{testo('id')}",
                             " / ".join(sedi), data=_iso(testo("createdAt"))))
+    return out
+
+
+def _personio_html(slug, dominio, html):
+    from bs4 import BeautifulSoup
+    out, visti = [], set()
+    for a in BeautifulSoup(html, "lxml").find_all("a", href=True):
+        m = re.search(r"/job/(\d+)", a["href"])
+        if not m or m.group(1) in visti:
+            continue
+        visti.add(m.group(1))
+        righe = [t for t in a.stripped_strings]
+        out.append(_offerta(righe[0] if righe else "", f"https://{slug}.{dominio}/job/{m.group(1)}",
+                            " ".join(righe[1:])[:80]))
     return out
 
 
@@ -246,8 +267,10 @@ def workday(url, **_):
     parti = [p for p in u.path.split("/") if p]
     if not parti:
         raise FonteErrore(f"workday: URL senza sito ({url})")
-    lingua = parti[0] if re.fullmatch(r"[a-z]{2}-[A-Z]{2}", parti[0]) else ""
-    sito = parti[-1] if not lingua or len(parti) > 1 else ""
+    lingua = parti[0] if RE_LINGUA.fullmatch(parti[0]) else ""
+    sito = (parti[1] if lingua else parti[0]) if len(parti) > (1 if lingua else 0) else ""
+    if not sito:
+        raise FonteErrore(f"workday: URL senza nome del sito ({url})")
     tenant = u.netloc.split(".")[0]
     api = f"https://{u.netloc}/wday/cxs/{tenant}/{sito}/jobs"
     base = f"https://{u.netloc}/{lingua + '/' if lingua else ''}{sito}"
@@ -340,6 +363,24 @@ RE_LINK_ANNUNCIO = re.compile(
     r"(?:^|[/_\-.?=&])(jobs?|careers?|carri[eè]res?|vacanc\w*|positions?|posizion[ei]|offres?|"
     r"emplois?|recrut\w*|stages?|internships?|interns?|lavora\w*|openings?|stellen\w*|annonces?|"
     r"apply|candidat\w*|job-?offers?|offerte|bandi-di-lavoro|selezion[ei])(?=$|[/_\-.?=&])", re.I)
+# Nelle pagine carriere generiche un link è un annuncio solo se il testo sembra
+# un titolo di lavoro: via "Life at Nokia", "Students and graduates", "Explore all jobs".
+RE_TITOLO_LAVORO = re.compile(
+    r"(\b(manager|engineer|ing[ée]nieure?|ingegner\w*|ingenieur\w*|ingeniero|consultant\w*|consulente|"
+    r"consultor\w*|officer|assistant\w*|assistente|analyst|analyste|analista|developer|d[ée]veloppeu\w*|"
+    r"sviluppator\w*|entwickler\w*|technician|technicien\w*|tecnic[oa]|t[ée]cnico|scientist|"
+    r"scientifique|researcher|chercheu\w*|ricercat\w*|investigador\w*|coordinator|coordinat\w*|"
+    r"specialist|sp[ée]cialiste|specialista|director|directeur|directrice|direttore|head of|team lead\w*|"
+    r"lead|charg[ée]e?|responsable|responsabile|chef de projet|stage|stagiaire|intern|internship|"
+    r"tirocin\w*|alternan\w*|apprenti\w*|trainee|junior|senior|expert\w*|esperto|advisor|adviser|"
+    r"conseill\w*|administrat\w*|accountant|comptable|contabile|controller|architect\w*|designer|"
+    r"operator|op[ée]rat\w*|economist|[ée]conomiste|economista|lawyer|juriste|recruiter|"
+    r"secr[ée]tair\w*|segretari\w*|postdoc\w*|ph\.?d|doctora\w*|dottorat\w*|fellow\w*|supervisor|"
+    r"auditor|editor|planner|mitarbeiter\w*|referent\w*|sachbearbeiter\w*|berater\w*|leiter\w*|"
+    r"praktik\w*|werkstudent\w*|becari[oa]|programmer|data scientist|buyer|acheteu\w*|"
+    r"impiegat\w*|addett\w*|project officer|policy officer)\b|"
+    r"\b[hf]\s*/\s*[hf]\b|\bm\s*/\s*[fw](?:\s*/\s*[dx])?\b|\(\s*[mfwd](?:\s*/\s*[mfwdx]){1,3}\s*\))", re.I)
+
 # Parametri che cambiano a ogni visita: tolti dall'URL, altrimenti lo stesso
 # annuncio sembrerebbe nuovo ogni giorno.
 RE_PARAM_VOLATILI = re.compile(r"(?i)^(utm_\w+|fbclid|gclid|mc_\w+|sessionid|sid|jsessionid|phpsessid|"
@@ -394,7 +435,7 @@ def estrai_link_annunci(html, url, filtro=None):
                 continue
         elif not su_ats and not RE_LINK_ANNUNCIO.search(urlparse(href).path + "?" + urlparse(href).query):
             continue
-        if href in visti or href.startswith("mailto:"):
+        if href in visti or href.startswith("mailto:") or not RE_TITOLO_LAVORO.search(testo):
             continue
         visti.add(href)
         out.append(_offerta(testo, href))
@@ -437,8 +478,8 @@ def chiave_fonte(fonte: dict) -> str:
     (".../fr-FR/Careers" e ".../en-US/Careers" sono lo stesso portale)."""
     if fonte.get("tipo") == "workday":
         u = urlparse(fonte.get("url", ""))
-        parti = [p for p in u.path.split("/") if p and not re.fullmatch(r"[a-z]{2}-[A-Z]{2}", p)]
-        return f"workday:{u.netloc.lower()}/{'/'.join(parti)}"
+        parti = [p for p in u.path.split("/") if p and not RE_LINGUA.fullmatch(p)]
+        return f"workday:{u.netloc.lower()}/{'/'.join(parti[:1])}"
     return fonte["tipo"] + ":" + str(fonte.get("slug") or fonte.get("url"))
 
 

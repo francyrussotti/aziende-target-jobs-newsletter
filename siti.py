@@ -110,8 +110,8 @@ def fonte_da_url(url):
         m = re.search(r"/companies/([\w-]+)", p.path)
         return {"tipo": "wttj", "slug": m.group(1)} if m else None
     if host.endswith("myworkdayjobs.com") and parti:
-        sito = [x for x in parti if not re.fullmatch(r"[a-z]{2}-[A-Z]{2}", x)][:1]
-        lingua = [x for x in parti[:1] if re.fullmatch(r"[a-z]{2}-[A-Z]{2}", x)]
+        sito = [x for x in parti if not tf.RE_LINGUA.fullmatch(x)][:1]
+        lingua = [x for x in parti[:1] if tf.RE_LINGUA.fullmatch(x)]
         if sito:
             return {"tipo": "workday", "url": f"https://{host}/" + "/".join(lingua + sito)}
     # Pagine aziendali su altri portali: solo con il sottodominio dell'azienda

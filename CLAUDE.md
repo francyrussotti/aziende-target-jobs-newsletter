@@ -70,8 +70,14 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
 - [x] 5ª ricerca (su a5f19ab): 98 aziende con fonte; uscite attese (Euronovia, 4 workable →
       da verificare). Trovata instabilità: Robotnik uscita, Civitta/Ubimet rientrate (siti lenti)
       → ora unione delle fonti con le stesse REGOLE (=5). Dubbi già decisi a mano tolti dagli elenchi.
-- [ ] Ricerca con REGOLE=5 (riparte da zero) e rilettura.
-- [ ] Prova fonti su tutte le fonti trovate; correggere quelle rotte o sbagliate.
+- [x] Prova di TUTTE le fonti (run 40359050288, log letto per intero): 105 aziende, 108 fonti,
+      102 funzionanti, 3090 offerte (PAR 755, IT 68, remoto 19, ND 376, altre 1872).
+      Thales 699 PAR + 63 IT (lettura per paese ok), Valeo 21, UTAC 12+4, Novaspace 10, PNO 3+1.
+      Errori trovati e corretti: le 376 "ND" erano quasi tutte link spazzatura delle pagine carriere
+      dei grandi gruppi (Nokia "Life at Nokia", Siemens "Explore all jobs", Sanofi…) → ora dalle
+      pagine si tengono solo link con un titolo di lavoro (`fonti.RE_TITOLO_LAVORO`); Repsol Workday
+      con lingua breve "/es" (404); Naturland Personio senza XML → lettura pagina pubblica. 50 test.
+- [ ] Ricerca con REGOLE=6 (riparte da zero) e rilettura; poi nuova prova di tutte le fonti.
 - [ ] Prima newsletter reale (workflow "🎯 Newsletter Aziende Target") e controllo dell'email
       (dimensione, sezioni, link).
 - [ ] Aziende prioritarie (Parigi/Italia, classe A o open innovation) ancora senza fonte:
