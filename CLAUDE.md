@@ -15,6 +15,9 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
 - Attenzione ai limiti di utilizzo: niente ricerche web superflue, pochi controlli dei run.
   Tenere aggiornato lo stato qui sotto, così una nuova sessione riparte senza perdere nulla.
 - Non inventare dati: le fonti manuali hanno una `nota` con l'origine.
+- Test sempre con **Python 3.11** (come GitHub Actions): `uv venv -p /usr/bin/python3.11 …` +
+  requests/beautifulsoup4/lxml. Con il 3.13 locale è passato un errore (barra rovesciata in un'espressione
+  f-string) che ha fatto fallire la run del 26/10 su GitHub.
 
 ## Come funziona
 

@@ -411,12 +411,12 @@ def invia_email(html_body, oggetto_email):
     print(f"✉️  Mittente con @: {'@' in mittente} · password: {len(password)} caratteri"
           + ("" if len(password) == 16 else " (attesi 16 per una App Password Gmail)"))
     # Altri controlli, sempre senza mostrare i valori
+    formato_app = bool(re.fullmatch(r"[a-z]{16}", password))
+    gmail = mittente.lower().endswith(("@gmail.com", "@googlemail.com"))
+    strani = bool(re.search(r"[\s<>]", mittente))
     print(f"✉️  Solo caratteri ASCII → mittente: {mittente.isascii()} · password: {password.isascii()} · "
-          f"password = 16 lettere minuscole (formato App Password): "
-          f"{bool(re.fullmatch(r'[a-z]{16}', password))} · "
-          f"mittente @gmail.com/@googlemail.com: "
-          f"{mittente.lower().endswith(('@gmail.com', '@googlemail.com'))} · "
-          f"mittente con spazi o '<>': {bool(re.search(r'[\s<>]', mittente))}")
+          f"password = 16 lettere minuscole (formato App Password): {formato_app} · "
+          f"mittente @gmail.com/@googlemail.com: {gmail} · mittente con spazi o '<>': {strani}")
     destinatari = list(dict.fromkeys(d for d in re.split(r"[,;\s]+", dest) if d))
     msg = MIMEMultipart("alternative")
     msg["Subject"], msg["From"], msg["To"] = oggetto_email, mittente, mittente
