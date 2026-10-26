@@ -114,14 +114,6 @@
     "trovata": "2026-10-26"
    }
   ],
-  "bpifrance": [
-   {
-    "tipo": "workable",
-    "slug": "bpifrance",
-    "verifica": "nome identico 'Bpifrance', nessun annuncio da controllare",
-    "trovata": "2026-10-26"
-   }
-  ],
   "bull": [
    {
     "tipo": "pagina",
@@ -159,6 +151,14 @@
     "tipo": "pagina",
     "url": "https://www.cemosa.es/empleo/",
     "verifica": "pagina carriere del sito www.cemosa.es",
+    "trovata": "2026-10-26"
+   }
+  ],
+  "civitta-eesti": [
+   {
+    "tipo": "pagina",
+    "url": "https://civitta.com/career/consultant/",
+    "verifica": "pagina carriere del sito civitta.com",
     "trovata": "2026-10-26"
    }
   ],
@@ -280,14 +280,6 @@
     "trovata": "2026-10-26"
    }
   ],
-  "euronovia": [
-   {
-    "tipo": "pagina",
-    "url": "https://euronovia.eu/recrutement-apprenti-financements-europeens/",
-    "verifica": "pagina carriere del sito euronovia.eu",
-    "trovata": "2026-10-26"
-   }
-  ],
   "europabio": [
    {
     "tipo": "pagina",
@@ -333,14 +325,6 @@
     "tipo": "pagina",
     "url": "https://www.fev.com/jobs/",
     "verifica": "pagina carriere del sito www.fev.com",
-    "trovata": "2026-10-26"
-   }
-  ],
-  "gac": [
-   {
-    "tipo": "workable",
-    "slug": "gac",
-    "verifica": "nome identico 'GAC', nessun annuncio da controllare",
     "trovata": "2026-10-26"
    }
   ],
@@ -413,12 +397,6 @@
     "tipo": "pagina",
     "url": "https://www.innova-eu.net/jobs/",
     "verifica": "pagina carriere del sito www.innova-eu.net",
-    "trovata": "2026-10-26"
-   },
-   {
-    "tipo": "workable",
-    "slug": "innova",
-    "verifica": "nome identico 'innova', nessun annuncio da controllare",
     "trovata": "2026-10-26"
    }
   ],
@@ -551,14 +529,6 @@
     "trovata": "2026-10-26"
    }
   ],
-  "oi-agorize": [
-   {
-    "tipo": "workable",
-    "slug": "agorize",
-    "verifica": "nome identico 'Agorize', nessun annuncio da controllare",
-    "trovata": "2026-10-26"
-   }
-  ],
   "pdm-e-fc-projecto-desenvolvimento-manutencao-formacao-e-consultadoria": [
    {
     "tipo": "pagina",
@@ -602,14 +572,6 @@
     "tipo": "pagina",
     "url": "https://www.bosch.com/careers/career-opportunities/",
     "verifica": "pagina carriere del sito www.bosch.com",
-    "trovata": "2026-10-26"
-   }
-  ],
-  "robotnik-automation": [
-   {
-    "tipo": "pagina",
-    "url": "https://robotnik.eu/es/trabaja-con-nosotros/",
-    "verifica": "pagina carriere del sito robotnik.eu",
     "trovata": "2026-10-26"
    }
   ],
@@ -758,6 +720,14 @@
     "trovata": "2026-10-26"
    }
   ],
+  "ubimet": [
+   {
+    "tipo": "recruitee",
+    "slug": "ubimet",
+    "verifica": "nome 'UBIMET GmbH' + annunci in AT/DE",
+    "trovata": "2026-10-26"
+   }
+  ],
   "ucb-biopharma": [
    {
     "tipo": "pagina",
@@ -845,11 +815,39 @@
     "da_verificare": "nome 'Avantium' più corto + annunci in NL"
    }
   ],
+  "bpifrance": [
+   {
+    "tipo": "workable",
+    "slug": "bpifrance",
+    "da_verificare": "nome identico 'Bpifrance' ma nessun annuncio per controllare il paese"
+   }
+  ],
+  "gac": [
+   {
+    "tipo": "workable",
+    "slug": "gac",
+    "da_verificare": "nome identico 'GAC' ma nessun annuncio per controllare il paese"
+   }
+  ],
+  "innova": [
+   {
+    "tipo": "workable",
+    "slug": "innova",
+    "da_verificare": "nome identico 'innova' ma nessun annuncio per controllare il paese"
+   }
+  ],
   "magellan-circle-italy": [
    {
     "tipo": "smartrecruiters",
     "slug": "magellan",
     "da_verificare": "nome 'Magellan' più corto + annunci in IT"
+   }
+  ],
+  "oi-agorize": [
+   {
+    "tipo": "workable",
+    "slug": "agorize",
+    "da_verificare": "nome identico 'Agorize' ma nessun annuncio per controllare il paese"
    }
   ],
   "saint-gobain-centre-de-recherches-et-d-etudes-europeen": [
@@ -860,7 +858,7 @@
    }
   ]
  },
- "controllate4": {
+ "controllate5": {
   "2-0-lca-consultants": "2026-10-26",
   "21c-consultancy": "2026-10-26",
   "28digital": "2026-10-26",
@@ -978,7 +976,6 @@
   "atrineo": "2026-10-26",
   "atrineo-iberia-sociedad-limitada": "2026-10-26",
   "australo-interinnov-marketing-lab": "2026-10-26",
-  "avantium-chemicals": "2026-10-26",
   "avesta-holding": "2026-10-26",
   "avl-list": "2026-10-26",
   "awake-ai": "2026-10-26",
@@ -1506,7 +1503,6 @@
   "luxmobility": "2026-10-26",
   "maaelu-teadmuskeskus": "2026-10-26",
   "magellan-circle-european-affairs-consultancy": "2026-10-26",
-  "magellan-circle-italy": "2026-10-26",
   "maggioli-s-p-a": "2026-10-26",
   "magneti-ljubljana-podjetje-za-proizvodnjo-magnetnih-materialov-dd": "2026-10-26",
   "mann-hummel": "2026-10-26",
@@ -1667,7 +1663,6 @@
   "s-pro-sustainable-projects": "2026-10-26",
   "safran-electronics-defense": "2026-10-26",
   "saft": "2026-10-26",
-  "saint-gobain-centre-de-recherches-et-d-etudes-europeen": "2026-10-26",
   "samira-boussetta-consulting": "2026-10-26",
   "samui-france": "2026-10-26",
   "sanofi-aventis-deutschland": "2026-10-26",
