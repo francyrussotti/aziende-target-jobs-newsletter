@@ -1,5 +1,6 @@
 {
  "aggiornato": "2026-10-26",
+ "regole": 5,
  "nota": "File generato da scopri_fonti.py: per correggere o confermare una fonte usa dati/fonti_manuali.json. 'da_verificare' = candidati dubbi (nome solo compatibile), NON usati.",
  "fonti": {
   "acteon": [
@@ -10,27 +11,11 @@
     "trovata": "2026-10-26"
    }
   ],
-  "agridea": [
-   {
-    "tipo": "pagina",
-    "url": "http://www.agridea.ch/fr/emploi/",
-    "verifica": "pagina carriere del sito www.agridea.ch",
-    "trovata": "2026-10-26"
-   }
-  ],
   "alleanza-contro-il-cancro": [
    {
     "tipo": "pagina",
     "url": "https://alleanzacontroilcancro.it/lavora-con-noi/",
     "verifica": "pagina carriere del sito alleanzacontroilcancro.it",
-    "trovata": "2026-10-26"
-   }
-  ],
-  "amplitude": [
-   {
-    "tipo": "pagina",
-    "url": "https://amplitude-laser.com/emploi/",
-    "verifica": "pagina carriere del sito amplitude-laser.com",
     "trovata": "2026-10-26"
    }
   ],
@@ -47,14 +32,6 @@
     "tipo": "pagina",
     "url": "https://www.artelys.com/careers/",
     "verifica": "pagina carriere del sito www.artelys.com",
-    "trovata": "2026-10-26"
-   }
-  ],
-  "association-europeenne-des-expositions-scientifiques-techniques-et-industrielles": [
-   {
-    "tipo": "pagina",
-    "url": "https://ecsite.eu/jobs",
-    "verifica": "pagina carriere del sito ecsite.eu",
     "trovata": "2026-10-26"
    }
   ],
@@ -82,14 +59,6 @@
     "trovata": "2026-10-26"
    }
   ],
-  "avantium-chemicals": [
-   {
-    "tipo": "pagina",
-    "url": "https://avantium.com/job-openings/",
-    "verifica": "pagina carriere del sito avantium.com",
-    "trovata": "2026-10-26"
-   }
-  ],
   "basf-se": [
    {
     "tipo": "pagina",
@@ -106,14 +75,6 @@
     "trovata": "2026-10-26"
    }
   ],
-  "biotalentum-tudasfejleszto-kft": [
-   {
-    "tipo": "pagina",
-    "url": "https://biotalentum.eu/career/",
-    "verifica": "pagina carriere del sito biotalentum.eu",
-    "trovata": "2026-10-26"
-   }
-  ],
   "bull": [
    {
     "tipo": "pagina",
@@ -127,14 +88,6 @@
     "tipo": "pagina",
     "url": "https://www.bureauveritas.fr/carriere/carriere-evolution",
     "verifica": "pagina carriere del sito www.bureauveritas.fr",
-    "trovata": "2026-10-26"
-   }
-  ],
-  "business-upper-austria-oo-wirtschaftsagentur": [
-   {
-    "tipo": "pagina",
-    "url": "https://www.biz-up.at/karriere",
-    "verifica": "pagina carriere del sito www.biz-up.at",
     "trovata": "2026-10-26"
    }
   ],
@@ -224,14 +177,6 @@
     "trovata": "2026-10-26"
    }
   ],
-  "ecoplus-niederosterreichs-wirtschaftsagentur": [
-   {
-    "tipo": "pagina",
-    "url": "https://www.ecoplus.at/karriere",
-    "verifica": "pagina carriere del sito www.ecoplus.at",
-    "trovata": "2026-10-26"
-   }
-  ],
   "eni": [
    {
     "tipo": "pagina",
@@ -256,14 +201,6 @@
     "trovata": "2026-10-26"
    }
   ],
-  "ernst-and-young-denkstatt": [
-   {
-    "tipo": "pagina",
-    "url": "https://www.ey.com/en_bg/careers",
-    "verifica": "pagina carriere del sito www.ey.com",
-    "trovata": "2026-10-26"
-   }
-  ],
   "eticas-research-and-consulting": [
    {
     "tipo": "pagina",
@@ -280,27 +217,11 @@
     "trovata": "2026-10-26"
    }
   ],
-  "europabio": [
-   {
-    "tipo": "pagina",
-    "url": "https://www.europabio.org/vacancies/",
-    "verifica": "pagina carriere del sito www.europabio.org",
-    "trovata": "2026-10-26"
-   }
-  ],
   "european-heat-pump-association": [
    {
     "tipo": "pagina",
     "url": "https://ehpa.org/about-ehpa/vacancies/",
     "verifica": "pagina carriere del sito ehpa.org",
-    "trovata": "2026-10-26"
-   }
-  ],
-  "european-network-of-transmission-system-operators-for-electricity-aisbl": [
-   {
-    "tipo": "pagina",
-    "url": "https://careers.entsoe.eu/",
-    "verifica": "pagina carriere del sito www.entsoe.eu",
     "trovata": "2026-10-26"
    }
   ],
@@ -328,14 +249,6 @@
     "trovata": "2026-10-26"
    }
   ],
-  "globalfoundries-dresden-module-one-llc": [
-   {
-    "tipo": "pagina",
-    "url": "https://gf.com/careers/",
-    "verifica": "pagina carriere del sito gf.com",
-    "trovata": "2026-10-26"
-   }
-  ],
   "gsi-helmholtzzentrum-fur-schwerionenforschung": [
    {
     "tipo": "pagina",
@@ -344,27 +257,11 @@
     "trovata": "2026-10-26"
    }
   ],
-  "iav-ingenieurgesellschaft-auto-und-verkehr": [
-   {
-    "tipo": "pagina",
-    "url": "https://www.iav.com/career/",
-    "verifica": "pagina carriere del sito www.iav.com",
-    "trovata": "2026-10-26"
-   }
-  ],
   "idiada-automotive-technology": [
    {
     "tipo": "smartrecruiters",
     "slug": "ApplusIDIADA1",
     "verifica": "linkato dalla pagina carriere https://www.applusidiada.com/global/en/Careers",
-    "trovata": "2026-10-26"
-   }
-  ],
-  "indra-sistemas": [
-   {
-    "tipo": "pagina",
-    "url": "https://careers.indragroup.com/",
-    "verifica": "pagina carriere del sito www.indragroup.com",
     "trovata": "2026-10-26"
    }
   ],
@@ -400,14 +297,6 @@
     "trovata": "2026-10-26"
    }
   ],
-  "inovertis-a3i": [
-   {
-    "tipo": "pagina",
-    "url": "https://inovertis.fr/nous-rejoindre/",
-    "verifica": "pagina carriere del sito inovertis.fr",
-    "trovata": "2026-10-26"
-   }
-  ],
   "intracom-single-member-telecom-solutions": [
    {
     "tipo": "pagina",
@@ -432,22 +321,6 @@
     "trovata": "2026-10-26"
    }
   ],
-  "kentro-merimnas-oikogeneias-kai-paidiou": [
-   {
-    "tipo": "pagina",
-    "url": "https://www.kmop.gr/work-with-us/",
-    "verifica": "pagina carriere del sito www.kmop.gr",
-    "trovata": "2026-10-26"
-   }
-  ],
-  "kws-saat-se-kgaa": [
-   {
-    "tipo": "pagina",
-    "url": "https://www.kws.com/corp/en/careers/",
-    "verifica": "pagina carriere del sito www.kws.com",
-    "trovata": "2026-10-26"
-   }
-  ],
   "la-palma-research-centre": [
    {
     "tipo": "pagina",
@@ -456,27 +329,11 @@
     "trovata": "2026-10-26"
    }
   ],
-  "liebherr-electronics-and-drives": [
-   {
-    "tipo": "pagina",
-    "url": "https://www.liebherr.com/en-us/careers/careers-4294637",
-    "verifica": "pagina carriere del sito www.liebherr.com",
-    "trovata": "2026-10-26"
-   }
-  ],
   "luxinnovation-gie": [
    {
     "tipo": "pagina",
     "url": "https://luxinnovation.lu/about/luxinnovation/join-our-team",
     "verifica": "pagina carriere del sito luxinnovation.lu",
-    "trovata": "2026-10-26"
-   }
-  ],
-  "mann-hummel": [
-   {
-    "tipo": "pagina",
-    "url": "https://www.mann-hummel.com/en/career.html",
-    "verifica": "pagina carriere del sito www.mann-hummel.com",
     "trovata": "2026-10-26"
    }
   ],
@@ -513,41 +370,11 @@
     "trovata": "2026-10-26"
    }
   ],
-  "novartis-pharma": [
-   {
-    "tipo": "pagina",
-    "url": "https://www.novartis.com/careers",
-    "verifica": "pagina carriere del sito www.novartis.com",
-    "trovata": "2026-10-26"
-   }
-  ],
   "office-international-de-l-eau": [
    {
     "tipo": "pagina",
     "url": "https://www.oieau.org/edito/emplois-stages",
     "verifica": "pagina carriere del sito www.oieau.org",
-    "trovata": "2026-10-26"
-   }
-  ],
-  "pdm-e-fc-projecto-desenvolvimento-manutencao-formacao-e-consultadoria": [
-   {
-    "tipo": "pagina",
-    "url": "https://pdmfc.teamtailor.com/jobs",
-    "verifica": "linkato da www.pdmfc.com",
-    "trovata": "2026-10-26"
-   },
-   {
-    "tipo": "pagina",
-    "url": "https://pdmfc.factorialhr.pt/",
-    "verifica": "linkato da www.pdmfc.com",
-    "trovata": "2026-10-26"
-   }
-  ],
-  "pfizer": [
-   {
-    "tipo": "pagina",
-    "url": "https://www.pfizer.co.uk/careers",
-    "verifica": "pagina carriere del sito www.pfizer.co.uk",
     "trovata": "2026-10-26"
    }
   ],
@@ -575,19 +402,19 @@
     "trovata": "2026-10-26"
    }
   ],
+  "robotnik-automation": [
+   {
+    "tipo": "pagina",
+    "url": "https://robotnik.eu/es/trabaja-con-nosotros/",
+    "verifica": "pagina carriere del sito robotnik.eu",
+    "trovata": "2026-10-26"
+   }
+  ],
   "rolls-royce-plc": [
    {
     "tipo": "pagina",
     "url": "https://careers.rolls-royce.com/en",
     "verifica": "pagina carriere del sito www.rolls-royce.com",
-    "trovata": "2026-10-26"
-   }
-  ],
-  "rothamsted-research": [
-   {
-    "tipo": "pagina",
-    "url": "https://www.rothamsted.ac.uk/careers-rothamsted",
-    "verifica": "pagina carriere del sito www.rothamsted.ac.uk",
     "trovata": "2026-10-26"
    }
   ],
@@ -672,14 +499,6 @@
     "trovata": "2026-10-26"
    }
   ],
-  "thales-alenia-space-france": [
-   {
-    "tipo": "workday",
-    "url": "https://thales.wd3.myworkdayjobs.com/en-US/Careers",
-    "verifica": "linkato dalla pagina carriere https://www.thalesaleniaspace.com/en/talents-careers",
-    "trovata": "2026-10-26"
-   }
-  ],
   "thales-alenia-space-italia": [
    {
     "tipo": "workday",
@@ -712,30 +531,6 @@
     "trovata": "2026-10-26"
    }
   ],
-  "tttech-computertechnik": [
-   {
-    "tipo": "pagina",
-    "url": "https://www.tttech.com/jobs-career",
-    "verifica": "pagina carriere del sito www.tttech.com",
-    "trovata": "2026-10-26"
-   }
-  ],
-  "ubimet": [
-   {
-    "tipo": "recruitee",
-    "slug": "ubimet",
-    "verifica": "nome 'UBIMET GmbH' + annunci in AT/DE",
-    "trovata": "2026-10-26"
-   }
-  ],
-  "ucb-biopharma": [
-   {
-    "tipo": "pagina",
-    "url": "https://careers.ucb.com/global/en",
-    "verifica": "pagina carriere del sito www.ucb.com",
-    "trovata": "2026-10-26"
-   }
-  ],
   "union-internationale-des-chemins-de-fer": [
    {
     "tipo": "pagina",
@@ -752,20 +547,6 @@
     "trovata": "2026-10-26"
    }
   ],
-  "utac-france": [
-   {
-    "tipo": "pagina",
-    "url": "https://www.utac.com/career",
-    "verifica": "pagina carriere del sito www.utac.com",
-    "trovata": "2026-10-26"
-   },
-   {
-    "tipo": "smartrecruiters",
-    "slug": "utac",
-    "verifica": "nome 'UTAC' + annunci in FR",
-    "trovata": "2026-10-26"
-   }
-  ],
   "valeo-comfort-and-driving-assistance": [
    {
     "tipo": "workday",
@@ -779,14 +560,6 @@
     "tipo": "pagina",
     "url": "https://www.euresearch.ch/en/about-us/jobs-170.html",
     "verifica": "pagina carriere del sito www.euresearch.ch",
-    "trovata": "2026-10-26"
-   }
-  ],
-  "verkor": [
-   {
-    "tipo": "lever",
-    "slug": "verkor",
-    "verifica": "nome 'Verkor' + annunci in FR",
     "trovata": "2026-10-26"
    }
   ],
@@ -808,18 +581,25 @@
   ]
  },
  "da_verificare": {
-  "avantium-chemicals": [
-   {
-    "tipo": "greenhouse",
-    "slug": "avantium",
-    "da_verificare": "nome 'Avantium' più corto + annunci in NL"
-   }
-  ],
   "bpifrance": [
    {
     "tipo": "workable",
     "slug": "bpifrance",
     "da_verificare": "nome identico 'Bpifrance' ma nessun annuncio per controllare il paese"
+   }
+  ],
+  "engie": [
+   {
+    "tipo": "workable",
+    "slug": "engie",
+    "da_verificare": "nome identico 'Engie' ma nessun annuncio per controllare il paese"
+   }
+  ],
+  "ericsson": [
+   {
+    "tipo": "workable",
+    "slug": "ericsson",
+    "da_verificare": "nome identico 'Ericsson' ma nessun annuncio per controllare il paese"
    }
   ],
   "gac": [
@@ -836,11 +616,11 @@
     "da_verificare": "nome identico 'innova' ma nessun annuncio per controllare il paese"
    }
   ],
-  "magellan-circle-italy": [
+  "novamont": [
    {
-    "tipo": "smartrecruiters",
-    "slug": "magellan",
-    "da_verificare": "nome 'Magellan' più corto + annunci in IT"
+    "tipo": "workable",
+    "slug": "novamont",
+    "da_verificare": "nome identico 'NOVAMONT' ma nessun annuncio per controllare il paese"
    }
   ],
   "oi-agorize": [
@@ -849,19 +629,11 @@
     "slug": "agorize",
     "da_verificare": "nome identico 'Agorize' ma nessun annuncio per controllare il paese"
    }
-  ],
-  "saint-gobain-centre-de-recherches-et-d-etudes-europeen": [
-   {
-    "tipo": "smartrecruiters",
-    "slug": "saintgobain",
-    "da_verificare": "nome 'Saint Gobain' più corto + annunci in FR"
-   }
   ]
  },
- "controllate5": {
+ "controllate": {
   "2-0-lca-consultants": "2026-10-26",
   "21c-consultancy": "2026-10-26",
-  "28digital": "2026-10-26",
   "28digital-finland-ry": "2026-10-26",
   "28digital-hungary-hub-non-profit-kft": "2026-10-26",
   "3ura": "2026-10-26",
@@ -869,44 +641,30 @@
   "a-spire": "2026-10-26",
   "a2a": "2026-10-26",
   "a4f-alga-fuel": "2026-10-26",
-  "aalborg-csp": "2026-10-26",
   "abb": "2026-10-26",
   "acceler8": "2026-10-26",
-  "acceligence": "2026-10-26",
-  "accelopment-schweiz": "2026-10-26",
   "accent-inkubator": "2026-10-26",
   "acciona-construccion": "2026-10-26",
-  "acsa-obras-e-infraestructuras-sau": "2026-10-26",
   "acteon": "2026-10-26",
-  "acumenist": "2026-10-26",
   "additess-advanced-integrated-technology-solutions-services": "2026-10-26",
   "addsen": "2026-10-26",
   "advanced-computing-spain": "2026-10-26",
   "advanced-laboratory-on-embedded-systems": "2026-10-26",
-  "aegis-it-research": "2026-10-26",
   "aeris-tecnologias-ambientales": "2026-10-26",
-  "aeroporia-aigaiou-anonymi-aeroporiki-etaireia": "2026-10-26",
-  "aerospace-valley": "2026-10-26",
   "agata-comunicacion-cientifica": "2026-10-26",
   "agencia-espacial-portuguesa-portugal-space": "2026-10-26",
   "agenzia-spaziale-italiana": "2026-10-26",
   "agricolus-s-r-l": "2026-10-26",
   "agricultural-applications": "2026-10-26",
-  "agridea": "2026-10-26",
   "agrifood-lithuania-dih": "2026-10-26",
-  "agroecology-europe": "2026-10-26",
   "agroknow": "2026-10-26",
   "ai-data-and-robotics-association": "2026-10-26",
   "aicib-agencia-de-investigacao-clinica-e-inovacao-biomedica": "2026-10-26",
   "aimsun-slu": "2026-10-26",
-  "ainigma-technologies": "2026-10-26",
-  "airbus": "2026-10-26",
   "airbus-defence-and-space": "2026-10-26",
   "airbus-operations": "2026-10-26",
-  "airport-regions-council": "2026-10-26",
   "alda-association-europeenne-pour-la-democratie-locale": "2026-10-26",
   "alg-global-infrastructure-advisorsslu": "2026-10-26",
-  "algaia": "2026-10-26",
   "algen-center-za-algne-tehnologije-doo": "2026-10-26",
   "alleanza-contro-il-cancro": "2026-10-26",
   "alliance-europeenne-de-recherche-dans-le-domaine-de-l-energie": "2026-10-26",
@@ -917,57 +675,41 @@
   "amires": "2026-10-26",
   "amires-the-business-innovation-management-institute-zu": "2026-10-26",
   "amphos-21-consulting": "2026-10-26",
-  "amplitude": "2026-10-26",
   "anaptyxiaki-etaireia-dimou-trikkaion-anaptyxiaki-anonymi-etaireia-ota": "2026-10-26",
   "anfia-associazione-nazionale-della-filiera-dell-industria-automobilistica": "2026-10-26",
   "ansaldo-nucleare": "2026-10-26",
   "anteja-ecg-d-o-o": "2026-10-26",
   "anthology-ventures-jsc": "2026-10-26",
   "aquabiotech": "2026-10-26",
-  "aquafin": "2026-10-26",
   "aquatec-soluciones-medioambientales-s-a": "2026-10-26",
-  "arcadia-international-geie": "2026-10-26",
-  "arctik": "2026-10-26",
   "areti-s-p-a": "2026-10-26",
   "arkema-france": "2026-10-26",
   "armengol-ros-consultors-i-associats": "2026-10-26",
   "art-er-societa-consortile-per-azioni": "2026-10-26",
   "artelys": "2026-10-26",
   "artemat": "2026-10-26",
-  "arthur-s-legal": "2026-10-26",
-  "asistencias-tecnicas-clave": "2026-10-26",
   "asm-terni": "2026-10-26",
   "asociacion-cluster-food-i": "2026-10-26",
   "asociacion-de-industrias-de-conocimiento-y-tecnologia-gaia-euskalherriko-ezagutza-eta-teknologia-industrien-elkartea": "2026-10-26",
-  "asociacion-ecoserveis": "2026-10-26",
   "asociacion-espanola-de-la-valorizacion-energetica-de-la-biomasa": "2026-10-26",
   "asociacion-espanola-de-normalizacion": "2026-10-26",
   "asociacion-internacional-de-parques-tecnologicos-iasp": "2026-10-26",
   "asociatia-cluster-de-educatie-c-edu": "2026-10-26",
   "asociatia-de-standardizare-din-romania": "2026-10-26",
   "asociatia-transilvania-it": "2026-10-26",
-  "asociatia-wwf-romania": "2026-10-26",
   "ass-cittadinanzattiva": "2026-10-26",
-  "associacio-revolve-mediterraneo": "2026-10-26",
   "association-de-coordination-technique-pour-l-industrie-agroalimentaire": "2026-10-26",
   "association-des-chambres-d-agriculture-de-l-arc-atlantique": "2026-10-26",
-  "association-du-pole-de-competivite-valorial": "2026-10-26",
   "association-eco-imagination": "2026-10-26",
   "association-europeenne-de-l-energie-de-l-ocean": "2026-10-26",
-  "association-europeenne-de-l-industrie-des-equipements-et-des-services-de-transmission-et-de-distribution-d-electricite-a": "2026-10-26",
   "association-europeenne-des-agencesde-developpement": "2026-10-26",
-  "association-europeenne-des-expositions-scientifiques-techniques-et-industrielles": "2026-10-26",
-  "association-europeenne-des-fournisseurs-automobiles": "2026-10-26",
   "association-europeenne-leader-pourle-developpement-rural": "2026-10-26",
   "association-europeenne-pour-l-innovation-dans-le-developpement-local": "2026-10-26",
   "association-nationale-des-industries-alimentaires": "2026-10-26",
   "association-of-cities-and-regions-ffor-sustainable-resource-management": "2026-10-26",
   "association-of-european-science-technology-transfer-professionals": "2026-10-26",
-  "association-pegase": "2026-10-26",
   "association-traces-theories-et-reflexions-sur-l-apprendre-la-communication-et-l-education-scientifiques": "2026-10-26",
   "associazione-frascati-scienza": "2026-10-26",
-  "astrazeneca": "2026-10-26",
-  "astrazeneca-uk": "2026-10-26",
   "athens-international-airport-s-a": "2026-10-26",
   "athens-technology-center-anonymi-viomichaniki-emporiki-kai-techniki-etaireia-efarmogon-ypsilis-technologias": "2026-10-26",
   "atlantis-symvouleftiki-anonymi-etaireia-atlantis-consulting": "2026-10-26",
@@ -978,8 +720,6 @@
   "australo-interinnov-marketing-lab": "2026-10-26",
   "avesta-holding": "2026-10-26",
   "avl-list": "2026-10-26",
-  "awake-ai": "2026-10-26",
-  "axelera-association-chimie-environnement-lyon-et-rhone-alpes": "2026-10-26",
   "azienda-elettrica-di-massagno-aem": "2026-10-26",
   "azzero-co2": "2026-10-26",
   "b-t-g-biomass-technology-group": "2026-10-26",
@@ -993,12 +733,8 @@
   "bayerische-forschungsallianz-bavarian-research-alliance": "2026-10-26",
   "bayerische-motoren-werke-aktiengesellschaft": "2026-10-26",
   "beak-consultants": "2026-10-26",
-  "bee-life-european-beekeeping-coordination": "2026-10-26",
   "beia-consult-international": "2026-10-26",
   "belgisch-laboratorium-van-elektriciteitsindustrie": "2026-10-26",
-  "beta-via": "2026-10-26",
-  "betthera": "2026-10-26",
-  "bewarrant": "2026-10-26",
   "bewise-femmes-et-sciences-en-belgique-vrouwen-en-wetenschappen-in-belgie": "2026-10-26",
   "big-van-ciencia-sccl": "2026-10-26",
   "bio-base-europe-pilot-plant-vzw": "2026-10-26",
@@ -1007,48 +743,31 @@
   "bioeast-hub-cr-z-u": "2026-10-26",
   "bioeconomy-cluster": "2026-10-26",
   "bioeconomy-for-change": "2026-10-26",
-  "biotalentum-tudasfejleszto-kft": "2026-10-26",
   "biotehnologichen-i-zdraven-klaster": "2026-10-26",
-  "biotrend-inovacao-e-engenharia-em-biotecnologia": "2026-10-26",
-  "bloom-biorenewables": "2026-10-26",
   "bluebiloba-startup-innovativa": "2026-10-26",
   "bluenergy-revolution-scrl": "2026-10-26",
-  "blueprint-energy-solutions": "2026-10-26",
   "bluspecs": "2026-10-26",
-  "boehringer-ingelheim-internationalgmbh": "2026-10-26",
   "boeing-aerospace-spain": "2026-10-26",
-  "boerenbond-projecten": "2026-10-26",
   "booster-labs-s-a-s": "2026-10-26",
   "bouygues-construction": "2026-10-26",
   "bpifrance": "2026-10-26",
-  "brg-business-region-goteborg": "2026-10-26",
   "brockmann-consult": "2026-10-26",
-  "bspoke-solutions-private-company": "2026-10-26",
   "bull": "2026-10-26",
   "bureau-veritas-marine-offshore-registre-international-de-classification-de-navires-et-de-plateformes-offshore": "2026-10-26",
   "business-development-group": "2026-10-26",
   "business-finland": "2026-10-26",
-  "business-upper-austria-oo-wirtschaftsagentur": "2026-10-26",
   "bwb-connect-clg": "2026-10-26",
   "c4g-consulting-and-training-network": "2026-10-26",
-  "cambiamo-sociedad-cooperativa-madrilena": "2026-10-26",
   "cap-holding": "2026-10-26",
   "careers-research-and-advisory-centre-crac-the": "2026-10-26",
   "cartago-ventures": "2026-10-26",
-  "celabor-scrl": "2026-10-26",
-  "celignis": "2026-10-26",
-  "cellock": "2026-10-26",
-  "celsa-opco": "2026-10-26",
   "center-for-technology-research-andinnovation-cetri": "2026-10-26",
   "centre-europeen-de-recherche-et-deformation-avancee-en-calcul-scientifique": "2026-10-26",
-  "centre-national-d-agroecologie": "2026-10-26",
   "centre-technique-de-la-conservation-des-produits-agricoles": "2026-10-26",
   "centro-de-estudios-de-materiales-y-control-de-obra": "2026-10-26",
   "centro-de-investigacao-em-energia-ren-state-grid": "2026-10-26",
-  "chimar-hellas-anonymi-viomichaniki-kai-emporiki-etaireia-chimikon-proionton": "2026-10-26",
   "chino": "2026-10-26",
   "ciencia-viva-agencia-nacional-para-a-cultura-cientifica-e-tecnologica": "2026-10-26",
-  "citizen-science-global-partnership-csgp-globale-partnerschaft-fuer-buergerwissenschaften-gpbw": "2026-10-26",
   "civipol": "2026-10-26",
   "civitta-eesti": "2026-10-26",
   "clerens": "2026-10-26",
@@ -1063,31 +782,21 @@
   "comau": "2026-10-26",
   "comet-scrl": "2026-10-26",
   "comite-des-donnees-scientifiques-ettechnologiques-association": "2026-10-26",
-  "comite-des-organisations-professionnelles-agricole-de-l-union-europeenne-copa-association-de-fait": "2026-10-26",
   "comite-technique-international-de-prevention-et-d-extinction-du-feu-ctif-dite-association-internationale-des-services-d-": "2026-10-26",
   "commission-internationale-des-grands-barrages": "2026-10-26",
   "comsensus-komunikacije-in-senzorika-doo": "2026-10-26",
-  "confederacion-de-la-industria-textil-asociacion": "2026-10-26",
-  "confederation-des-laboratoires-de-recherche-sur-l-intelligence-artificielle-en-europe": "2026-10-26",
   "confederazione-generale-dell-agricoltura-italiana": "2026-10-26",
   "conference-des-regions-peripheriques-maritimes-d-europe": "2026-10-26",
   "conoscenza-e-innovazione-societa-aresponsabilita-limitata-semplificata": "2026-10-26",
-  "conseil-des-architectes-d-europe": "2026-10-26",
-  "conseil-europeen-des-jeunes-agriculteurs-aisbl": "2026-10-26",
-  "consortium-of-european-taxonomic-facilities": "2026-10-26",
   "consorzio-italiano-compostatori": "2026-10-26",
   "consulai-consultoria-agro-industriatrial": "2026-10-26",
   "contactica": "2026-10-26",
   "cooperativas-agro-alimentarias-de-espana-u-de-coop-sociedad-cooperativa": "2026-10-26",
   "cooperative-electrica-do-vale-deste-crl": "2026-10-26",
-  "coopernico-cooperativa-de-desenvolvimento-sustentavel-crl": "2026-10-26",
   "core-innovation-and-technology-oe": "2026-10-26",
-  "corporation": "2026-10-26",
   "corvers-greece-monoprosopi": "2026-10-26",
-  "corvers-iberia": "2026-10-26",
   "corvers-procurement-services": "2026-10-26",
   "corvus-energy": "2026-10-26",
-  "council-of-european-bioregions": "2026-10-26",
   "covestro-deutschland": "2026-10-26",
   "creative-industry-kosice-no": "2026-10-26",
   "crowdhelix": "2026-10-26",
@@ -1099,13 +808,9 @@
   "cuerva-energia-slu": "2026-10-26",
   "culture-action-europe": "2026-10-26",
   "cy-r-i-c-cyprus-research-and-innovation-center": "2026-10-26",
-  "cybergrid": "2026-10-26",
-  "cybernetica": "2026-10-26",
   "d-tsakalidis-g-domalis-oe": "2026-10-26",
   "da-vinci-labs": "2026-10-26",
-  "daf-trucks": "2026-10-26",
   "daikin-europe-n-v": "2026-10-26",
-  "data-ai-and-robotics-dairo": "2026-10-26",
   "day-one-societa-a-responsabilita-limitata": "2026-10-26",
   "de-blauwe-cluster": "2026-10-26",
   "deep-blue": "2026-10-26",
@@ -1116,15 +821,11 @@
   "delphy": "2026-10-26",
   "demo-consultants": "2026-10-26",
   "design-terminal-kozhasznu-nonprofit-korlatolt-felelossegu-tarsasag": "2026-10-26",
-  "deutsche-forschungsgemeinschaft-ev": "2026-10-26",
   "dfds": "2026-10-26",
   "di-edzh-razvoyna-deynost-i-komersializatsia-na-tehnologii": "2026-10-26",
   "diacheiristis-ellinikou-diktyou-dianomis-elektrikis-energeias": "2026-10-26",
   "diadikasia-business-consulting-symvouloi-epicheiriseon": "2026-10-26",
-  "diaxiristis-ethnikou-sistimatos-fisikou-aeriou-anonimi-eteria-hellenic-gas-transmission-system-operator": "2026-10-26",
   "diginnov-digital-innovation-consulting-s-r-l": "2026-10-26",
-  "digital-for-planet-d4p": "2026-10-26",
-  "digitaleurope-aisbl": "2026-10-26",
   "dimos-athinaion-epicheirisi-michanografisis": "2026-10-26",
   "dimosia-epicheirisi-ilektrismou-anonymi-etaireia": "2026-10-26",
   "ditecfer-distretto-per-le-tecnologie-ferroviarie-l-alta-velocita-e-la-sicurezza-delle-reti-scarl": "2026-10-26",
@@ -1132,27 +833,18 @@
   "dowel-innovation": "2026-10-26",
   "draxis-environmental": "2026-10-26",
   "dutch-research-institute-for-transitions": "2026-10-26",
-  "dynamic-security-computations": "2026-10-26",
-  "e-redes-distribuicao-de-eletricidade": "2026-10-26",
   "e3-modelling": "2026-10-26",
   "easn-technology-innovation-services-bvba": "2026-10-26",
   "ebos-technologies": "2026-10-26",
   "echalliance-company-by-guarantee": "2026-10-26",
   "echemicles-zartkoruen-mukodo-reszvenytarsasag": "2026-10-26",
   "eclipse-foundation-europe": "2026-10-26",
-  "ecocastulum": "2026-10-26",
   "ecoinnovazione": "2026-10-26",
-  "ecoplus-niederosterreichs-wirtschaftsagentur": "2026-10-26",
   "ecorys-brussels": "2026-10-26",
   "ecorys-espana": "2026-10-26",
   "ecostack-innovations": "2026-10-26",
-  "edag-engineering": "2026-10-26",
   "eden-tech": "2026-10-26",
-  "edge-in-earth-observation-sciences-monoprosopi": "2026-10-26",
-  "egm": "2026-10-26",
-  "eidgenoessische-anstalt-fuer-wasserversorgung-abwasserreinigung-und-gewaesserschutz": "2026-10-26",
   "eiropas-lauksaimniecibas-un-lauku-konsultantu-asociacija": "2026-10-26",
-  "eit-culture-creativity": "2026-10-26",
   "eit-food": "2026-10-26",
   "eit-food-clc-south-s-l": "2026-10-26",
   "eit-health-ev": "2026-10-26",
@@ -1168,29 +860,21 @@
   "eit-urban-mobility-foundation": "2026-10-26",
   "eit-urban-mobility-innovation-hubeast-s-r-o": "2026-10-26",
   "electricite-de-france": "2026-10-26",
-  "elektro-celje-d-d": "2026-10-26",
   "elektro-ljubljana-podjetje-zadistribucijo-elektricne-energije-d-d": "2026-10-26",
   "eles-doo-operater-kombiniranega-prenosnega-in-distribucijskega-elektroenergetskega-omrezja": "2026-10-26",
   "elliniko-vraveio-epicheirimatikotitas": "2026-10-26",
   "emisia": "2026-10-26",
   "emotion": "2026-10-26",
   "empirica-gesellschaft-fur-kommunikations-und-technologieforschung-mbh": "2026-10-26",
-  "empresa-municipal-de-la-innovacion-y-desarrollo-tecnologico": "2026-10-26",
   "empresarios-agrupados-internacional": "2026-10-26",
   "ena-symvouloi-anaptyxis-g-p": "2026-10-26",
-  "enbw-energie-baden-wurttemberg": "2026-10-26",
   "enco": "2026-10-26",
-  "energeiako-grafeio-kyprou": "2026-10-26",
-  "energies-2050": "2026-10-26",
-  "energy-cities-energie-cites-association": "2026-10-26",
-  "energy-efficiency-in-industrial-processes": "2026-10-26",
   "energy-storage-europe": "2026-10-26",
   "engie": "2026-10-26",
   "engineering-ingegneria-informatica": "2026-10-26",
   "engreen": "2026-10-26",
   "eni": "2026-10-26",
   "enrich-global": "2026-10-26",
-  "environmental-coalition-on-standards": "2026-10-26",
   "epia-solarpower-europe": "2026-10-26",
   "epistimi-epikoinonia": "2026-10-26",
   "equinor-energy": "2026-10-26",
@@ -1198,9 +882,7 @@
   "ericsson": "2026-10-26",
   "erinn-innovation": "2026-10-26",
   "erion-compliance-organization-scarl": "2026-10-26",
-  "ernst-and-young-denkstatt": "2026-10-26",
   "ernst-young-business-school-scuola-di-management": "2026-10-26",
-  "ernst-young-cyprus": "2026-10-26",
   "esferico-mrv-systems": "2026-10-26",
   "eta-energia-trasporti-agricoltura": "2026-10-26",
   "eticas-research-and-consulting": "2026-10-26",
@@ -1225,44 +907,29 @@
   "euroheat-power": "2026-10-26",
   "euronovia": "2026-10-26",
   "europa-media-szolgaltato-non-profit-kft": "2026-10-26",
-  "europabio": "2026-10-26",
   "european-aluminium": "2026-10-26",
   "european-aquaculture-society": "2026-10-26",
-  "european-association-for-palliative-care": "2026-10-26",
   "european-association-of-remote-sensing-companies": "2026-10-26",
-  "european-association-of-research-managers-and-administrators": "2026-10-26",
   "european-biogas-association-aisbl": "2026-10-26",
-  "european-business-and-innovation-centre-network-aisbl": "2026-10-26",
-  "european-business-angels-network": "2026-10-26",
-  "european-cancer-organisation": "2026-10-26",
-  "european-cancer-patient-coalition": "2026-10-26",
   "european-center-for-agricultural-regional-and-environmental-policy-research-eurocare": "2026-10-26",
-  "european-clusters-alliance": "2026-10-26",
   "european-conference-of-transport-research-institutes": "2026-10-26",
   "european-construction-and-sustainable-built-environment-technology-platform": "2026-10-26",
-  "european-council-of-transport-users-conseil-europeen-des-usagers-des-transports": "2026-10-26",
-  "european-developing-countries-clinical-trials-partnership": "2026-10-26",
   "european-digital-sme-alliance": "2026-10-26",
   "european-distribution-system-operators-for-smart-grids": "2026-10-26",
   "european-dynamics-advanced-information-technology-and-telecommunication-systems": "2026-10-26",
   "european-dynamics-luxembourg": "2026-10-26",
   "european-environmental-bureau": "2026-10-26",
   "european-fashion-heritage-association": "2026-10-26",
-  "european-federation-for-welding-joining-and-cutting": "2026-10-26",
   "european-food-information-council": "2026-10-26",
   "european-forum-of-farm-animal-breeders": "2026-10-26",
   "european-geothermal-energy-council": "2026-10-26",
   "european-green-cities": "2026-10-26",
-  "european-health-management-association": "2026-10-26",
   "european-heat-pump-association": "2026-10-26",
-  "european-inland-waterway-transport-iwt-platform": "2026-10-26",
   "european-integrated-project": "2026-10-26",
   "european-landowners-organization": "2026-10-26",
   "european-network-of-living-labs-ivzw": "2026-10-26",
-  "european-network-of-transmission-system-operators-for-electricity-aisbl": "2026-10-26",
   "european-organisation-for-security": "2026-10-26",
   "european-passengers-federation-ivzw": "2026-10-26",
-  "european-public-health-alliance": "2026-10-26",
   "european-public-health-association": "2026-10-26",
   "european-regions-research-and-innovation-network": "2026-10-26",
   "european-renewable-energies-federation-federation-europeenne-des-energies-renouvelables": "2026-10-26",
@@ -1275,23 +942,16 @@
   "europroject-ood": "2026-10-26",
   "euroquality": "2026-10-26",
   "euroseeds": "2026-10-26",
-  "evenor-tech": "2026-10-26",
-  "evonik-operations": "2026-10-26",
   "exail": "2026-10-26",
-  "exus-software-monoprosopi-etairia-periorismenis-evthinis": "2026-10-26",
   "eyde-klyngen": "2026-10-26",
-  "f-hoffmann-la-roche": "2026-10-26",
   "f6s-eu-tech-innovation-network-dac": "2026-10-26",
   "f6s-network-ireland": "2026-10-26",
   "fachagentur-nachwachsende-rohstoffe-ev": "2026-10-26",
   "factual-consulting": "2026-10-26",
   "fasttrack-ventures": "2026-10-26",
   "fbcd": "2026-10-26",
-  "fbm": "2026-10-26",
   "fcc-aqualia": "2026-10-26",
   "fcc-medio-ambiente-sau": "2026-10-26",
-  "federacio-de-cooperatives-agraries-de-catalunya": "2026-10-26",
-  "federacion-espanola-de-industrias-de-la-alimentacion-y-bebidas": "2026-10-26",
   "federation-europeenne-d-agroforesterie-euraf-association": "2026-10-26",
   "federation-europeenne-des-agences-et-des-regions-pour-l-energie-et-l-environnement": "2026-10-26",
   "federation-europeenne-des-geologues": "2026-10-26",
@@ -1301,12 +961,10 @@
   "fev-europe": "2026-10-26",
   "fit-consulting": "2026-10-26",
   "fiware-foundation-ev": "2026-10-26",
-  "flanders-food": "2026-10-26",
   "fogus-innovations-services-p-c": "2026-10-26",
   "fondation-europeenne-de-la-science": "2026-10-26",
   "fondazione-icons": "2026-10-26",
   "fondazione-wwf-mediterranean": "2026-10-26",
-  "fonden-dansk-standard": "2026-10-26",
   "foreningen-bloxhub": "2026-10-26",
   "foreningen-c40-cities-climate-leadership-denmark": "2026-10-26",
   "formicablu": "2026-10-26",
@@ -1315,23 +973,14 @@
   "forumul-agricultorilor-si-procesatorilor-profesionisti-din-romania": "2026-10-26",
   "framatome": "2026-10-26",
   "france-energies-marines": "2026-10-26",
-  "free-software-foundation-europe-ev": "2026-10-26",
   "frequentis": "2026-10-26",
   "fresh-thoughts-consulting": "2026-10-26",
   "frontier-innovations-i-k-e": "2026-10-26",
   "fs-engineering": "2026-10-26",
-  "fundacio-privada-parc-de-recerca": "2026-10-26",
-  "fundacio-ticsalut-i-social": "2026-10-26",
-  "fundacion-centro-andaluz-de-investigaciones-del-agua": "2026-10-26",
-  "fundacion-cientifica-de-la-asociaci-n-espanola-contra-el-cancer": "2026-10-26",
-  "fundacion-cluster-de-empresas-de-automocion-de-galicia": "2026-10-26",
   "fundacion-corporacion-tecnologica-de-andalucia": "2026-10-26",
   "fundacion-empresa-universidad-gallega": "2026-10-26",
-  "fundacion-epica-la-fura-dels-baus": "2026-10-26",
   "fundacion-espanola-para-la-cienciay-la-tecnologia-f-s-p-fecyt": "2026-10-26",
   "fundacion-para-el-conocimiento-madrimasd": "2026-10-26",
-  "fundacion-para-el-fomento-en-asturias-de-la-investigacion-cientifica-y-la-tecnologia": "2026-10-26",
-  "fundacion-para-la-investigacion-e-innovacion-biosanitaria-de-atencion-primaria": "2026-10-26",
   "fundacion-regeneration-academy": "2026-10-26",
   "fundacja-unimos": "2026-10-26",
   "fundatia-adept-transilvania": "2026-10-26",
@@ -1348,16 +997,10 @@
   "geothermal-engineering": "2026-10-26",
   "gesundheit-osterreich": "2026-10-26",
   "gft-italia": "2026-10-26",
-  "gilab-doo-beograd": "2026-10-26",
   "gioumpitek-meleti-schediasmos-ylopoiisi-kai-polisi-ergon-pliroforikis-etaireia-periorismenis-efthynis": "2026-10-26",
-  "glaxosmithkline-research-development": "2026-10-26",
-  "global-heart-hub-company-by-guarantee": "2026-10-26",
-  "globalfoundries-dresden-module-one-llc": "2026-10-26",
   "globaz": "2026-10-26",
   "gmv-aerospace-and-defence": "2026-10-26",
   "gnd-advisory": "2026-10-26",
-  "goimek-s-coop": "2026-10-26",
-  "goodrich-controls-holding": "2026-10-26",
   "gospodarska-zbornica-slovenije": "2026-10-26",
   "green-digital-idiotiki-kefalaiouchiki-etaireia": "2026-10-26",
   "green-supply-chain-digital-innovation-hub-astiki-mi-kerdoskopiki-etaireia": "2026-10-26",
@@ -1367,32 +1010,23 @@
   "gruber-logistics-s-p-a": "2026-10-26",
   "gruenlandzentrum-niedersachen-bremen-e-v": "2026-10-26",
   "gsi-helmholtzzentrum-fur-schwerionenforschung": "2026-10-26",
-  "h2b2-electrolysis-technologies": "2026-10-26",
   "haiki-cobat-societa-benefit": "2026-10-26",
   "hardware-and-software-engineering-epe": "2026-10-26",
-  "health-care-without-harm-europe": "2026-10-26",
-  "hellenic-train-anonymi-sidirodromiki-etaireia": "2026-10-26",
   "helleniq-petroleum-s-a": "2026-10-26",
   "hetfa-kutatointezet-kft": "2026-10-26",
   "highclere-consulting": "2026-10-26",
-  "hive-power": "2026-10-26",
   "hive-ventures": "2026-10-26",
   "holcim-innovation-center": "2026-10-26",
-  "holcim-polska-spolka-akcyjna": "2026-10-26",
   "holistic": "2026-10-26",
   "holoss-holistic-and-ontologicalsolutions-for-sustainability": "2026-10-26",
   "honeywell-international": "2026-10-26",
   "horta": "2026-10-26",
   "hssmi-consulting": "2026-10-26",
   "hydrogen-europe-research": "2026-10-26",
-  "hygear": "2026-10-26",
   "hysytech": "2026-10-26",
   "i-catalist": "2026-10-26",
   "i4ce-institute-for-climate-economics": "2026-10-26",
   "ianus-technologies": "2026-10-26",
-  "iav-ingenieurgesellschaft-auto-und-verkehr": "2026-10-26",
-  "ibm-ireland": "2026-10-26",
-  "ibm-research": "2026-10-26",
   "icares-consulting": "2026-10-26",
   "iclei-european-secretariat-iclei-europasekretariat": "2026-10-26",
   "idc-cema": "2026-10-26",
@@ -1407,15 +1041,11 @@
   "impact-hub": "2026-10-26",
   "in": "2026-10-26",
   "incites-consulting": "2026-10-26",
-  "indra-sistemas": "2026-10-26",
   "industrie-de-nora-idn": "2026-10-26",
-  "ineuvo": "2026-10-26",
   "infineon-technologies": "2026-10-26",
   "infineon-technologies-austria": "2026-10-26",
   "infineon-technologies-dresden": "2026-10-26",
-  "ingenieria-y-economia-del-transporte-sme-mp": "2026-10-26",
   "innceinnmat": "2026-10-26",
-  "inneurope-initiative-s-l": "2026-10-26",
   "innotrope": "2026-10-26",
   "innov-acts": "2026-10-26",
   "innova": "2026-10-26",
@@ -1424,16 +1054,11 @@
   "innovasjon-norge": "2026-10-26",
   "innovation-des-producteurs-de-plants-de-pomme-de-terre": "2026-10-26",
   "innovation-for-agriculture": "2026-10-26",
-  "innovation-in-research-engineering-solutions": "2026-10-26",
   "innovation-skane": "2026-10-26",
-  "innovative-advanced-materials-initiative": "2026-10-26",
   "innovawin-2006": "2026-10-26",
-  "innovawood": "2026-10-26",
   "inosens-doo-novi-sad": "2026-10-26",
   "inova-innovation-services": "2026-10-26",
-  "inovertis-a3i": "2026-10-26",
   "inrae-transfert": "2026-10-26",
-  "institute-for-methods-innovation": "2026-10-26",
   "institutul-de-stiinte-spatiale": "2026-10-26",
   "instytut-ogrodnictwa-panstwowy-instytut-badawczy": "2026-10-26",
   "interact-international-network-for-terrestrial-research-and-monitoring": "2026-10-26",
@@ -1442,34 +1067,24 @@
   "international-development-ireland": "2026-10-26",
   "international-federation-of-organic-agriculture-movements-european-union-regional-group": "2026-10-26",
   "international-hydropower-association": "2026-10-26",
-  "international-raw-materials-observatory-aisbl": "2026-10-26",
-  "international-road-federation": "2026-10-26",
   "internet-institute-communications-solutions-and-consulting": "2026-10-26",
   "intracom-single-member-telecom-solutions": "2026-10-26",
   "iotam-internet-of-things-applications-and-multi-layer-development": "2026-10-26",
-  "iqm-finland": "2026-10-26",
-  "iquadrat-informatica": "2026-10-26",
   "iren": "2026-10-26",
-  "irideon": "2026-10-26",
   "iris-technology-solutions-sociedad-limitada": "2026-10-26",
   "irish-bioeconomy-foundation": "2026-10-26",
   "iron-anonymi-etaireia-energeiakon-ypiresion-heron-societe-anonyme-energy-services": "2026-10-26",
-  "iseki-food-europaische-gesellschaft-fur-die-integration-der-lebensmittelwissinschaft-und-technolgie-in-die-lebensmittelv": "2026-10-26",
   "isle-utilities": "2026-10-26",
   "istituto-di-studi-per-l-integrazione-dei-sistemi-societa-cooperativa": "2026-10-26",
   "its-norge-norsk-forening-for-multimodale-intelligente-transport-systemer-og-tjenester-its-norway": "2026-10-26",
   "itti-sp-zoo": "2026-10-26",
-  "jan-de-nul": "2026-10-26",
-  "janssen-cilag": "2026-10-26",
   "janssen-cilag-950": "2026-10-26",
   "janssen-pharmaceutica": "2026-10-26",
   "jic-zajmove-sdruzeni-pravnickch-osob": "2026-10-26",
   "jisc-lbg": "2026-10-26",
   "johnson-matthey-plc": "2026-10-26",
-  "joint-programming-initiative-on-healthy-and-productive-seas-and-oceans": "2026-10-26",
   "jrc-capital-management-consultancy-research": "2026-10-26",
   "kea-european-affairs": "2026-10-26",
-  "kentro-merimnas-oikogeneias-kai-paidiou": "2026-10-26",
   "kic-ie": "2026-10-26",
   "kic-innoenergy-se": "2026-10-26",
   "kielregion": "2026-10-26",
@@ -1481,10 +1096,8 @@
   "kneia": "2026-10-26",
   "koinoniki-synetairistiki-epicheirisi-syllogikis-kai-koinonikis-ofeleias-ilektra-energy-koinoniki-synetairistiki-epicheir": "2026-10-26",
   "konnecta-systems": "2026-10-26",
-  "konnekt-able-technologies": "2026-10-26",
   "kpmg-advisory": "2026-10-26",
   "krakowski-park-technologiczny-sp-zoo": "2026-10-26",
-  "kws-saat-se-kgaa": "2026-10-26",
   "l-m-ericsson": "2026-10-26",
   "l-up": "2026-10-26",
   "la-palma-research-centre": "2026-10-26",
@@ -1494,27 +1107,21 @@
   "leonardo-societa-per-azioni": "2026-10-26",
   "lesprojekt-sluzby": "2026-10-26",
   "levin-sources": "2026-10-26",
-  "liebherr-electronics-and-drives": "2026-10-26",
   "linq-consulting-and-management": "2026-10-26",
-  "lobelia-earth": "2026-10-26",
   "lomartov": "2026-10-26",
   "lombardy-green-chemistry-association": "2026-10-26",
   "luxinnovation-gie": "2026-10-26",
-  "luxmobility": "2026-10-26",
   "maaelu-teadmuskeskus": "2026-10-26",
   "magellan-circle-european-affairs-consultancy": "2026-10-26",
   "maggioli-s-p-a": "2026-10-26",
   "magneti-ljubljana-podjetje-za-proizvodnjo-magnetnih-materialov-dd": "2026-10-26",
-  "mann-hummel": "2026-10-26",
   "map-traffic-management": "2026-10-26",
   "marie-curie-alumni-association": "2026-10-26",
   "mariene-informatie-service-maris": "2026-10-26",
   "marine-cluster-bulgaria-sdruzhenie": "2026-10-26",
   "maritimes-cluster-norddeutschland-ev": "2026-10-26",
   "marloconsult": "2026-10-26",
-  "martel": "2026-10-26",
   "martel-innovate": "2026-10-26",
-  "materalia": "2026-10-26",
   "mc-shared-services": "2026-10-26",
   "mediterranean-information-office-for-environment-culture-and-sustainable-development-association": "2026-10-26",
   "meta": "2026-10-26",
@@ -1522,28 +1129,20 @@
   "metec-innovation-consulting": "2026-10-26",
   "meteorological-and-environmental-earth-observation": "2026-10-26",
   "microfluidics-innovation-center": "2026-10-26",
-  "minoa-energeiaki-koinotita-politon-syn-p-e": "2026-10-26",
   "missions-publiques": "2026-10-26",
   "mitsubishi-electric-europe-b-v": "2026-10-26",
   "mnlt-innovations": "2026-10-26",
   "mobics-telecommunication-and-consulting-services": "2026-10-26",
   "moby-x-software": "2026-10-26",
-  "modelo-continente-hipermercados-s-a": "2026-10-26",
   "moses-productos": "2026-10-26",
   "mreza-savjetodavnih-sluzbi-jugoistocne-europe": "2026-10-26",
   "mtu-australo-alpha-lab": "2026-10-26",
-  "mtu-civitta-foundation": "2026-10-26",
   "multiverse-computing": "2026-10-26",
-  "muon-solutions": "2026-10-26",
   "my-energia-oner": "2026-10-26",
   "national-infrastructures-for-research-and-technology": "2026-10-26",
   "nats-en-route-public-company": "2026-10-26",
-  "natureplast": "2026-10-26",
   "naturland-verband-fur-okologischen-landbau-ev": "2026-10-26",
-  "nazka-mapps-bvba": "2026-10-26",
-  "nea-georgia-nea-genia-astiki-mi-kerdoskopiki-etairia": "2026-10-26",
   "nec-laboratories-europe": "2026-10-26",
-  "nemzeti-innovacios-ugynokseg-nonprofit-zrt": "2026-10-26",
   "neovia-innovation": "2026-10-26",
   "netcompany-s-a": "2026-10-26",
   "neuropublic-anonymi-etaireia-pliroforikis-kai-epikoinonion": "2026-10-26",
@@ -1555,8 +1154,6 @@
   "novamechanics": "2026-10-26",
   "novamechanics-monoprosopi": "2026-10-26",
   "novamont": "2026-10-26",
-  "novartis-pharma": "2026-10-26",
-  "novo-nordisk-a-s": "2026-10-26",
   "npl-management": "2026-10-26",
   "nrg-pallas": "2026-10-26",
   "nuevas-tecnologias-para-el-desarrollo-de-packaging-y-productos-agroalimentarios-con-componente-plastica": "2026-10-26",
@@ -1567,80 +1164,50 @@
   "oi-agorize": "2026-10-26",
   "open-access-in-the-european-area-through-scholarly-communication": "2026-10-26",
   "open-agile-smart-cities": "2026-10-26",
-  "open-geospatial-consortium-europe": "2026-10-26",
   "openaire-amke": "2026-10-26",
   "opendot-foundation-ets": "2026-10-26",
-  "openforum-europe": "2026-10-26",
   "oppla-eeig": "2026-10-26",
   "orange-romania": "2026-10-26",
   "organismos-tilepikoinonion-tis-ellados-ote": "2026-10-26",
   "orsted-wind-power-a-s": "2026-10-26",
   "osterreichische-forschungsforderungsgesellschaft-mbh": "2026-10-26",
-  "osterreichisches-rotes-kreuz": "2026-10-26",
   "ove-arup-partners-ireland": "2026-10-26",
   "p-net-anadyomena-diktya-neas-genias-efarmoges-idiotiki-kefalaiouchiki-etaireia": "2026-10-26",
-  "pagkosmio-tameio-gia-tin-fysi-w-w-f-ellas": "2026-10-26",
   "panteia": "2026-10-26",
   "parco-scientifico-tecnologico-per-lambiente-environment-park-torino": "2026-10-26",
   "paris-europlace": "2026-10-26",
   "particula-group-drustvo-s-ogranicenom-odgovornoscu-za-istrazivanje-razvoj-i-proizvodnju": "2026-10-26",
   "partners-for-automated-vehicle-education-europe-association": "2026-10-26",
   "partnership-for-advanced-computing-in-europe-aisbl": "2026-10-26",
-  "pdm-e-fc-projecto-desenvolvimento-manutencao-formacao-e-consultadoria": "2026-10-26",
   "pedal-consulting": "2026-10-26",
   "pensoft-publishers": "2026-10-26",
-  "pfizer": "2026-10-26",
-  "pfizer-r-d-uk": "2026-10-26",
-  "philips-consumer-lifestyle": "2026-10-26",
-  "philips-electronics-nederland": "2026-10-26",
-  "philips-medical-systems-nederland": "2026-10-26",
   "photonics-austria-plattform-zur-forderung-der-osterreichischen-interessen-im-bereich-photonik": "2026-10-26",
-  "pintail": "2026-10-26",
-  "plants-for-the-future-european-technology-platform": "2026-10-26",
-  "plate-forme-technologique-europeenne-pour-le-future-du-textile-et-de-l-habillement": "2026-10-26",
-  "pno-innovation-single-member-private-company": "2026-10-26",
   "pole-mer-bretagne-atlantique": "2026-10-26",
   "polis": "2026-10-26",
-  "polymeris": "2026-10-26",
   "powercell-sweden": "2026-10-26",
-  "pragma-iot": "2026-10-26",
   "prasidentenkonferenz-der-landwirtschaftskammern-osterreichs": "2026-10-26",
   "predictby-research-and-consulting-s-l": "2026-10-26",
   "preferred-by-nature-fmba": "2026-10-26",
-  "premotec": "2026-10-26",
-  "premotec-poland-sp-z-o-o": "2026-10-26",
   "pricewaterhousecoopers-advisory": "2026-10-26",
   "pricewaterhousecoopers-business-services": "2026-10-26",
   "pricewaterhousecoopers-business-solutions": "2026-10-26",
-  "prinses-maxima-centrum-voor-kinderoncologie": "2026-10-26",
   "privanova": "2026-10-26",
   "proagria-keskusten-liitto-ry": "2026-10-26",
-  "prospex-institute": "2026-10-26",
-  "protisvalor-mediterranee": "2026-10-26",
-  "ptv-planung-transport-verkehr": "2026-10-26",
   "pwc-advisory-france": "2026-10-26",
   "q-plan-international-advisors": "2026-10-26",
-  "quantis": "2026-10-26",
   "que-technologies-kefalaiouchiki-etaireia": "2026-10-26",
   "r2m-solution": "2026-10-26",
   "r2m-solution-spain": "2026-10-26",
-  "rainno-idiotiki-kefalaiouchiki-etaireia": "2026-10-26",
-  "re-imagine-europa": "2026-10-26",
   "recatalyst-razvoj-proizvodnja-in-prodaja-katalizatorskih-kompozitov-d-o-o": "2026-10-26",
-  "recharge": "2026-10-26",
-  "recycling-europe": "2026-10-26",
   "reframe-food-astiki-mi-kerdoskopiki-etairia": "2026-10-26",
   "regional-development-fund-of-central-macedonia": "2026-10-26",
   "regionalis-informacios-es-fejleszto-tudaskozpont-korlatolt-felelossegu-tarsasag": "2026-10-26",
   "renault": "2026-10-26",
   "renewable-energy-solutions-for-the-mediterranean-and-africa": "2026-10-26",
-  "renewables-grid-initiative-ev": "2026-10-26",
   "repsol": "2026-10-26",
   "research-and-innovation-services-doo-za-usluge": "2026-10-26",
-  "reseau-europeen-pour-des-initiatives-communautaires-sur-les-changements-climatiques-et-le-developpement-durable": "2026-10-26",
   "resilience-advisors": "2026-10-26",
   "resilience-advisors-europe": "2026-10-26",
-  "resilience-guard": "2026-10-26",
   "rete-ferroviaria-italiana": "2026-10-26",
   "rete-internazionale-per-le-piccolee-medie-imprese": "2026-10-26",
   "rete-semi-rurali": "2026-10-26",
@@ -1656,7 +1223,6 @@
   "robotnik-automation": "2026-10-26",
   "rohealth-clusterul-pentru-sanatate-si-bioeconomie": "2026-10-26",
   "rolls-royce-plc": "2026-10-26",
-  "rothamsted-research": "2026-10-26",
   "rsk-adas": "2026-10-26",
   "rupprecht-consult-forschung-beratung": "2026-10-26",
   "rwe-offshore-wind": "2026-10-26",
@@ -1676,13 +1242,10 @@
   "science-innovation-link-office": "2026-10-26",
   "scitation-science-communication": "2026-10-26",
   "sdruzenie-asociacija-na-dunavskite-obstini-dunav": "2026-10-26",
-  "seascape-belgium": "2026-10-26",
   "semi-europe": "2026-10-26",
-  "semidynamics-technology-services": "2026-10-26",
   "senior-europa-sociedad-limitada": "2026-10-26",
   "seureco-societe-europeenne-d-economie": "2026-10-26",
   "seven-engineering-consultants-oe": "2026-10-26",
-  "seven-past-nine-d-o-o": "2026-10-26",
   "shake-up-factory": "2026-10-26",
   "shell-global-solutions-international": "2026-10-26",
   "shine-2europe": "2026-10-26",
@@ -1692,7 +1255,6 @@
   "siemens-energy-global": "2026-10-26",
   "siemens-gamesa-renewable-energy": "2026-10-26",
   "siemens-industry-software": "2026-10-26",
-  "sig-de-raee-y-pilas-sociedad-limitada": "2026-10-26",
   "sihtasutus-eesti-teadusagentuur": "2026-10-26",
   "simbiotica": "2026-10-26",
   "singularlogic-pliroforiakon-systimaton-kai-efarmogon-pliroforikis": "2026-10-26",
@@ -1704,20 +1266,16 @@
   "smartlex-societa-di-prodotti-e-servizi-giuridici-interdisciplinari": "2026-10-26",
   "snam": "2026-10-26",
   "sociedade-portuguesa-de-inovacao-consultadoria-empresarial-e-fomento-da-inovacao": "2026-10-26",
-  "societe-europeenne-de-cardiologie": "2026-10-26",
   "societe-nationale-sncf": "2026-10-26",
   "society-for-territorial-and-environmental-prosperity": "2026-10-26",
   "software-imagination-and-vision": "2026-10-26",
   "solar-heat-europe": "2026-10-26",
   "soli-tek-r-d": "2026-10-26",
   "soluciones-agricolas-ecoinnovadoras": "2026-10-26",
-  "solvionic": "2026-10-26",
   "solydera": "2026-10-26",
   "sopra-steria-group": "2026-10-26",
-  "soprema": "2026-10-26",
   "space-applications-services": "2026-10-26",
   "space-hellas-anonymi-etaireia-systimata-kai-ypiresies-tilepikoinonionpliroforikis-asfaleias-idiotiki-epicheirisi-parochi": "2026-10-26",
-  "sparsity": "2026-10-26",
   "specialty-operations-france": "2026-10-26",
   "splorotech": "2026-10-26",
   "spring-sustainable-processes-and-resources-for-innovation-and-national-growth": "2026-10-26",
@@ -1729,15 +1287,12 @@
   "step-ri-znanstveno-tehnologijskipark-sveucilista-u-rijeci-druzba-zomejeno-odgovornostjo-za-inovacijei-transfer-tehnologi": "2026-10-26",
   "sterreichische-energieagentur-austrian-energy-agency": "2026-10-26",
   "stichting-circle-economy": "2026-10-26",
-  "stichting-climate-adaptation-services": "2026-10-26",
   "stichting-climate-kic-international-foundation": "2026-10-26",
   "stichting-climate-strategies": "2026-10-26",
   "stichting-dutch-marine-energy-centre": "2026-10-26",
   "stichting-egi": "2026-10-26",
   "stichting-global-resilient-cities-network": "2026-10-26",
   "stichting-liber": "2026-10-26",
-  "stichting-metabolic-institute": "2026-10-26",
-  "stichting-nederlands-instituut-voorbeeld-en-geluid": "2026-10-26",
   "stichting-oapen-open-access-publishing-in-european-networks": "2026-10-26",
   "stichting-platform31": "2026-10-26",
   "stichting-projecten-binnenvaart": "2026-10-26",
@@ -1746,26 +1301,19 @@
   "stiftelsen-grid-arendal": "2026-10-26",
   "stmicroelectronics": "2026-10-26",
   "stmicroelectronics-france": "2026-10-26",
-  "stmicroelectronics-grenoble-2": "2026-10-26",
-  "stmicroelectronics-rousset": "2026-10-26",
   "strane-innovation": "2026-10-26",
   "strascheg-center-for-entrepreneurship": "2026-10-26",
-  "strateco-og": "2026-10-26",
   "submariner-network-for-blue-growth-ewiv": "2026-10-26",
   "suite5-data-intelligence-solutions": "2026-10-26",
-  "sumitomo-shi-fw-energia": "2026-10-26",
   "suomen-fotoniikan-seura-ry": "2026-10-26",
   "supergrid-institute": "2026-10-26",
-  "surf": "2026-10-26",
   "sustainable-innovation-technology-services": "2026-10-26",
   "sustainable-innovations-europe": "2026-10-26",
-  "sustainable-nuclear-energy-technology-platform": "2026-10-26",
   "syensqo-specialty-polymers-italy-s-p-a": "2026-10-26",
   "synchrotron-soleil-societe-civile": "2026-10-26",
   "synelixis-lyseis-pliroforikis-automatismou-tilepikoinonion-anonimi-etairia": "2026-10-26",
   "synyo": "2026-10-26",
   "syreon-kutato-intezet-korlatolt-felelossegu-tarsasag": "2026-10-26",
-  "syspro-automation": "2026-10-26",
   "t6-ecosystems": "2026-10-26",
   "teamit-research-s-l": "2026-10-26",
   "tech-tour-europe": "2026-10-26",
@@ -1777,21 +1325,14 @@
   "telefonica-innovacion-digital": "2026-10-26",
   "telelink-business-services-ead": "2026-10-26",
   "telenor-asa": "2026-10-26",
-  "telespazio-france": "2026-10-26",
-  "temas-solutions": "2026-10-26",
   "terna-rete-elettrica-nazionale": "2026-10-26",
-  "th-nk-e": "2026-10-26",
-  "thales-alenia-space-france": "2026-10-26",
   "thales-alenia-space-italia": "2026-10-26",
-  "thales-avs-france": "2026-10-26",
   "thales-six-gts-france": "2026-10-26",
-  "the-democratic-society-aisbl": "2026-10-26",
   "the-equator-company": "2026-10-26",
   "the-european-marine-energy-centre": "2026-10-26",
   "the-factory": "2026-10-26",
   "the-lisbon-council-for-economic-competitiveness": "2026-10-26",
   "three-o-clock": "2026-10-26",
-  "timelex": "2026-10-26",
   "tinexta-innovation-hub-s-p-a": "2026-10-26",
   "tis-pt-consultores-em-transportes-inovacao-e-sistemas": "2026-10-26",
   "topview": "2026-10-26",
@@ -1801,79 +1342,46 @@
   "toyota-motor-europe": "2026-10-26",
   "tractebel-engineering-s-a": "2026-10-26",
   "trans-europe-halles": "2026-10-26",
-  "transport-mobility-leuven": "2026-10-26",
-  "tree-technology": "2026-10-26",
   "trialog": "2026-10-26",
   "trilateral-research": "2026-10-26",
   "trt-trasporti-e-territorio": "2026-10-26",
   "trust-it-services": "2026-10-26",
   "trustmotion-austria": "2026-10-26",
-  "tttech-computertechnik": "2026-10-26",
   "tvp-solar": "2026-10-26",
   "twenty-communications": "2026-10-26",
-  "ubimet": "2026-10-26",
   "ubitech": "2026-10-26",
-  "ucb-biopharma": "2026-10-26",
   "udruga-dih-agrihrana-hrvatska": "2026-10-26",
   "udruzenje-eko-inovacija-na-balkanu": "2026-10-26",
   "udruzenje-za-preduzetnistvo-i-inovacije-future-systems-hub": "2026-10-26",
   "uicn-bureau-de-representation-aupres-de-l-union-europeenne-aisbl": "2026-10-26",
   "ujv-rez": "2026-10-26",
-  "umweltbundesamt-gesellschaft-mit-beschrankter-haftung-uba": "2026-10-26",
-  "una-europa": "2026-10-26",
   "uni-ente-italiano-di-normazione": "2026-10-26",
   "uni-systems-systimata-pliroforikis-monoprosopi-anonymi-emporiki-etairia": "2026-10-26",
   "union-internationale-des-chemins-de-fer": "2026-10-26",
   "union-internationale-des-transports-publics": "2026-10-26",
   "uniresearch": "2026-10-26",
-  "unisystems-luxembourg": "2026-10-26",
-  "united-kingdom-national-nuclear-laboratory": "2026-10-26",
-  "uptec-associacao-de-transferencia-de-tecnologia-da-asprela": "2026-10-26",
   "urbanex-doo-za-gradevinarstvo": "2026-10-26",
-  "urbaser": "2026-10-26",
-  "utac-france": "2026-10-26",
   "valeo-comfort-and-driving-assistance": "2026-10-26",
   "valeo-electrification": "2026-10-26",
-  "vde-verband-der-elektrotechnik-elektronik-informationstechnik-ev": "2026-10-26",
   "vdi-vde-innovation-technik": "2026-10-26",
-  "vegepolys-valley": "2026-10-26",
   "veolia-servicios-lecam": "2026-10-26",
   "verein-euresearch": "2026-10-26",
-  "verkor": "2026-10-26",
-  "vertoro": "2026-10-26",
   "vestas-wind-systems-a-s": "2026-10-26",
   "vgbe-energy-ev": "2026-10-26",
   "via-donau-osterreichische-wasserstrassen-gesellschaft-mbh": "2026-10-26",
-  "vianode": "2026-10-26",
   "viesoji-istaiga-lietuvos-zemes-ukio-konsultavimo-tarnyba": "2026-10-26",
-  "vilabs-bg": "2026-10-26",
-  "vilabs-cy": "2026-10-26",
-  "vilabs-oe": "2026-10-26",
   "vitagora-pole": "2026-10-26",
-  "vivid-components-germany": "2026-10-26",
-  "vlaams-instituut-voor-de-logistiek-vzw": "2026-10-26",
-  "vlaamse-maatschappij-voor-watervoorziening": "2026-10-26",
   "volkswagen-aktiengesellschaft": "2026-10-26",
-  "volvo-personvagnar": "2026-10-26",
   "volvo-technology": "2026-10-26",
-  "waste-of-electrical-and-electronical-equipment-forum": "2026-10-26",
   "water-europe": "2026-10-26",
-  "waterborne-technology-platform": "2026-10-26",
-  "watt-is": "2026-10-26",
   "wedo-project-intelligence-made-easy": "2026-10-26",
-  "westcountry-rivers-trust-lbg": "2026-10-26",
   "wetlands-international-european-association": "2026-10-26",
   "white-research": "2026-10-26",
-  "windeurope": "2026-10-26",
   "wings-ict-solutions-technologies-pliroforikis-kai-epikoinonion-anonymi-etaireia": "2026-10-26",
   "wirtschaft-und-infrastruktur-planungs": "2026-10-26",
   "wirtschaftsakademie-schleswig-holstein": "2026-10-26",
   "wissenschaftszentrum-kiel": "2026-10-26",
   "workplace-innovation-europe-clg": "2026-10-26",
-  "world-resources-forum-association": "2026-10-26",
-  "worldgbc-europe": "2026-10-26",
-  "wri-europe-stichting": "2026-10-26",
-  "wwf-adria-udruga-za-zastitu-prirode-i-ocuvanje-bioloske-raznolikosti": "2026-10-26",
   "wwf-vilag-termeszeti-alap-magyarorszag-alapitvany": "2026-10-26",
   "x-officio-research": "2026-10-26",
   "yaghma-b-v": "2026-10-26",
@@ -1882,8 +1390,6 @@
   "zabala-innovation-consulting": "2026-10-26",
   "zdruzenie-platforma-za-zelen-razvoj-skopje": "2026-10-26",
   "zemedelsky-vyzkum": "2026-10-26",
-  "zemnieku-saeima": "2026-10-26",
-  "zep-communications": "2026-10-26",
   "zf-friedrichshafen": "2026-10-26",
   "zuidelijke-land-en-tuinbouworganisatie-vereniging": "2026-10-26"
  }
