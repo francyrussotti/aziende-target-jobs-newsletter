@@ -3,6 +3,7 @@ Avvio:  python -m unittest -v test_newsletter
 """
 import json
 import os
+import sys
 import tempfile
 import unittest
 from datetime import datetime, timedelta
@@ -534,6 +535,49 @@ class TestErroriQuartaRicerca(unittest.TestCase):
             return articolo, "https://euronovia.eu/recrutement-apprenti-financements-europeens/"
         with mock.patch.object(siti, "_html", side_effect=finto):
             self.assertEqual(siti.trova_fonti_sito("https://euronovia.eu/"), [])
+
+
+class TestScopriFonti(unittest.TestCase):
+    """scopri_fonti.main con rete finta: regole, unione, decisioni manuali."""
+
+    def setUp(self):
+        import scopri_fonti, newsletter
+        self.dir = tempfile.TemporaryDirectory()
+        self.addCleanup(self.dir.cleanup)
+        p = lambda n: os.path.join(self.dir.name, n)
+        for mod in (scopri_fonti, newsletter):
+            for attr, nome in [("AZIENDE_FILE", "aziende.json"), ("FONTI_FILE", "fonti.json"),
+                               ("FONTI_MANUALI_FILE", "fonti_manuali.json")]:
+                if hasattr(mod, attr):
+                    m = mock.patch.object(mod, attr, p(nome)); m.start(); self.addCleanup(m.stop)
+        with open(p("aziende.json"), "w") as f:
+            json.dump({"aziende": [{"id": "a", "n": "Acme", "p": "FR", "k": "PAR"},
+                                   {"id": "m", "n": "Manuale", "p": "IT", "k": "IT"}]}, f)
+        with open(p("fonti_manuali.json"), "w") as f:
+            json.dump({"m": []}, f)
+        self.p, self.sf = p, scopri_fonti
+
+    def lancia(self, trovate):
+        with mock.patch.object(self.sf.siti, "_leggi_json", create=True), \
+             mock.patch.object(self.sf, "siti") as finto_siti, \
+             mock.patch.object(self.sf.tf, "scopri", return_value=trovate), \
+             mock.patch.object(sys, "argv", ["scopri_fonti.py", "--minuti", "1"]):
+            finto_siti.SITI_FILE = self.p("siti.json")
+            self.sf.main()
+        with open(self.p("fonti.json")) as f:
+            return json.load(f)
+
+    def test_unione_e_regole(self):
+        d = self.lancia([{"tipo": "lever", "slug": "acme", "verifica": "x"}])
+        self.assertEqual(d["regole"], self.sf.REGOLE)
+        self.assertEqual(list(d["fonti"]), ["a"])                 # "m" ha decisione manuale
+        d = self.lancia([])                                       # sito lento: niente trovato
+        self.assertEqual([f["slug"] for f in d["fonti"]["a"]], ["acme"])
+        d["regole"] = 0                                           # regole cambiate
+        with open(self.p("fonti.json"), "w") as f:
+            json.dump(d, f)
+        d = self.lancia([])
+        self.assertEqual(d["fonti"], {})
 
 
 if __name__ == "__main__":

@@ -24,8 +24,9 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
 - `siti.py`: siti ufficiali dai dati CORDIS (`dati/siti.json`) e ricerca della pagina carriere / portale linkato.
 - `scopri_fonti.py`: ricerca fonti (workflow `scopri-fonti.yml`, lunedì), max 40 minuti per run
   (in pratica ~11 minuti per 1040 aziende), salva a intervalli, riparte dalle aziende non ancora
-  controllate (`controllate5` in `dati/fonti.json`). A ogni controllo le fonti di un'azienda si
-  sostituiscono. Regole di accettazione:
+  controllate (`controllate` in `dati/fonti.json`). `REGOLE` in scopri_fonti.py: se cambia, l'elenco
+  riparte da zero; con le stesse regole le fonti confermate restano (un sito che non risponde una
+  volta non fa sparire la fonte). Aziende in fonti_manuali.json escluse. Regole di accettazione:
   - portale linkato dal sito ufficiale (CORDIS) → accettato;
   - pagina carriere del sito → solo se contiene lessico da annunci (`siti.sembra_pagina_lavoro`),
     non è un articolo (>3 parole nell'ultimo pezzo dell'URL), non è una bacheca della rete/soci
@@ -66,7 +67,10 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
       solo del 2018, portale abbandonato, scartato. Decisioni in fonti_manuali.json (`_scartate`).
 - [x] Prima lettura: "già aperte" solo se pubblicate negli ultimi 365 giorni (portali abbandonati).
 - [x] Nome identico senza annunci (Agorize, Bpifrance, GAC, Innova su Workable) → da_verificare.
-- [ ] 5ª ricerca (controllate5) con queste ultime regole; rileggere l'elenco.
+- [x] 5ª ricerca (su a5f19ab): 98 aziende con fonte; uscite attese (Euronovia, 4 workable →
+      da verificare). Trovata instabilità: Robotnik uscita, Civitta/Ubimet rientrate (siti lenti)
+      → ora unione delle fonti con le stesse REGOLE (=5). Dubbi già decisi a mano tolti dagli elenchi.
+- [ ] Ricerca con REGOLE=5 (riparte da zero) e rilettura.
 - [ ] Prova fonti su tutte le fonti trovate; correggere quelle rotte o sbagliate.
 - [ ] Prima newsletter reale (workflow "🎯 Newsletter Aziende Target") e controllo dell'email
       (dimensione, sezioni, link).
