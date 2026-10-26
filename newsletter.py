@@ -38,7 +38,10 @@ GIORNI_OBLIO = 90
 MAX_PER_AZIENDA = 12
 # Sezioni mostrate: le offerte in "ALTRO" (fuori da Parigi/Italia, non da
 # remoto) si contano ma non si mostrano. Obiettivo: Parigi, poi Italia.
-SEZIONI_MOSTRATE = {"PAR", "IT", "REMOTO", "ND"}
+SEZIONI_MOSTRATE = {"PAR", "IT", "REMOTO", "FR", "ND"}
+# Gmail taglia i messaggi oltre ~102 KB ("[Messaggio troncato]"): si riducono
+# le offerte mostrate per azienda finché l'email sta sotto questo limite.
+MAX_EMAIL_BYTES = 95_000
 STORICO_MAX_RUN = 14
 
 ETICHETTE_LIVELLO = [
@@ -184,9 +187,11 @@ def seleziona(aziende, risultati, seen, oggi):
         for o in offerte:
             stat["trovate"] += 1
             o["luogo"] = tf.luogo(o)
-            if o["luogo"] not in SEZIONI_MOSTRATE:
+            # Sede non indicata: interessa solo per le aziende con sede a Parigi o in Italia
+            if o["luogo"] not in SEZIONI_MOSTRATE or (o["luogo"] == "ND" and not aziende[aid].get("k")):
                 stat["fuori_focus"] += 1
                 continue
+            o["fonte_url"] = tf.url_pubblico(f)
             i = job_id(aid, o)
             gia = i in seen["ids"]
             seen["ids"][i] = oggi
@@ -207,6 +212,16 @@ def seleziona(aziende, risultati, seen, oggi):
                 continue
             nuove.append({**o, "azienda": aid})
         seen["fonti"].append(k)
+    # Stessa offerta da due portali dello stesso gruppo: una sola volta
+    uniche, viste = [], set()
+    for o in nuove:
+        chiave = (re.sub(r"\W+", " ", o["titolo"].lower()).strip(), o.get("location", "").lower())
+        if chiave in viste:
+            stat["doppioni"] = stat.get("doppioni", 0) + 1
+            continue
+        viste.add(chiave)
+        uniche.append(o)
+    nuove = uniche
     # Oblio: offerte non più viste da GIORNI_OBLIO giorni
     limite = (datetime.strptime(oggi, "%Y-%m-%d") - timedelta(days=GIORNI_OBLIO)).strftime("%Y-%m-%d")
     seen["ids"] = {i: d for i, d in seen["ids"].items() if d >= limite}
@@ -251,7 +266,7 @@ def _quando(data):
     return datetime.strptime(data[:10], "%Y-%m-%d").strftime("%d/%m")
 
 
-def genera_html(nuove, aziende, fonti, stat, problemi, n_fonti):
+def genera_html(nuove, aziende, fonti, stat, problemi, n_fonti, max_per_azienda=MAX_PER_AZIENDA):
     esc = html_lib.escape
     sans = "font-family:-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;"
     serif = "font-family:Georgia,'Times New Roman',serif;"
@@ -289,7 +304,7 @@ def genera_html(nuove, aziende, fonti, stat, problemi, n_fonti):
             lista = sorted(per_az[aid], key=lambda o: (eta_giorni(o.get("data")) is None,
                                                        eta_giorni(o.get("data")) or 0))
             voci = ""
-            for o in lista[:MAX_PER_AZIENDA]:
+            for o in lista[:max_per_azienda]:
                 meta = [esc(x) for x in (o.get("location"), _quando(o.get("data"))) if x]
                 meta += [f'<span style="padding:0 6px;border:1px solid {linea};border-radius:9px;'
                          f'font-size:11px;">{e}</span>' for e in etichette(o["titolo"])]
@@ -301,9 +316,9 @@ def genera_html(nuove, aziende, fonti, stat, problemi, n_fonti):
                  color:{ink};text-decoration:none;">{esc(o['titolo'] or 'Annuncio')}</a>
               <div style="margin-top:3px;{sans}font-size:12px;color:{grigio};">
                 {' &nbsp;·&nbsp; '.join(meta)}</div></td></tr>"""
-            extra = len(lista) - MAX_PER_AZIENDA
+            extra = len(lista) - max_per_azienda
             if extra > 0:
-                link = next((f.get("url") or "" for f in fonti.get(aid, []) if f.get("url")), "")
+                link = next((o["fonte_url"] for o in lista if o.get("fonte_url")), "")
                 voci += (f'<tr><td style="padding:6px 0 6px 12px;{sans}font-size:12px;color:{grigio};">'
                          f'+ altre {extra} offerte' + (f' · <a href="{esc(link)}" style="color:{ink};">'
                                                       f'vedi tutte</a>' if link else "") + '</td></tr>')
@@ -333,6 +348,10 @@ def genera_html(nuove, aziende, fonti, stat, problemi, n_fonti):
         titolo = (f"{totale} offerte" + (f", di cui {aperte} già aperte" if aperte < totale
                                           else " già aperte"))
     aziende_con_fonte = len(fonti)
+    nota_taglio = (f" Per restare leggibile l'email mostra al massimo {max_per_azienda} offerte per "
+                   "azienda e sezione: le altre sono nel link «vedi tutte»."
+                   if any(sum(1 for o in nuove if o["azienda"] == a and o["luogo"] == l) > max_per_azienda
+                          for a, l in {(o["azienda"], o["luogo"]) for o in nuove}) else "")
     return f"""<!DOCTYPE html>
 <html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light"></head>
@@ -351,10 +370,20 @@ def genera_html(nuove, aziende, fonti, stat, problemi, n_fonti):
         Solo aziende della lista Aziende Target Europa ({len(aziende)} aziende, {aziende_con_fonte} con una
         fonte di annunci, {n_fonti} fonti lette). {stat['trovate']} offerte lette oggi, di cui
         {stat['fuori_focus']} fuori da Parigi/Italia/remoto (non mostrate).
-        Livello (Stage, Junior…) dedotto dal titolo.</div></td></tr>
+        Livello (Stage, Junior…) dedotto dal titolo.{nota_taglio}</div></td></tr>
     </table>
   </td></tr>
 </table></body></html>"""
+
+
+def componi_email(nuove, aziende, fonti, stat, problemi, n_fonti):
+    """HTML sotto MAX_EMAIL_BYTES: se serve, meno offerte per azienda."""
+    for massimo in (MAX_PER_AZIENDA, 8, 5, 3, 2, 1):
+        html = genera_html(nuove, aziende, fonti, stat, problemi, n_fonti, massimo)
+        if len(html.encode("utf-8")) <= MAX_EMAIL_BYTES:
+            break
+    print(f"✉️  Email: {len(html.encode('utf-8')) // 1024} KB, max {massimo} offerte per azienda e sezione")
+    return html
 
 
 def invia_email(html_body, oggetto_email):
@@ -465,9 +494,12 @@ def main():
     rete_ko = errori > len(risultati) / 2
 
     stato_invio = "nessuna"
-    if nuove:
-        html = genera_html(nuove, aziende, fonti, stat, problemi, len(risultati))
-        stato_invio = invia_email(html, oggetto(nuove))
+    controllo_settimanale = datetime.now().weekday() == 0 and problemi
+    if nuove or controllo_settimanale:
+        html = componi_email(nuove, aziende, fonti, stat, problemi, len(risultati))
+        ogg = oggetto(nuove) if nuove else \
+            f"🎯 Aziende Target {datetime.now():%d/%m/%Y} — nessuna novità, {len(problemi)} fonti da controllare"
+        stato_invio = invia_email(html, ogg)
     else:
         print("📭 Nessuna offerta nuova: email non inviata")
 

@@ -322,8 +322,10 @@ class TestFileReali(unittest.TestCase):
     """I file in dati/ devono essere coerenti: solo aziende della lista."""
 
     def test_fonti_manuali_solo_aziende_in_lista(self):
-        ids = {a["id"] for a in json.load(open("dati/aziende.json"))["aziende"]}
-        manuali = json.load(open("dati/fonti_manuali.json"))
+        with open("dati/aziende.json") as f:
+            ids = {a["id"] for a in json.load(f)["aziende"]}
+        with open("dati/fonti_manuali.json") as f:
+            manuali = json.load(f)
         for k, fonti in manuali.items():
             if k.startswith("_"):
                 continue
@@ -359,6 +361,142 @@ class TestSiti(unittest.TestCase):
         portali, carriere = siti.link_carriere(html, "https://acme.fr/")
         self.assertEqual(portali, [{"tipo": "lever", "slug": "acme"}])
         self.assertEqual(carriere, "https://acme.fr/fr/nous-rejoindre")
+
+
+class TestFalleCorrette(ConCartella):
+    """Una prova per ogni falla trovata nella revisione del 26/10/2026."""
+
+    def test_remote_sensing_non_e_da_remoto(self):
+        self.assertEqual(tf.luogo({"titolo": "Remote Sensing Engineer", "location": "Toulouse"}), "ALTRO")
+        self.assertEqual(tf.luogo({"titolo": "Data Analyst (Remote)", "location": "Madrid"}), "REMOTO")
+
+    def test_solo_francia_e_sezione_a_parte(self):
+        self.assertEqual(tf.luogo({"titolo": "x", "location": "France"}), "FR")
+        self.assertEqual(tf.luogo({"titolo": "x", "location": "", "paese": "FR"}), "FR")
+        self.assertEqual(tf.luogo({"titolo": "x", "location": "Toulouse, France"}), "ALTRO")
+        self.assertEqual(tf.luogo({"titolo": "x", "location": "Paris, France"}), "PAR")
+
+    def test_link_stabili_e_parole_intere(self):
+        html = """<a href="/careers/junior-pm?utm_source=x&id=7">Junior Project Manager EU</a>
+                  <a href="/international-cooperation">International cooperation news</a>
+                  <a href="/careers/junior-pm?id=7&utm_source=y">Junior Project Manager EU</a>"""
+        o = tf.estrai_link_annunci(html, "https://acme.it/careers")
+        self.assertEqual([x["url"] for x in o], ["https://acme.it/careers/junior-pm?id=7"])
+
+    def test_opportunita_di_finanziamento_non_e_carriere(self):
+        import siti
+        html = """<a href="/funding-opportunities">Funding opportunities</a>
+                  <a href="/talent-programme">Talent programme</a>"""
+        self.assertEqual(siti.link_carriere(html, "https://acme.eu/"), ([], ""))
+        html2 = '<a href="/about/careers">Careers</a>'
+        self.assertEqual(siti.link_carriere(html2, "https://acme.eu/")[1], "https://acme.eu/about/careers")
+
+    def test_sede_non_indicata_solo_per_aziende_parigi_italia(self):
+        az = dict(tn.carica_aziende())
+        az["acme-de"] = {"id": "acme-de", "n": "Acme Berlin", "p": "DE", "k": "", "c": "B", "s": 50, "o": 0}
+        seen = {"ids": {}, "fonti": ["lever:a", "lever:b"], "storico": []}
+        o = lambda u: {"titolo": "Analyst", "location": "", "paese": "", "remoto": False, "url": u, "data": ""}
+        nuove, stat = tn.seleziona(az, [("acme-de", {"tipo": "lever", "slug": "a"}, [o("u1")], None),
+                                        ("acme-par", {"tipo": "lever", "slug": "b"}, [o("u2")], None)],
+                                   seen, giorni_fa(0))
+        self.assertEqual([x["azienda"] for x in nuove], ["acme-par"])
+        self.assertEqual(stat["fuori_focus"], 1)
+
+    def test_doppioni_tra_portali(self):
+        az = tn.carica_aziende()
+        seen = {"ids": {}, "fonti": ["lever:a", "workday:b"], "storico": []}
+        o = lambda u: {"titolo": "Ingénieur Système", "location": "Vélizy", "paese": "", "remoto": False,
+                       "url": u, "data": ""}
+        nuove, stat = tn.seleziona(az, [("acme-par", {"tipo": "lever", "slug": "a"}, [o("u1")], None),
+                                        ("acme-par", {"tipo": "workday", "url": "b"}, [o("u2")], None)],
+                                   seen, giorni_fa(0))
+        self.assertEqual(len(nuove), 1)
+        self.assertEqual(stat["doppioni"], 1)
+
+    def test_email_sotto_il_limite_di_gmail(self):
+        az = tn.carica_aziende()
+        nuove = [{"titolo": f"Offerta numero {i} con un titolo piuttosto lungo per occupare spazio",
+                  "location": "Paris", "luogo": "PAR", "url": f"https://x/{i}", "data": giorni_fa(1),
+                  "azienda": "acme-par" if i % 2 else "acme-it", "fonte_url": "https://x/tutte",
+                  "gia_aperta": True} for i in range(3000)]
+        stat = {"trovate": 3000, "fuori_focus": 0}
+        html = tn.componi_email(nuove, az, {}, stat, [], 2)
+        self.assertLessEqual(len(html.encode()), tn.MAX_EMAIL_BYTES)
+        self.assertIn("vedi tutte", html)
+        self.assertIn("https://x/tutte", html)
+
+    def test_url_pubblico(self):
+        self.assertEqual(tf.url_pubblico({"tipo": "lever", "slug": "novaspace"}), "https://jobs.lever.co/novaspace")
+        self.assertEqual(tf.url_pubblico({"tipo": "personio", "slug": "pno", "dominio": "jobs.personio.com"}),
+                         "https://pno.jobs.personio.com/")
+        self.assertEqual(tf.url_pubblico({"tipo": "pagina", "url": "https://a.fr/jobs"}), "https://a.fr/jobs")
+
+    def test_wttj_bloccato_prova_il_browser(self):
+        html = '<a href="/fr/companies/acme/jobs/analyste_paris">Analyste</a>'
+        with mock.patch.object(tf, "_get", side_effect=tf.FonteErrore("403")), \
+             mock.patch.object(tf, "_html_con_browser", return_value=html):
+            self.assertEqual(len(tf.wttj("acme")), 1)
+        with mock.patch.object(tf, "_get", side_effect=tf.NonTrovata("404")):
+            with self.assertRaises(tf.NonTrovata):
+                tf.wttj("acme")
+
+
+class TestErroriRicercaReale(unittest.TestCase):
+    """Casi presi dall'elenco reale della ricerca del 26/10/2026."""
+
+    def test_nome_identico_vero(self):
+        self.assertFalse(tf.nome_uguale("Trust-It Services SRL", "Trust"))
+        self.assertFalse(tf.nome_uguale("Hydrogen Europe Research", "Hydrogen"))
+        self.assertTrue(tf.nome_uguale("Agorize", "Agorize"))
+        self.assertTrue(tf.nome_uguale("Bpifrance", "BPIFRANCE"))
+
+    def test_nome_forte(self):
+        self.assertTrue(tf.nome_forte("Rina Consulting SPA", "RINA"))
+        self.assertTrue(tf.nome_forte("Engie", "ENGIE Italia"))
+        self.assertFalse(tf.nome_forte("Magellan Circle Italy SRL", "Magellan"))
+        self.assertFalse(tf.nome_forte("Thales Six Gts France SAS", "Thales"))
+        self.assertFalse(tf.nome_forte("Trust-It Services SRL", "Trust"))
+
+    def test_nome_corto_va_da_verificare(self):
+        az = {"n": "Thales Six Gts France SAS", "p": "FR"}
+        francia = [tf._offerta("Ingénieur", "https://x/1", "Vélizy, France")]
+        with mock.patch.object(tf, "_json", return_value={"content": [{"company": {"name": "Thales"}}]}), \
+             mock.patch.object(tf, "leggi_fonte", return_value=francia):
+            f = tf._prova("smartrecruiters", "thales", az)
+        self.assertIn("da_verificare", f)
+
+    def test_omonimo_con_annunci_altrove_scartato(self):
+        az = {"n": "A.Spire", "p": "BE"}
+        usa = [tf._offerta("Engineer", "https://x/1", "Boulder, CO", "US")]
+        with mock.patch.object(tf, "_json", return_value={"name": "Spire"}), \
+             mock.patch.object(tf, "leggi_fonte", return_value=usa):
+            self.assertIsNone(tf._prova("greenhouse", "spire", az))
+
+    def test_workday_stessa_chiave_in_ogni_lingua(self):
+        a = tf.chiave_fonte({"tipo": "workday", "url": "https://thales.wd3.myworkdayjobs.com/fr-FR/Careers"})
+        b = tf.chiave_fonte({"tipo": "workday", "url": "https://thales.wd3.myworkdayjobs.com/en-US/Careers"})
+        self.assertEqual(a, b)
+
+    def test_pagine_che_non_sono_carriere(self):
+        import siti
+        self.assertTrue(siti.sembra_articolo("https://www.insme.org/join-us-at-the-10th-insme-annual-meeting/"))
+        self.assertFalse(siti.sembra_articolo("https://acme.fr/nous-rejoindre/"))
+        adesione = "<h1>Join the network</h1><p>Become a member of our association, membership fees</p>"
+        lavoro = "<h1>Careers</h1><p>Open positions: Junior consultant (full-time). Apply with your CV.</p>"
+        self.assertFalse(siti.sembra_pagina_lavoro(adesione))
+        self.assertTrue(siti.sembra_pagina_lavoro(lavoro))
+        self.assertFalse(siti.RE_CARRIERE.search("/membership/join-us"))
+
+    def test_sito_con_pagina_adesione_scartata(self):
+        import siti
+        home = '<a href="/nous-rejoindre/">Nous rejoindre</a>'
+        adesione = "<p>Adhérer au réseau : cotisation annuelle des membres</p>"
+        pagine = {"https://rete.fr/": home, "https://rete.fr/nous-rejoindre/": adesione}
+        with mock.patch.object(siti, "_html", side_effect=lambda u: (pagine[u], u)):
+            self.assertEqual(siti.trova_fonti_sito("https://rete.fr/"), [])
+        pagine["https://rete.fr/nous-rejoindre/"] = "<p>Nous recrutons : stage et CDI, postuler ici</p>"
+        with mock.patch.object(siti, "_html", side_effect=lambda u: (pagine[u], u)):
+            self.assertEqual(siti.trova_fonti_sito("https://rete.fr/")[0]["url"], "https://rete.fr/nous-rejoindre/")
 
 
 if __name__ == "__main__":

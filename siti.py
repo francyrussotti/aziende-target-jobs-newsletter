@@ -119,11 +119,37 @@ def fonte_da_url(url):
     return None
 
 
+# Link alla pagina "carriere". Niente "opportunities"/"talent" da soli: nei siti
+# di consulenza sui bandi UE "funding opportunities" è la pagina dei bandi.
+# Link alla pagina "carriere". Niente "opportunities"/"talent"/"join us" da soli:
+# nei siti di consulenza sui bandi UE "funding opportunities" sono i bandi e
+# nelle associazioni "join us" è l'adesione alla rete.
 RE_CARRIERE = re.compile(
-    r"(careers?|jobs?|carri[eè]re|lavora[- ]con[- ]noi|lavora[- ]con[- ]us|work[- ]with[- ]us|join[- ]us|"
-    r"join[- ]the[- ]team|join[- ]our[- ]team|nous[- ]rejoindre|rejoignez|recrutement|recrute|emplois?|"
-    r"offres[- ]d.emploi|vacanc|opportunit|posizioni[- ]aperte|offerte[- ]di[- ]lavoro|we.?re[- ]hiring|"
-    r"karriere|stellenangebote|trabaja[- ]con|empleo|talent)", re.I)
+    r"\b(careers?|jobs?|job[- ]opportunities|carri[eè]res?|lavora[- ]con[- ]noi|work[- ]with[- ]us|"
+    r"join[- ]the[- ]team|join[- ]our[- ]team|nous[- ]rejoindre|rejoignez[- ]nous|recrutement|"
+    r"on[- ]recrute|nous[- ]recrutons|offres[- ]d.emploi|emplois?|vacanc(y|ies)|posizioni[- ]aperte|"
+    r"offerte[- ]di[- ]lavoro|we.?re[- ]hiring|karriere|stellenangebote|trabaja[- ]con[- ]nosotros|"
+    r"empleo|lavora[- ]con[- ]us)\b", re.I)
+# Una vera pagina carriere parla di lavoro: almeno 2 di questi termini diversi
+RE_LESSICO_LAVORO = re.compile(
+    r"\b(cdi|cdd|stage|stagiaire|internship|full[- ]time|part[- ]time|apply|postuler|candidat\w*|"
+    r"job (?:offer|opening|description)s?|open positions?|vacanc(?:y|ies)|posizion[ei] apert\w*|"
+    r"offerte di lavoro|curriculum|\bcv\b|recrutement|recrutons|we are hiring|hiring|offres? d.emploi|"
+    r"lavora con noi|stellenangebote|bewerb\w*|empleo|ofertas? de empleo|tirocini\w*|"
+    r"contrat|contratto|contract type|salary|salaire|retribuzione)\b", re.I)
+
+
+def sembra_pagina_lavoro(html):
+    from bs4 import BeautifulSoup
+    testo = BeautifulSoup(html, "lxml").get_text(" ", strip=True)
+    return len({m.group(1).lower() for m in RE_LESSICO_LAVORO.finditer(testo)}) >= 2
+
+
+def sembra_articolo(url):
+    """/join-us-at-the-10th-insme-annual-meeting/ è un articolo, non la pagina carriere."""
+    ultimo = [p for p in urlparse(url).path.split("/") if p][-1:] or [""]
+    return len(re.split(r"[-_]", ultimo[0])) > 5
+
 PERCORSI_COMUNI = ["careers", "jobs", "lavora-con-noi", "carrieres", "recrutement", "nous-rejoindre",
                    "join-us", "work-with-us", "en/careers", "it/lavora-con-noi", "fr/recrutement",
                    "fr/carrieres", "en/jobs", "about/careers", "company/careers"]
@@ -149,6 +175,8 @@ def link_carriere(html, base):
         if urlparse(href).netloc.replace("www.", "") != host:
             continue
         testo = a.get_text(" ", strip=True)[:60]
+        if sembra_articolo(href):
+            continue
         if RE_CARRIERE.search(urlparse(href).path) or (testo and RE_CARRIERE.search(testo)):
             # Preferisci i link più "parlanti" e con percorso corto
             punti = (2 if RE_CARRIERE.search(urlparse(href).path) else 0) + (1 if RE_CARRIERE.search(testo) else 0)
@@ -158,34 +186,37 @@ def link_carriere(html, base):
 
 
 def trova_fonti_sito(sito):
-    """Fonti trovate a partire dal sito ufficiale. Lista vuota se nulla."""
+    """Fonti trovate a partire dal sito ufficiale. Lista vuota se nulla.
+    Un portale linkato dal sito è verificato per costruzione; una pagina
+    carriere si tiene solo se parla davvero di lavoro (sembra_pagina_lavoro)."""
     try:
         html, finale = _html(sito)
     except tf.FonteErrore:
         return []
     portali, carriere = link_carriere(html, finale)
     nota = f"linkato da {urlparse(finale).netloc}"
-    if not portali and not carriere:
-        for p in PERCORSI_COMUNI:
-            try:
-                h, fin = _html(urljoin(finale, p))
-            except tf.FonteErrore:
-                continue
-            if RE_CARRIERE.search(urlparse(fin).path):    # niente redirect alla home
-                carriere = fin
-                break
-    if carriere and not portali:
-        # La pagina carriere spesso rimanda a sua volta al portale
+    candidate = [carriere] if carriere else [urljoin(finale, p) for p in PERCORSI_COMUNI]
+    for url in candidate:
+        if portali:
+            break
         try:
-            h, fin = _html(carriere)
-            portali, _ = link_carriere(h, fin)
+            h, fin = _html(url)
         except tf.FonteErrore:
-            pass
-    if portali:
-        return [{**f, "verifica": nota} for f in portali][:3]
-    if carriere:
-        return [{"tipo": "pagina", "url": carriere, "verifica": f"pagina carriere del sito {urlparse(finale).netloc}"}]
-    return []
+            continue
+        if not RE_CARRIERE.search(urlparse(fin).path + " " + url):   # redirect alla home
+            continue
+        # La pagina carriere spesso rimanda a sua volta al portale
+        portali, _ = link_carriere(h, fin)
+        if portali:
+            nota = f"linkato dalla pagina carriere {fin}"
+            break
+        if sembra_pagina_lavoro(h):
+            return [{"tipo": "pagina", "url": fin, "verifica": f"pagina carriere del sito {urlparse(finale).netloc}"}]
+        if carriere:
+            break                       # la pagina linkata non parla di lavoro: niente percorsi a caso
+    # Solo portali con slug plausibile (es. "jobs.smartrecruiters.com/ni/…" non è uno slug)
+    portali = [f for f in portali if len(str(f.get("slug") or f.get("url") or "")) >= 3]
+    return [{**f, "verifica": nota} for f in portali][:3]
 
 
 def main():

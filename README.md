@@ -30,7 +30,8 @@ quelle senza data diventano lo stato iniziale e da lì in poi si segnalano solo 
 |---|---|
 | `dati/aziende.json` | La lista (1040 aziende). Si aggiorna con `python importa_aziende.py --html page.html` (pagina generata da `build_page.py` o salvata dall'artifact). |
 | `dati/fonti_manuali.json` | Fonti scritte a mano: vincono su quelle automatiche. Lista vuota = nessuna fonte (es. stesso portale di un'altra voce dello stesso gruppo). |
-| `dati/fonti.json` | Fonti trovate da `scopri_fonti.py` (ogni lunedì). Una fonte si tiene solo se il nome dell'azienda sul portale corrisponde a quello in lista. |
+| `dati/fonti.json` | Fonti trovate da `scopri_fonti.py` (ogni lunedì): portali e pagine carriere linkati dal sito ufficiale dell'azienda, o portali con lo stesso nome e annunci nei paesi dell'azienda. I casi dubbi finiscono in `da_verificare` e non si usano. |
+| `dati/siti.json` | Sito ufficiale di ogni azienda, dai dati CORDIS (`python siti.py`). |
 | `dati/seen.json` | Offerte già inviate (si dimenticano dopo 90 giorni senza vederle). |
 
 ## Fonti supportate
@@ -38,6 +39,8 @@ quelle senza data diventano lo stato iniziale e da lì in poi si segnalano solo 
 Lever, Greenhouse, Workable, SmartRecruiters, Ashby, Recruitee (API pubbliche),
 Personio (XML), Workday (siti `myworkdayjobs.com`), Welcome to the Jungle
 (pagina azienda) e una pagina "carriere" qualunque (`pagina`: segnala i link nuovi).
+
+Per controllare cosa legge ogni fonte senza mandare email: Actions → "🧪 Prova fonti".
 
 Esempio di fonte manuale:
 

@@ -22,8 +22,17 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
 - `fonti.py`: lettori dei portali (lever, greenhouse, workable, smartrecruiters, ashby, recruitee,
   personio, workday, wttj, pagina) + classificazione sede (PAR/IT/REMOTO/ND/ALTRO) + scoperta per slug.
 - `siti.py`: siti ufficiali dai dati CORDIS (`dati/siti.json`) e ricerca della pagina carriere / portale linkato.
-- `scopri_fonti.py`: ricerca fonti (workflow `scopri-fonti.yml`, lunedì), max 40 minuti per run,
-  salva a intervalli, riparte dalle aziende non ancora controllate (`controllate2` in `dati/fonti.json`).
+- `scopri_fonti.py`: ricerca fonti (workflow `scopri-fonti.yml`, lunedì), max 40 minuti per run
+  (in pratica ~11 minuti per 1040 aziende), salva a intervalli, riparte dalle aziende non ancora
+  controllate (`controllate3` in `dati/fonti.json`). A ogni controllo le fonti di un'azienda si
+  sostituiscono. Regole di accettazione:
+  - portale linkato dal sito ufficiale (CORDIS) → accettato;
+  - pagina carriere del sito → solo se contiene lessico da annunci (`siti.sembra_pagina_lavoro`)
+    e non è un articolo; mai "opportunities"/"talent"/"join us" da soli;
+  - portale trovato per slug → nome con TUTTE le parole distintive + annunci in un paese
+    dell'azienda; senza annunci solo se il nome è identico parola per parola;
+  - nome solo compatibile (più corto) → `da_verificare` (non usato: controllare a mano e
+    spostare in `fonti_manuali.json` se giusto).
 - `dati/fonti_manuali.json` vince su `dati/fonti.json`.
 - Prima lettura di una fonte: portale strutturato → tutte le offerte aperte in focus ("già aperta");
   pagina generica → stato iniziale silenzioso. Poi solo le nuove.
@@ -33,14 +42,21 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
 - [x] Repo creato, secret Gmail aggiunti dall'utente, test verdi su GitHub.
 - [x] Fonti manuali verificate su GitHub (prova 26/10): PNO 14, Novaspace 25, Starburst 5,
       Hello Tomorrow 1, Commpla 1, LGI 0 (WTTJ, nessuna offerta aperta).
-- [x] Workday per paese: Thales 2000 offerte lette (686 Parigi/IDF, 25 Italia); ora un paese
-      alla volta per non perdere offerte oltre il limite di 2000 di Workday (da riverificare).
-- [x] Prima ricerca automatica (26/10) scartata: troppi falsi positivi su nomi comuni
-      (Alliance, Space, Advanced, Hive, Amplitude…). Ora: nome compatibile + annunci in un paese
-      dell'azienda (o nome identico). dati/fonti.json cancellato per ripartire da zero.
-- [ ] Nuova ricerca fonti completa (siti ufficiali CORDIS + slug); leggere nel log tutte le fonti
-      trovate e verificare a mano quelle delle aziende prioritarie.
+- [x] Workday: Thales 2000 offerte lette (686 Parigi/IDF, 25 Italia) con il filtro per paese;
+      ora un paese alla volta (limite 2000 di Workday) — da riverificare con la prova.
+- [x] 1ª ricerca (slug) scartata: omonimi (Alliance, Space, Advanced, Hive, Amplitude…).
+- [x] 2ª ricerca (run 40347272318, 208 aziende con fonte) scartata dopo revisione a mano:
+      pagine di adesione/articoli/bandi prese per "carriere", nomi "identici" falsi
+      (Trust-It→Trust, Hydrogen Europe Research→Hydrogen, A.Spire→Spire), Thales Workday doppio.
+      Copia per confronto: nessuna nel repo (era nel commit 6138b41).
+- [x] Revisione completa del codice (26/10): corretti email oltre il limite Gmail (~102 KB),
+      doppioni tra portali, link "vedi tutte" per ogni portale, "Remote Sensing" ≠ remoto,
+      sede solo "France" mostrata a parte, link con parametri volatili, WTTJ 403 → browser,
+      sedi non indicate solo per aziende Parigi/Italia, email del lunedì se ci sono fonti rotte,
+      workflow newsletter non lancia più la ricerca (sforava il timeout). 42 test.
+- [ ] 3ª ricerca fonti con le regole nuove; rileggere TUTTO l'elenco nel log (anche ❔ da verificare).
 - [ ] Prova fonti su tutte le fonti trovate; correggere quelle rotte o sbagliate.
-- [ ] Prima newsletter reale (workflow "🎯 Newsletter Aziende Target") e controllo dell'email.
+- [ ] Prima newsletter reale (workflow "🎯 Newsletter Aziende Target") e controllo dell'email
+      (dimensione, sezioni, link).
 - [ ] Aziende prioritarie (Parigi/Italia, classe A o open innovation) ancora senza fonte:
       elencarle per l'utente.

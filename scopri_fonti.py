@@ -10,7 +10,8 @@ restituito dal portale (o citato negli annunci) corrisponde a quello in lista:
 così non entrano annunci di aziende omonime.
 
 Le aziende in dati/fonti_manuali.json non si cercano (vince la scelta manuale).
-Le fonti trovate in passato restano.
+A ogni controllo le fonti di un'azienda si sostituiscono con quelle trovate.
+I candidati dubbi (nome solo compatibile) vanno in "da_verificare" e non si usano.
 
 Ogni run ha un tempo massimo (--minuti): si parte dalle aziende mai
 controllate, poi da quelle controllate da più tempo, e si salva a intervalli.
@@ -35,13 +36,15 @@ from newsletter import AZIENDE_FILE, FONTI_FILE, FONTI_MANUALI_FILE, _leggi_json
 SALVA_OGNI = 40   # aziende
 
 
-def salva(fonti, controllate, oggi):
+def salva(fonti, da_verificare, controllate, oggi):
     tmp = FONTI_FILE + ".tmp"
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump({"aggiornato": oggi, "nota": "File generato da scopri_fonti.py: per "
-                   "correggere una fonte usa dati/fonti_manuali.json",
+                   "correggere o confermare una fonte usa dati/fonti_manuali.json. "
+                   "'da_verificare' = candidati dubbi (nome solo compatibile), NON usati.",
                    "fonti": dict(sorted(fonti.items())),
-                   "controllate2": dict(sorted(controllate.items()))},
+                   "da_verificare": dict(sorted(da_verificare.items())),
+                   "controllate3": dict(sorted(controllate.items()))},
                   f, ensure_ascii=False, indent=1)
         f.write("\n")
     os.replace(tmp, FONTI_FILE)
@@ -61,8 +64,8 @@ def main():
     manuali = _leggi_json(FONTI_MANUALI_FILE, {})
     vecchio = _leggi_json(FONTI_FILE, {})
     fonti = {k: v for k, v in vecchio.get("fonti", {}).items() if k in ids}   # solo aziende in lista
-    # "controllate2": controllo che include il sito ufficiale (dati/siti.json)
-    controllate = {k: v for k, v in vecchio.get("controllate2", {}).items() if k in ids}
+    # "controllate3": regole del 26/10 (verifica severa, pagine carriere controllate)
+    controllate = {k: v for k, v in vecchio.get("controllate3", {}).items() if k in ids}
     siti_uff = _leggi_json(siti.SITI_FILE, {})
 
     da_cercare = [x for x in aziende if x["id"] not in manuali]
@@ -83,30 +86,42 @@ def main():
         # 1) dal sito ufficiale (verificato per costruzione); 2) slug sui portali
         dal_sito = siti.trova_fonti_sito(siti_uff[az["id"]]) if az["id"] in siti_uff else []
         tipi_trovati = {f["tipo"] for f in dal_sito}
-        return az, dal_sito + [f for f in tf.scopri(az) if f["tipo"] not in tipi_trovati]
+        return az, dal_sito + [f for f in tf.scopri(az)
+                               if f["tipo"] not in tipi_trovati or "da_verificare" in f]
 
+    da_verificare = {k: v for k, v in vecchio.get("da_verificare", {}).items() if k in ids}
     with ThreadPoolExecutor(max_workers=a.thread) as ex:
         for az, trovate in ex.map(uno, da_cercare):
             if trovate is None:
                 continue
             fatte += 1
             controllate[az["id"]] = oggi
-            if trovate:
-                prima = {tf.chiave_fonte(f) for f in fonti.get(az["id"], [])}
-                unite = {tf.chiave_fonte(f): f for f in fonti.get(az["id"], [])}
-                for f in trovate:
-                    f.setdefault("trovata", oggi)
-                    unite.setdefault(tf.chiave_fonte(f), f)
-                fonti[az["id"]] = list(unite.values())
-                if set(unite) - prima:
-                    trovate_oggi += 1
-                    print(f"   ✅ {az['n']}: " + ", ".join(
-                        f"{tf.chiave_fonte(f)} ({f.get('verifica', '')})" for f in trovate), flush=True)
+            buone = [f for f in trovate if "da_verificare" not in f]
+            dubbie = [f for f in trovate if "da_verificare" in f]
+            # A ogni controllo le fonti dell'azienda si sostituiscono: una fonte
+            # che le regole attuali non confermano non deve restare.
+            prima = {tf.chiave_fonte(f) for f in fonti.get(az["id"], [])}
+            if buone:
+                for f in buone:
+                    f["trovata"] = oggi
+                fonti[az["id"]] = list({tf.chiave_fonte(f): f for f in buone}.values())
+            else:
+                fonti.pop(az["id"], None)
+            if dubbie:
+                da_verificare[az["id"]] = dubbie
+            else:
+                da_verificare.pop(az["id"], None)
+            if buone and {tf.chiave_fonte(f) for f in buone} != prima:
+                trovate_oggi += 1
+                print(f"   ✅ {az['n']} [{az['id']}]: " + ", ".join(
+                    f"{tf.chiave_fonte(f)} ({f.get('verifica', '')})" for f in buone), flush=True)
+            for f in dubbie:
+                print(f"   ❔ {az['n']} [{az['id']}]: {tf.chiave_fonte(f)} ({f['da_verificare']})", flush=True)
             if fatte % SALVA_OGNI == 0:
-                salva(fonti, controllate, oggi)
+                salva(fonti, da_verificare, controllate, oggi)
                 print(f"   … {fatte}/{len(da_cercare)} controllate", flush=True)
 
-    salva(fonti, controllate, oggi)
+    salva(fonti, da_verificare, controllate, oggi)
     restano = len(da_cercare) - fatte
     print(f"\n💾 {fatte} aziende controllate, {trovate_oggi} con fonte nuova · "
           f"{len(fonti)} aziende con fonte in totale"

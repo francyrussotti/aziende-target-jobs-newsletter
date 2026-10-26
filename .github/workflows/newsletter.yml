@@ -51,9 +51,6 @@ jobs:
       - name: Install Playwright system deps
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: sudo $(which playwright) install-deps chromium
-      - name: Cerca le fonti se non ci sono ancora
-        run: |
-          if [ ! -f dati/fonti.json ]; then python -u scopri_fonti.py; fi
       - name: Run newsletter
         timeout-minutes: 30
         env:

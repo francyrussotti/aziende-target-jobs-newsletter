@@ -299,7 +299,12 @@ def wttj(slug, **_):
     """Pagina pubblica dell'azienda su Welcome to the Jungle. Se il codice HTML
     non contiene gli annunci (pagina costruita in JavaScript) si usa Playwright."""
     url = f"https://www.welcometothejungle.com/fr/companies/{slug}/jobs"
-    html = _get(url, headers={"Accept": "text/html"}).text
+    try:
+        html = _get(url, headers={"Accept": "text/html"}).text
+    except NonTrovata:
+        raise
+    except FonteErrore:
+        html = ""                     # es. 403 anti-bot: si prova col browser
     out = _wttj_estrai(slug, html)
     if not out:
         html_js = _html_con_browser(url)
@@ -329,9 +334,26 @@ def _wttj_estrai(slug, html):
 
 # --- Pagina carriere generica -----------------------------------------------
 
+# Parole da annuncio nel percorso del link, come parole intere
+# ("intern" sì, "international" no).
 RE_LINK_ANNUNCIO = re.compile(
-    r"(job|jobs|career|careers|carriere|carrière|vacanc|position|posizion|offre|offres|emploi|"
-    r"recrut|stage|intern|lavora|opportunit|opening|stelle|annonce|apply|candidat)", re.I)
+    r"(?:^|[/_\-.?=&])(jobs?|careers?|carri[eè]res?|vacanc\w*|positions?|posizion[ei]|offres?|"
+    r"emplois?|recrut\w*|stages?|internships?|interns?|lavora\w*|openings?|stellen\w*|annonces?|"
+    r"apply|candidat\w*|job-?offers?|offerte|bandi-di-lavoro|selezion[ei])(?=$|[/_\-.?=&])", re.I)
+# Parametri che cambiano a ogni visita: tolti dall'URL, altrimenti lo stesso
+# annuncio sembrerebbe nuovo ogni giorno.
+RE_PARAM_VOLATILI = re.compile(r"(?i)^(utm_\w+|fbclid|gclid|mc_\w+|sessionid|sid|jsessionid|phpsessid|"
+                               r"_ga|ref|source|lang|hl)$")
+
+
+def _url_stabile(href):
+    from urllib.parse import parse_qsl, urlencode
+    u = urlparse(href)
+    q = [(k, v) for k, v in parse_qsl(u.query, keep_blank_values=True) if not RE_PARAM_VOLATILI.match(k)]
+    u = u._replace(query=urlencode(q), fragment="")
+    return re.sub(r";jsessionid=[^/?]*", "", u.geturl(), flags=re.I)
+
+
 RE_LINK_MENU = re.compile(
     r"^(careers?|jobs?|carri[eè]res?|lavora con noi|work with us|join us|nous rejoindre|"
     r"rejoignez[- ]nous|apply|candidature spontan\w*|spontaneous application|open application|"
@@ -360,7 +382,7 @@ def estrai_link_annunci(html, url, filtro=None):
     visti, out = set(), []
     for a in soup.find_all("a", href=True):
         testo = a.get_text(" ", strip=True)
-        href = urljoin(url, a["href"]).split("#")[0]
+        href = _url_stabile(urljoin(url, a["href"]))
         if not (8 <= len(testo) <= 160) or RE_LINK_MENU.match(testo) or href.rstrip("/") == url.rstrip("/"):
             continue
         dominio = urlparse(href).netloc.replace("www.", "")
@@ -370,7 +392,7 @@ def estrai_link_annunci(html, url, filtro=None):
         if rf:
             if not rf.search(href + " " + testo):
                 continue
-        elif not su_ats and not RE_LINK_ANNUNCIO.search(urlparse(href).path):
+        elif not su_ats and not RE_LINK_ANNUNCIO.search(urlparse(href).path + "?" + urlparse(href).query):
             continue
         if href in visti or href.startswith("mailto:"):
             continue
@@ -411,6 +433,12 @@ def leggi_fonte(fonte: dict) -> list:
 
 
 def chiave_fonte(fonte: dict) -> str:
+    """Identifica il portale. Workday: host + sito, senza la lingua
+    (".../fr-FR/Careers" e ".../en-US/Careers" sono lo stesso portale)."""
+    if fonte.get("tipo") == "workday":
+        u = urlparse(fonte.get("url", ""))
+        parti = [p for p in u.path.split("/") if p and not re.fullmatch(r"[a-z]{2}-[A-Z]{2}", p)]
+        return f"workday:{u.netloc.lower()}/{'/'.join(parti)}"
     return fonte["tipo"] + ":" + str(fonte.get("slug") or fonte.get("url"))
 
 
@@ -436,26 +464,48 @@ RE_ITALIA = re.compile(
     r"frascati|ispra|cosenza|potenza|campobasso|l'aquila|sesto san giovanni|assago|segrate)\b", re.I)
 RE_REMOTO = re.compile(r"\b(remote|remoto|full[- ]?remote|t[ée]l[ée]travail|anywhere|home[- ]based|"
                        r"smart ?working|work from home)\b", re.I)
-RE_FRANCIA = re.compile(r"\b(france|francia)\b", re.I)
+# Nel titolo solo forme esplicite: "Remote Sensing Engineer" non è da remoto
+RE_REMOTO_TITOLO = re.compile(r"(\bfull[- ]?remote\b|\b100\s?% remote\b|\bremote[- ]first\b|"
+                              r"\bfully remote\b|\bt[ée]l[ée]travail (?:complet|total)\b|"
+                              r"\(remote\)|[-–] remote\s*$)", re.I)
+RE_FRANCIA = re.compile(r"\b(france|francia|frankreich|fr)\b", re.I)
 
 # Sezioni della newsletter, in ordine di priorità
 SEZIONI = [("PAR", "Parigi e Île-de-France"), ("IT", "Italia"), ("REMOTO", "Da remoto"),
-           ("ND", "Sede non indicata"), ("ALTRO", "Altre sedi")]
+           ("FR", "Francia, città non indicata"), ("ND", "Sede non indicata"), ("ALTRO", "Altre sedi")]
 
 
 def luogo(o: dict) -> str:
-    """PAR / IT / REMOTO / ALTRO / ND. Parigi vince su tutto: un annuncio
-    "Paris / Milano" finisce sotto Parigi."""
+    """PAR / IT / REMOTO / FR / ND / ALTRO. Parigi vince su tutto: un annuncio
+    "Paris / Milano" finisce sotto Parigi. "France" senza città → FR (può
+    essere Parigi: si mostra a parte)."""
     loc, paese = o.get("location") or "", (o.get("paese") or "").upper()
     if RE_PARIGI.search(loc):
         return "PAR"
     if paese == "IT" or RE_ITALIA.search(loc):
         return "IT"
-    if o.get("remoto") or RE_REMOTO.search(loc) or RE_REMOTO.search(o.get("titolo") or ""):
+    if o.get("remoto") or RE_REMOTO.search(loc) or RE_REMOTO_TITOLO.search(o.get("titolo") or ""):
         return "REMOTO"
     if not loc and not paese:
         return "ND"
+    resto = re.sub(r"[\s,;/|()\-]+", "", RE_FRANCIA.sub("", loc))
+    if (RE_FRANCIA.search(loc) or paese == "FR") and not resto:
+        return "FR"
     return "ALTRO"
+
+
+def url_pubblico(fonte: dict) -> str:
+    """Pagina pubblica con tutti gli annunci della fonte (link "vedi tutte")."""
+    t, s = fonte.get("tipo"), fonte.get("slug")
+    return {"lever": f"https://jobs.{'eu.' if fonte.get('eu') else ''}lever.co/{s}",
+            "greenhouse": f"https://boards.greenhouse.io/{s}",
+            "workable": f"https://apply.workable.com/{s}/",
+            "smartrecruiters": f"https://jobs.smartrecruiters.com/{s}",
+            "ashby": f"https://jobs.ashbyhq.com/{s}",
+            "recruitee": f"https://{s}.recruitee.com/",
+            "personio": f"https://{s}.{fonte.get('dominio', 'jobs.personio.de')}/",
+            "wttj": f"https://www.welcometothejungle.com/fr/companies/{s}/jobs",
+            }.get(t) or fonte.get("url") or ""
 
 
 # ============================================================
@@ -478,7 +528,10 @@ GENERICHE = {
     "energia", "digital", "global", "partners", "associazione", "association", "centre", "center",
     "centro", "advisory", "management", "sustainable", "systems", "engineering", "italia",
     "france", "france", "de", "la", "le", "les", "des", "del", "della", "per", "et", "for", "of",
-    "in", "und", "y", "da", "do", "eu", "it", "new", "smart", "green", "data", "labs", "lab",
+    "in", "und", "y", "da", "do", "eu", "new", "smart", "green", "data", "labs", "lab",
+    # paesi (non distinguono un'azienda: "ENGIE Italia" è Engie)
+    "italy", "spain", "espana", "germany", "deutschland", "belgium", "belgique", "netherlands",
+    "nederland", "hellas", "greece", "portugal", "austria", "ireland", "uk", "suisse", "schweiz",
 }
 
 
@@ -526,7 +579,16 @@ def nome_corrisponde(nostro: str, loro: str) -> bool:
 
 
 def nome_uguale(nostro: str, loro: str) -> bool:
-    return bool(_distintive(nostro)) and "".join(_distintive(nostro)) == "".join(_distintive(loro))
+    """Nomi identici parola per parola (generiche comprese): "Trust-It Services"
+    non è uguale a "Trust", "Hydrogen Europe Research" non è "Hydrogen"."""
+    return bool(parole(nostro)) and "".join(parole(nostro)) == "".join(parole(loro))
+
+
+def nome_forte(nostro: str, loro: str) -> bool:
+    """Il nome sul portale contiene TUTTE le parole distintive del nostro
+    ("RINA" per "Rina Consulting SPA" sì; "Magellan" per "Magellan Circle" no)."""
+    a = _distintive(nostro)
+    return bool(a) and set(a) <= set(parole(loro))
 
 
 def testo_cita_nome(nostro: str, testi: list) -> bool:
@@ -638,10 +700,16 @@ def _prova(tipo, slug, azienda):
         if tipo == "lever-eu":
             f["eu"] = True
         offerte = leggi_fonte(f)
-        if offerte and annunci_nei_paesi(offerte, paesi):
+        nei_paesi = bool(offerte) and annunci_nei_paesi(offerte, paesi)
+        forte = nome_forte(nome, loro)
+        if forte and nei_paesi:
             f["verifica"] = f"nome '{loro}' + annunci in {'/'.join(p for p in paesi if p)}"
-        elif nome_uguale(nome, loro) and tipo not in ("lever", "lever-eu", "ashby"):
-            f["verifica"] = f"nome identico '{loro}'"
+        elif forte and not offerte and nome_uguale(nome, loro) and tipo not in ("lever", "lever-eu", "ashby"):
+            f["verifica"] = f"nome identico '{loro}', nessun annuncio da controllare"
+        elif nei_paesi:
+            # Nome solo compatibile (es. "Thales" per "Thales Six Gts France"): può
+            # essere il gruppo o un omonimo. Non si usa: va verificato a mano.
+            f["da_verificare"] = f"nome '{loro}' più corto + annunci in {'/'.join(p for p in paesi if p)}"
         else:
             return None
         return f
@@ -653,8 +721,9 @@ TIPI_SCOPERTA = ["greenhouse", "lever", "lever-eu", "workable", "smartrecruiters
 
 
 def scopri(azienda: dict) -> list:
-    """Fonti verificate per un'azienda della lista. WTTJ solo per le aziende
-    con sede in Francia (lì è il portale più usato)."""
+    """Fonti per un'azienda della lista, provando gli slug sui portali. WTTJ solo
+    per le aziende con sede in Francia. Le fonti con "da_verificare" non vanno
+    nella newsletter finché non le conferma una persona."""
     tipi = TIPI_SCOPERTA + (["wttj"] if "FR" in (azienda.get("p") or "").split(",") else [])
     trovate, usati = [], set()
     for tipo in tipi:
@@ -662,6 +731,7 @@ def scopri(azienda: dict) -> list:
             f = _prova(tipo, slug, azienda)
             if f and f["tipo"] not in usati:
                 trovate.append(f)
-                usati.add(f["tipo"])
-                break
+                if "da_verificare" not in f:
+                    usati.add(f["tipo"])
+                    break
     return trovate
