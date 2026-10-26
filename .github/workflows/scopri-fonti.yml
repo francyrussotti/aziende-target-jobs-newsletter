@@ -34,10 +34,12 @@ jobs:
       - run: pip install requests beautifulsoup4 lxml
       - run: python -u scopri_fonti.py ${{ inputs.solo_focus && '--focus' || '' }}
       - name: Commit fonti
+        if: always()   # salva anche i risultati parziali
         run: |
           set -e
           git config --global user.name "github-actions"
           git config --global user.email "actions@github.com"
+          [ -f dati/fonti.json ] || exit 0
           git add dati/fonti.json
           if git diff --staged --quiet; then echo "Nessuna modifica"; exit 0; fi
           git commit -m "aziende target: aggiorna fonti"

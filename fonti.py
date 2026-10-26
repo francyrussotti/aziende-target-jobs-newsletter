@@ -53,11 +53,16 @@ def _sessione():
 
 
 SESSION = _sessione()
+# Per la scoperta: nessun nuovo tentativo e niente attese su Retry-After.
+# Uno slug che non risponde al primo colpo si riprova la settimana dopo.
+SESSION_RAPIDA = requests.Session()
+SESSION_RAPIDA.mount("https://", HTTPAdapter(max_retries=0, pool_maxsize=32))
 
 
 def _get(url, metodo="GET", **kw):
+    sessione = SESSION_RAPIDA if kw.pop("rapida", False) else SESSION
     try:
-        r = SESSION.request(metodo, url, headers={**HEADERS, **kw.pop("headers", {})},
+        r = sessione.request(metodo, url, headers={**HEADERS, **kw.pop("headers", {})},
                             timeout=kw.pop("timeout", 20), **kw)
     except requests.RequestException as e:
         raise FonteErrore(f"{url}: {e.__class__.__name__}") from e
@@ -506,7 +511,9 @@ def testo_cita_nome(nostro: str, testi: list) -> bool:
 
 
 def _prova(tipo, slug, nome):
-    """(fonte, n. offerte) se lo slug esiste ED è dell'azienda, altrimenti None."""
+    """Fonte se lo slug esiste ED è dell'azienda, altrimenti None."""
+    _json = lambda url, **kw: globals()["_json"](url, rapida=True, timeout=8, **kw)
+    _get = lambda url, **kw: globals()["_get"](url, rapida=True, timeout=8, **kw)
     try:
         if tipo == "greenhouse":
             b = _json(f"https://boards-api.greenhouse.io/v1/boards/{slug}")
