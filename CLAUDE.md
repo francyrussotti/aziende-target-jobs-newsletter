@@ -114,8 +114,9 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
       40372291915): raccolta ok (955 offerte, 75 KB), login Gmail sempre "Connection unexpectedly
       closed" su 465 e 587. Controlli secret: mittente Gmail ASCII senza spazi, password 16 lettere
       minuscole → formato giusto ma valore non valido (Big4 invia con le sue credenziali).
-- [ ] IN ATTESA DELL'UTENTE: aggiornare GMAIL_PASSWORD (stessa App Password di BIG4 o nuova) e
-      GMAIL_MITTENTE nei secret del repo; poi rilanciare newsletter.yml con forza=true.
+- [x] Nuova App Password messa dall'utente → 1ª newsletter INVIATA (run 40381057806, 26/10):
+      2851 offerte, 965 mostrate, email 81 KB, porta 465; seen.json creato (1042 offerte, commit 4ec5d01).
+      Dalle prossime run solo le offerte nuove.
 - [x] Ricerca REGOLE=7 con browser per WTTJ (run 40369605324): 97 aziende con fonte; WTTJ trova
       Artelys (nuova) e CS Group; prioritarie con fonte ancora 8/54.
 - [ ] Aziende prioritarie (Parigi/Italia, classe A o open innovation) ancora senza fonte:
