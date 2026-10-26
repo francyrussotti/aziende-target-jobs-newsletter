@@ -104,7 +104,11 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
       19 senza sito in CORDIS. Corretto: WTTJ nella ricerca con il browser (solo FR del focus
       Parigi), home mai pagina carriere, siti_manuali Bpifrance → bpifrance.fr. REGOLE=7. 59 test.
 - [ ] Ricerca REGOLE=7 (con browser per WTTJ) e rilettura; prova delle fonti nuove.
-- [ ] Prima newsletter reale (workflow "🎯 Newsletter Aziende Target") e controllo dell'email
-      (dimensione, sezioni, link).
+- [x] 1ª newsletter (run 40369302568) FALLITA all'invio: raccolta ok (2847 offerte, 955 da mostrare,
+      email 75 KB) ma Gmail chiude la connessione ("Connection unexpectedly closed", 3 volte).
+      Corretto: secret ripuliti da spazi/"a capo", porta 587 STARTTLS di riserva, log della fase e
+      della lunghezza password (16 attesi). Newsletter in un gruppo di concorrenza proprio. 61 test.
+- [ ] Rilanciare la newsletter e controllare l'invio; se fallisce ancora → problema dei secret
+      (chiedere all'utente di ricontrollare GMAIL_MITTENTE / App Password nel nuovo repo).
 - [ ] Aziende prioritarie (Parigi/Italia, classe A o open innovation) ancora senza fonte:
       elencarle per l'utente.

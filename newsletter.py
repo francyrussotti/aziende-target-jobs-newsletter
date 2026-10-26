@@ -380,32 +380,57 @@ def componi_email(nuove, aziende, fonti, stat, problemi, n_fonti):
     return html
 
 
+def _segreti():
+    """Secret ripuliti: spazi e "a capo" incollati per errore fanno chiudere la
+    connessione a Gmail (la App Password si mostra come "abcd efgh ijkl mnop")."""
+    mittente = os.environ.get("GMAIL_MITTENTE", "").strip()
+    password = re.sub(r"\s+", "", os.environ.get("GMAIL_PASSWORD", ""))
+    dest = os.environ.get("EMAIL_DESTINATARIO", "").strip()
+    return mittente, password, dest
+
+
+def _smtp(porta):
+    if porta == 465:
+        return smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=60)
+    s = smtplib.SMTP("smtp.gmail.com", 587, timeout=60)
+    s.ehlo()
+    s.starttls()
+    s.ehlo()
+    return s
+
+
 def invia_email(html_body, oggetto_email):
     """Invio via Gmail (App Password). Destinatari in CCN: nell'intestazione
-    compare solo il mittente. Restituisce 'ok', 'auth', 'config' o 'errore'."""
-    mittente = os.environ.get("GMAIL_MITTENTE", "")
-    password = os.environ.get("GMAIL_PASSWORD", "")
-    dest = os.environ.get("EMAIL_DESTINATARIO", "")
+    compare solo il mittente. Restituisce 'ok', 'auth', 'config' o 'errore'.
+    Prova la porta 465 (SSL) e, se la connessione si chiude, la 587 (STARTTLS)."""
+    mittente, password, dest = _segreti()
     if not mittente or not password or not dest:
         print("❌ Secret mancanti: GMAIL_MITTENTE, GMAIL_PASSWORD, EMAIL_DESTINATARIO")
         return "config"
+    # Diagnostica senza rivelare nulla: una App Password Gmail ha 16 caratteri
+    print(f"✉️  Mittente con @: {'@' in mittente} · password: {len(password)} caratteri"
+          + ("" if len(password) == 16 else " (attesi 16 per una App Password Gmail)"))
     destinatari = list(dict.fromkeys(d for d in re.split(r"[,;\s]+", dest) if d))
     msg = MIMEMultipart("alternative")
     msg["Subject"], msg["From"], msg["To"] = oggetto_email, mittente, mittente
     msg.attach(MIMEText(html_body, "html", "utf-8"))
-    for tentativo, attesa in enumerate((0, 10, 30), 1):
+    for tentativo, (porta, attesa) in enumerate([(465, 0), (587, 5), (465, 20), (587, 20)], 1):
         time.sleep(attesa)
+        fase = "connessione"
         try:
-            with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=60) as s:
+            with _smtp(porta) as s:
+                fase = "login"
                 s.login(mittente, password)
+                fase = "invio"
                 s.sendmail(mittente, list(dict.fromkeys([mittente] + destinatari)), msg.as_string())
-            print(f"✅ Email inviata a {len(destinatari)} destinatari (CCN)")
+            print(f"✅ Email inviata a {len(destinatari)} destinatari (CCN), porta {porta}")
             return "ok"
         except smtplib.SMTPAuthenticationError:
-            print("❌ Autenticazione Gmail rifiutata: rigenera la App Password")
+            print("❌ Autenticazione Gmail rifiutata: controlla GMAIL_MITTENTE e rigenera la App Password")
             return "auth"
         except Exception as e:
-            print(f"❌ Invio fallito (tentativo {tentativo}/3): {e}")
+            print(f"❌ Invio fallito (tentativo {tentativo}/4, porta {porta}, fase {fase}): "
+                  f"{e.__class__.__name__}: {e}")
     return "errore"
 
 

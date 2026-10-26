@@ -690,5 +690,33 @@ class TestDiagnosi(unittest.TestCase):
         self.assertEqual(siti.link_carriere(html, "https://www.engie.com/")[1], "https://www.engie.com/fr/carrieres")
 
 
+class TestInvioEmail(unittest.TestCase):
+    """Prima newsletter reale (26/10): Gmail chiudeva la connessione."""
+
+    def test_segreti_ripuliti(self):
+        env = {"GMAIL_MITTENTE": " fra@gmail.com\n", "GMAIL_PASSWORD": "abcd efgh ijkl mnop\n",
+               "EMAIL_DESTINATARIO": "a@x.it, b@y.it"}
+        with mock.patch.dict(os.environ, env):
+            self.assertEqual(tn._segreti(), ("fra@gmail.com", "abcdefghijklmnop", "a@x.it, b@y.it"))
+
+    def test_porta_di_riserva(self):
+        env = {"GMAIL_MITTENTE": "fra@gmail.com", "GMAIL_PASSWORD": "abcdefghijklmnop",
+               "EMAIL_DESTINATARIO": "a@x.it"}
+        ok = mock.MagicMock()
+        ok.__enter__.return_value = ok
+        porte = []
+
+        def finto(porta):
+            porte.append(porta)
+            if porta == 465:
+                raise tn.smtplib.SMTPServerDisconnected("Connection unexpectedly closed")
+            return ok
+        with mock.patch.dict(os.environ, env), mock.patch.object(tn, "_smtp", side_effect=finto), \
+             mock.patch.object(tn.time, "sleep"):
+            self.assertEqual(tn.invia_email("<p>x</p>", "oggetto"), "ok")
+        self.assertEqual(porte, [465, 587])
+        ok.login.assert_called_once_with("fra@gmail.com", "abcdefghijklmnop")
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -18,8 +18,10 @@ on:
 permissions:
   contents: write
 
+# Gruppo proprio: la newsletter non aspetta la ricerca fonti (scrivono file
+# diversi: seen.json e fonti.json; il push si riallinea con pull --rebase).
 concurrency:
-  group: newsletter
+  group: newsletter-invio
   cancel-in-progress: false
 
 jobs:
