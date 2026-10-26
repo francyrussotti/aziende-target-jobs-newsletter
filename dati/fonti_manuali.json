@@ -1,0 +1,56 @@
+{
+ "_nota": "Fonti scritte a mano: per un'azienda presente qui la ricerca automatica non gira. Chiave = id dell'azienda in target/aziende.json (solo aziende della lista). Lista vuota = nessuna fonte (es. stesso portale di un'altra voce dello stesso gruppo). Tipi: lever, greenhouse, workable, smartrecruiters, ashby, recruitee (slug), personio (slug, dominio), workday (url), wttj (slug Welcome to the Jungle), pagina (url, filtro regex opzionale, js true/false).",
+ "novaspace": [
+  {
+   "tipo": "lever",
+   "slug": "novaspace",
+   "nota": "jobs.lever.co/novaspace, 2026-10-26"
+  }
+ ],
+ "pno-innovation": [
+  {
+   "tipo": "personio",
+   "slug": "pno-group-europe",
+   "dominio": "jobs.personio.com",
+   "nota": "portale unico del gruppo PNO, 2026-10-26"
+  }
+ ],
+ "pno-consultants": [],
+ "pno-digital": [],
+ "hello-tomorrow": [
+  {
+   "tipo": "wttj",
+   "slug": "hello-tomorrow",
+   "nota": "welcometothejungle.com, 2026-10-26"
+  }
+ ],
+ "lgi-sustainable-innovation": [
+  {
+   "tipo": "wttj",
+   "slug": "lgi-sustainable-innovation",
+   "nota": "welcometothejungle.com, 2026-10-26"
+  }
+ ],
+ "oi-starburst-accelerator": [
+  {
+   "tipo": "wttj",
+   "slug": "starburst-aerospace",
+   "nota": "pagina WTTJ di Starburst (Accelerator/Aerospace), 2026-10-26"
+  }
+ ],
+ "thales": [
+  {
+   "tipo": "workday",
+   "url": "https://thales.wd3.myworkdayjobs.com/fr-FR/Careers",
+   "nota": "portale Workday del gruppo, 2026-10-26"
+  }
+ ],
+ "thales-las-france": [],
+ "commpla": [
+  {
+   "tipo": "pagina",
+   "url": "https://commpla.com/careers",
+   "nota": "pagina carriere, 2026-10-26"
+  }
+ ]
+}

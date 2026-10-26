@@ -1,0 +1,20 @@
+name: 🧪 Test
+
+# Test offline (nessuna rete, nessuna email) a ogni modifica del codice o dei dati.
+on:
+  push:
+    paths: ["**.py", "requirements.txt", "dati/aziende.json", "dati/fonti_manuali.json", ".github/workflows/tests.yml"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install requests beautifulsoup4 lxml
+      - run: python -m unittest -v test_newsletter

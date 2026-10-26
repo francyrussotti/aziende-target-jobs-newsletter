@@ -1,0 +1,78 @@
+name: 🎯 Newsletter Aziende Target
+
+# Offerte di lavoro delle aziende della lista "Aziende Target Europa"
+# (dati/aziende.json). Email solo quando ci sono offerte nuove.
+on:
+  schedule:
+    # Orari in UTC, non allo scoccare dell'ora (GitHub ritarda i cron delle :00).
+    # Il secondo è di riserva: se la prima run è già andata, si ferma subito.
+    - cron: "37 4 * * *"
+    - cron: "37 6 * * *"
+  workflow_dispatch:
+    inputs:
+      forza:
+        description: "Esegui anche se la run di oggi è già stata fatta"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: newsletter
+  cancel-in-progress: false
+
+jobs:
+  newsletter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('requirements.txt') }}
+      - run: pip install -r requirements.txt
+      - name: Install Playwright + Chromium
+        # Serve solo per le pagine costruite in JavaScript (Welcome to the Jungle)
+        run: playwright install chromium
+      - name: Install Playwright system deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: sudo $(which playwright) install-deps chromium
+      - name: Cerca le fonti se non ci sono ancora
+        run: |
+          if [ ! -f dati/fonti.json ]; then python -u scopri_fonti.py; fi
+      - name: Run newsletter
+        timeout-minutes: 30
+        env:
+          GMAIL_MITTENTE: ${{ secrets.GMAIL_MITTENTE }}
+          GMAIL_PASSWORD: ${{ secrets.GMAIL_PASSWORD }}
+          EMAIL_DESTINATARIO: ${{ secrets.EMAIL_DESTINATARIO }}
+          NEWSLETTER_FORZA: ${{ inputs.forza }}
+        run: python -u newsletter.py
+      - name: Commit storico e fonti
+        if: always()
+        run: |
+          set -e
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          for f in dati/seen.json dati/fonti.json; do if [ -f "$f" ]; then git add "$f"; fi; done
+          if git diff --staged --quiet; then echo "Nessuna modifica"; exit 0; fi
+          git commit -m "aziende target: aggiorna storico offerte"
+          for tentativo in 1 2 3; do
+            if git push; then exit 0; fi
+            git pull --rebase --autostash
+          done
+          exit 1
