@@ -218,7 +218,9 @@ def trova_fonti_sito(sito):
         except tf.FonteErrore:
             continue
         # Conta l'indirizzo FINALE: se la pagina carriere rimanda alla home non vale
-        if not RE_CARRIERE.search(urlparse(fin).netloc + urlparse(fin).path) or bacheca_di_rete(fin):
+        # (e WordPress rimanda "/recrutement" all'articolo dal nome più simile)
+        if (not RE_CARRIERE.search(urlparse(fin).netloc + urlparse(fin).path)
+                or bacheca_di_rete(fin) or sembra_articolo(fin)):
             continue
         # La pagina carriere spesso rimanda a sua volta al portale
         portali, _ = link_carriere(h, fin)

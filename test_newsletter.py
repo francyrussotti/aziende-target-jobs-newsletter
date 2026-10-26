@@ -67,10 +67,10 @@ class TestNomi(unittest.TestCase):
         with mock.patch.object(tf, "_json", return_value={"name": "Hive Power"}), \
              mock.patch.object(tf, "leggi_fonte", return_value=svizzera):
             self.assertEqual(tf._prova("greenhouse", "hivepower", az)["tipo"], "greenhouse")
-        # Nome identico ma nessun annuncio: si tiene (si leggerà ogni giorno)
+        # Nome identico ma nessun annuncio: non verificabile → da verificare, non usato
         with mock.patch.object(tf, "_json", return_value={"name": "Agorize"}), \
              mock.patch.object(tf, "leggi_fonte", return_value=[]):
-            self.assertIsNotNone(tf._prova("workable", "agorize", {"n": "Agorize", "p": "FR"}))
+            self.assertIn("da_verificare", tf._prova("workable", "agorize", {"n": "Agorize", "p": "FR"}))
 
     def test_testo_cita_nome(self):
         self.assertTrue(tf.testo_cita_nome("Novaspace GMBH", ["At Novaspace, we advise…"]))
@@ -238,18 +238,19 @@ class TestSelezione(ConCartella):
         fonte = {"tipo": "lever", "slug": "acme"}
         seen = {"ids": {}, "fonti": [], "storico": []}
         offerte = [self.offerta("recente", data=giorni_fa(3)), self.offerta("vecchia", data=giorni_fa(60)),
-                   self.offerta("senza-data"), self.offerta("madrid", loc="Madrid", data=giorni_fa(1))]
+                   self.offerta("senza-data"), self.offerta("madrid", loc="Madrid", data=giorni_fa(1)),
+                   self.offerta("del-2018", data="2018-09-10")]      # portale abbandonato
         nuove, stat = tn.seleziona(az, [("acme-par", fonte, offerte, None)], seen, giorni_fa(0))
         # Prima lettura di un portale: tutte le aperte in focus, segnate "già aperta"
         self.assertEqual([o["titolo"] for o in nuove], ["recente", "vecchia", "senza-data"])
         self.assertTrue(all(o["gia_aperta"] for o in nuove))
-        self.assertEqual(stat["fuori_focus"], 1)
+        self.assertEqual((stat["fuori_focus"], stat["vecchie"]), (1, 1))
         # Run successiva: le note non tornano; una nuova sì, una nuova ma vecchia no
         nuove, stat = tn.seleziona(az, [("acme-par", fonte, offerte + [
             self.offerta("nuova"), self.offerta("ripubblicata", data=giorni_fa(90))], None)], seen, giorni_fa(0))
         self.assertEqual([o["titolo"] for o in nuove], ["nuova"])
         self.assertNotIn("gia_aperta", nuove[0])
-        self.assertEqual(stat["vecchie"], 1)
+        self.assertEqual(stat["vecchie"], 1)          # la ripubblicata (la 2018 è già nello storico)
 
     def test_pagina_generica_prima_lettura_silenziosa(self):
         az = tn.carica_aziende()
@@ -519,6 +520,20 @@ class TestErroriTerzaRicerca(unittest.TestCase):
         home = '<a href="/careers">Careers</a>'
         with mock.patch.object(siti, "_html", side_effect=lambda u: (home, "https://www.actia-asso.eu/")):
             self.assertEqual(siti.trova_fonti_sito("https://www.actia-asso.eu/"), [])
+
+
+class TestErroriQuartaRicerca(unittest.TestCase):
+    def test_redirect_wordpress_verso_articolo(self):
+        import siti
+        home = "<p>Accueil</p>"
+        articolo = "<p>Nous recrutons un apprenti : candidature, CV, contrat</p>"
+
+        def finto(u):
+            if u.rstrip("/") == "https://euronovia.eu":
+                return home, "https://euronovia.eu/"
+            return articolo, "https://euronovia.eu/recrutement-apprenti-financements-europeens/"
+        with mock.patch.object(siti, "_html", side_effect=finto):
+            self.assertEqual(siti.trova_fonti_sito("https://euronovia.eu/"), [])
 
 
 if __name__ == "__main__":

@@ -44,7 +44,7 @@ def salva(fonti, da_verificare, controllate, oggi):
                    "'da_verificare' = candidati dubbi (nome solo compatibile), NON usati.",
                    "fonti": dict(sorted(fonti.items())),
                    "da_verificare": dict(sorted(da_verificare.items())),
-                   "controllate4": dict(sorted(controllate.items()))},
+                   "controllate5": dict(sorted(controllate.items()))},
                   f, ensure_ascii=False, indent=1)
         f.write("\n")
     os.replace(tmp, FONTI_FILE)
@@ -64,8 +64,8 @@ def main():
     manuali = _leggi_json(FONTI_MANUALI_FILE, {})
     vecchio = _leggi_json(FONTI_FILE, {})
     fonti = {k: v for k, v in vecchio.get("fonti", {}).items() if k in ids}   # solo aziende in lista
-    # "controllate4": regole del 26/10 (verifica severa, pagine carriere controllate)
-    controllate = {k: v for k, v in vecchio.get("controllate4", {}).items() if k in ids}
+    # "controllate5": regole del 26/10 (verifica severa, pagine carriere controllate)
+    controllate = {k: v for k, v in vecchio.get("controllate5", {}).items() if k in ids}
     siti_uff = _leggi_json(siti.SITI_FILE, {})
 
     da_cercare = [x for x in aziende if x["id"] not in manuali]

@@ -24,7 +24,7 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
 - `siti.py`: siti ufficiali dai dati CORDIS (`dati/siti.json`) e ricerca della pagina carriere / portale linkato.
 - `scopri_fonti.py`: ricerca fonti (workflow `scopri-fonti.yml`, lunedì), max 40 minuti per run
   (in pratica ~11 minuti per 1040 aziende), salva a intervalli, riparte dalle aziende non ancora
-  controllate (`controllate4` in `dati/fonti.json`). A ogni controllo le fonti di un'azienda si
+  controllate (`controllate5` in `dati/fonti.json`). A ogni controllo le fonti di un'azienda si
   sostituiscono. Regole di accettazione:
   - portale linkato dal sito ufficiale (CORDIS) → accettato;
   - pagina carriere del sito → solo se contiene lessico da annunci (`siti.sembra_pagina_lavoro`),
@@ -32,7 +32,7 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
     (`siti.bacheca_di_rete`) e l'indirizzo FINALE (dopo i redirect) è ancora una pagina carriere;
     mai "opportunities"/"talent"/"join us" da soli;
   - portale trovato per slug → nome con TUTTE le parole distintive + annunci in un paese
-    dell'azienda; senza annunci solo se il nome è identico parola per parola;
+    dell'azienda (senza annunci → da_verificare, anche se il nome è identico);
   - nome solo compatibile (più corto) → `da_verificare` (non usato: controllare a mano e
     spostare in `fonti_manuali.json` se giusto).
 - `dati/fonti_manuali.json` vince su `dati/fonti.json`.
@@ -59,10 +59,14 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
 - [x] 3ª ricerca (run su 19b620a): 107 aziende con fonte, 3 da verificare. Riletta tutta: errori
       residui corretti (Actia → home dopo redirect; Axelera/Polymeris bacheche dei soci;
       ENTSO-E → www.teamtailor.com; Euronovia → articolo). 45 test.
-- [ ] 4ª ricerca (controllate4); rileggere di nuovo TUTTO l'elenco.
-- [ ] Da verificare a mano con `prova-fonti` (opzione "dubbi"): Saint-Gobain (smartrecruiters
-      saintgobain), Magellan Circle Italy (smartrecruiters magellan), Avantium (greenhouse avantium).
-      Se i titoli/sedi confermano → `fonti_manuali.json` con nota.
+- [x] 4ª ricerca (su e3f8c52): 101 aziende con fonte. Riletta tutta: unico errore Euronovia
+      (WordPress rimanda /recrutement a un articolo → ora controllo articoli anche sull'URL finale).
+- [x] Dubbi decisi a mano con prova-fonti (dubbi): Avantium → confermato (fonti_manuali);
+      Magellan → è Magellan Partners (consulenza IT Parigi), scartato; Saint-Gobain → annunci
+      solo del 2018, portale abbandonato, scartato. Decisioni in fonti_manuali.json (`_scartate`).
+- [x] Prima lettura: "già aperte" solo se pubblicate negli ultimi 365 giorni (portali abbandonati).
+- [x] Nome identico senza annunci (Agorize, Bpifrance, GAC, Innova su Workable) → da_verificare.
+- [ ] 5ª ricerca (controllate5) con queste ultime regole; rileggere l'elenco.
 - [ ] Prova fonti su tutte le fonti trovate; correggere quelle rotte o sbagliate.
 - [ ] Prima newsletter reale (workflow "🎯 Newsletter Aziende Target") e controllo dell'email
       (dimensione, sezioni, link).

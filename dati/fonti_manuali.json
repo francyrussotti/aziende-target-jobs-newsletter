@@ -52,5 +52,18 @@
    "url": "https://commpla.com/careers",
    "nota": "pagina carriere, 2026-10-26"
   }
- ]
+ ],
+ "avantium-chemicals": [
+  {
+   "tipo": "greenhouse",
+   "slug": "avantium",
+   "nota": "verificata a mano il 2026-10-26 con prova-fonti: 5 annunci ad Amsterdam e Delfzijl, sedi di Avantium"
+  }
+ ],
+ "magellan-circle-italy": [],
+ "saint-gobain-centre-de-recherches-et-d-etudes-europeen": [],
+ "_scartate": {
+  "magellan-circle-italy": "smartrecruiters 'magellan' = Magellan Partners (consulenza IT Parigi), non Magellan Circle (2026-10-26)",
+  "saint-gobain-centre-de-recherches-et-d-etudes-europeen": "smartrecruiters 'saintgobain': solo annunci del 2018, portale abbandonato (2026-10-26)"
+ }
 }

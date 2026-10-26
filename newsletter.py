@@ -32,6 +32,10 @@ SEEN_FILE = os.path.join(DIR, "seen.json")
 
 # Offerte "nuove" ma pubblicate da più di questi giorni: non si mostrano
 MAX_GIORNI_NUOVA = 30
+# Prima lettura di un portale: le offerte "già aperte" si mostrano se pubblicate
+# entro questi giorni (oltre, è spesso un portale abbandonato: Saint-Gobain su
+# SmartRecruiters aveva solo annunci del 2018)
+MAX_GIORNI_GIA_APERTA = 365
 # Un ID non più visto da tanti giorni (offerta chiusa) esce dallo storico
 GIORNI_OBLIO = 90
 # Offerte mostrate al massimo per azienda in una email (le altre: link)
@@ -204,6 +208,9 @@ def seleziona(aziende, risultati, seen, oggi):
                 # dai portali strutturati si mostrano tutte le offerte aperte.
                 if f.get("tipo") == "pagina":
                     stat["iniziali"] += 1
+                    continue
+                if eta is not None and eta > MAX_GIORNI_GIA_APERTA:
+                    stat["vecchie"] += 1
                     continue
                 nuove.append({**o, "azienda": aid, "gia_aperta": True})
                 continue

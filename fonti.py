@@ -705,7 +705,9 @@ def _prova(tipo, slug, azienda):
         if forte and nei_paesi:
             f["verifica"] = f"nome '{loro}' + annunci in {'/'.join(p for p in paesi if p)}"
         elif forte and not offerte and nome_uguale(nome, loro) and tipo not in ("lever", "lever-eu", "ashby"):
-            f["verifica"] = f"nome identico '{loro}', nessun annuncio da controllare"
+            # Nome identico ma niente annunci per controllare il paese: non verificabile
+            # ("GAC" su Workable può essere qualunque GAC). Si riprova la settimana dopo.
+            f["da_verificare"] = f"nome identico '{loro}' ma nessun annuncio per controllare il paese"
         elif nei_paesi:
             # Nome solo compatibile (es. "Thales" per "Thales Six Gts France"): può
             # essere il gruppo o un omonimo. Non si usa: va verificato a mano.
