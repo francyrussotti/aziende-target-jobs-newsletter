@@ -36,7 +36,8 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
     dell'azienda (senza annunci → da_verificare, anche se il nome è identico);
   - nome solo compatibile (più corto) → `da_verificare` (non usato: controllare a mano e
     spostare in `fonti_manuali.json` se giusto).
-- `dati/fonti_manuali.json` vince su `dati/fonti.json`.
+- `dati/fonti_manuali.json` vince su `dati/fonti.json`; `dati/siti_manuali.json` corregge i siti
+  CORDIS vecchi (vince su `dati/siti.json`). Workflow ricerca: input "aziende" per rifarla su pochi ID.
 - Prima lettura di una fonte: portale strutturato → tutte le offerte aperte in focus ("già aperta");
   pagina generica → stato iniziale silenzioso. Poi solo le nuove.
 
@@ -77,7 +78,14 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
       dei grandi gruppi (Nokia "Life at Nokia", Siemens "Explore all jobs", Sanofi…) → ora dalle
       pagine si tengono solo link con un titolo di lavoro (`fonti.RE_TITOLO_LAVORO`); Repsol Workday
       con lingua breve "/es" (404); Naturland Personio senza XML → lettura pagina pubblica. 50 test.
-- [ ] Ricerca con REGOLE=6 (riparte da zero) e rilettura; poi nuova prova di tutte le fonti.
+- [x] Ricerca REGOLE=6 + statistiche (run 40361319424): 98 aziende con fonte; Repsol ora
+      workday …/es/Repsol; Robotnik rientrata (home con tentativi). Siti ufficiali: 390, provati 382,
+      raggiunti 288 (75%), con pagina carriere/portale 96, irraggiungibili 94 (domini CORDIS vecchi).
+      Dubbi: 7 workable "nome identico senza annunci" (Bpifrance, Engie, GAC, Innova, Agorize, Polis, Surf).
+- [x] siti_manuali.json: RINA (2 voci) → rina.org, Engie → engie.com, Erdyn → erdyn.com.
+      Irraggiungibili prioritari senza correzione: INRAE Transfert (inra-transfert.fr), Tinexta
+      Innovation Hub (warrantgroup.eu) → da segnalare all'utente.
+- [ ] Ricerca sugli ID corretti, poi prova di TUTTE le fonti (log per intero).
 - [ ] Prima newsletter reale (workflow "🎯 Newsletter Aziende Target") e controllo dell'email
       (dimensione, sezioni, link).
 - [ ] Aziende prioritarie (Parigi/Italia, classe A o open innovation) ancora senza fonte:

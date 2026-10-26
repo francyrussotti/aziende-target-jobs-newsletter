@@ -12,6 +12,9 @@ on:
         description: "Solo aziende Parigi / Italia / open innovation / classe A"
         type: boolean
         default: false
+      aziende:
+        description: "Solo questi ID, separati da spazio (vuoto = tutte)"
+        default: ""
 
 permissions:
   contents: write
@@ -34,7 +37,13 @@ jobs:
       - run: pip install requests beautifulsoup4 lxml
       - name: Siti ufficiali da CORDIS (solo se mancano)
         run: if [ ! -f dati/siti.json ]; then python -u siti.py; fi
-      - run: python -u scopri_fonti.py ${{ inputs.solo_focus && '--focus' || '' }}
+      - name: Ricerca
+        env:
+          AZIENDE: ${{ inputs.aziende }}
+        run: |
+          ARGS=""
+          for i in $AZIENDE; do ARGS="$ARGS --id $i"; done
+          python -u scopri_fonti.py ${{ inputs.solo_focus && '--focus' || '' }} $ARGS
       - name: Commit fonti
         if: always()   # salva anche i risultati parziali
         run: |

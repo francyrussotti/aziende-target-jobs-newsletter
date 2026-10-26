@@ -76,6 +76,9 @@ def main():
     fonti = {k: v for k, v in vecchio.get("fonti", {}).items() if tenere(k)}
     controllate = {k: v for k, v in vecchio.get("controllate", {}).items() if tenere(k)}
     siti_uff = _leggi_json(siti.SITI_FILE, {})
+    # Correzioni a mano dei siti (domini vecchi in CORDIS)
+    siti_uff.update({k: v["url"] for k, v in _leggi_json("dati/siti_manuali.json", {}).items()
+                     if not k.startswith("_") and k in ids})
 
     da_cercare = [x for x in aziende if x["id"] not in manuali]
     if a.id:

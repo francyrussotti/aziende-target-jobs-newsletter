@@ -1,0 +1,19 @@
+{
+ "_nota": "Siti ufficiali corretti a mano: in CORDIS c'è un dominio vecchio o irraggiungibile. Vincono su dati/siti.json. Solo aziende della lista, con la fonte della correzione.",
+ "rina-consulting": {
+  "url": "https://www.rina.org/",
+  "nota": "CORDIS: dappolonia.it (vecchio nome D'Appolonia, ora RINA). rina.org visto nella ricerca fonti del 26/10 (pagina carriere www.rina.org/en/careers/working-in-rina)"
+ },
+ "rina-consulting-centro-sviluppo-materiali": {
+  "url": "https://www.rina.org/",
+  "nota": "CORDIS: c-s-m.it (Centro Sviluppo Materiali, gruppo RINA). Stesso sito del gruppo"
+ },
+ "engie": {
+  "url": "https://www.engie.com/",
+  "nota": "CORDIS: gdfsuez.com (vecchio nome). engie.com visto nella ricerca web del 26/10 (pagina 'search for a vacancy')"
+ },
+ "erdyn-consultants": {
+  "url": "https://www.erdyn.com/",
+  "nota": "CORDIS: erdyn.fr irraggiungibile. erdyn.com indicato come sito ufficiale (craft.co, ricerca web del 26/10)"
+ }
+}
