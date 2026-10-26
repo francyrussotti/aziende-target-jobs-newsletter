@@ -55,13 +55,66 @@ def salva(fonti, da_verificare, controllate, oggi, irraggiungibili=None):
     os.replace(tmp, FONTI_FILE)
 
 
+def diagnosi(azienda, sito):
+    """Stampa, passo per passo, cosa vede la ricerca per un'azienda (nessuna scrittura)."""
+    from urllib.parse import urljoin
+    print(f"\n■ {azienda['n']} [{azienda['id']}] · paesi {azienda.get('p')} · sito {sito or '—'}")
+    if sito:
+        try:
+            html, fin = siti._html(sito, rapida=False)
+            print(f"   home: ok → {fin} ({len(html)} caratteri)")
+            portali, carriere = siti.link_carriere(html, fin)
+            print(f"   portali linkati: {[tf.chiave_fonte(f) for f in portali] or 'nessuno'}")
+            print(f"   link carriere scelto: {carriere or 'nessuno'}")
+            candidate = [carriere] if carriere else [urljoin(fin, p) for p in siti.PERCORSI_COMUNI]
+            for u in candidate:
+                try:
+                    h, f2 = siti._html(u)
+                except tf.FonteErrore as e:
+                    if carriere:
+                        print(f"   {u}: errore {e}")
+                    continue
+                termini = sorted({m.group(1).lower() for m in siti.RE_LESSICO_LAVORO.finditer(
+                    __import__("bs4").BeautifulSoup(h, "lxml").get_text(" ", strip=True))})
+                print(f"   {u} → {f2}: carriere={bool(siti.RE_CARRIERE.search(f2))} "
+                      f"articolo={siti.sembra_articolo(f2)} bacheca={siti.bacheca_di_rete(f2)} "
+                      f"lessico={termini[:8]} portali={[tf.chiave_fonte(x) for x in siti.link_carriere(h, f2)[0]]}")
+                print(f"      link annuncio estratti: {[o['titolo'][:50] for o in tf.estrai_link_annunci(h, f2)][:6]}")
+        except tf.FonteErrore as e:
+            print(f"   home: IRRAGGIUNGIBILE ({e})")
+    tipi = tf.TIPI_SCOPERTA + (["wttj"] if "FR" in (azienda.get("p") or "").split(",") else [])
+    for tipo in tipi:
+        for slug in tf.slug_candidati(azienda["n"]):
+            esito = tf._prova(tipo, slug, azienda)
+            if esito:
+                print(f"   slug {tipo}:{slug} → {esito.get('verifica') or esito.get('da_verificare')}")
+    if "FR" in (azienda.get("p") or "").split(","):
+        for slug in tf.slug_candidati(azienda["n"])[:2]:
+            try:
+                r = tf._get(f"https://www.welcometothejungle.com/fr/companies/{slug}", rapida=True,
+                            headers={"Accept": "text/html"})
+                print(f"   wttj {slug}: HTTP {r.status_code}")
+            except tf.FonteErrore as e:
+                print(f"   wttj {slug}: {e}")
+
+
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--diagnosi", action="store_true", help="solo stampa, per gli --id indicati")
     ap.add_argument("--focus", action="store_true")
     ap.add_argument("--id", action="append", default=[])
     ap.add_argument("--thread", type=int, default=16)
     ap.add_argument("--minuti", type=float, default=40)
     a = ap.parse_args()
+    if a.diagnosi:
+        az = {x["id"]: x for x in _leggi_json(AZIENDE_FILE, {}).get("aziende", [])}
+        siti_uff = _leggi_json(siti.SITI_FILE, {})
+        siti_uff.update({k: v["url"] for k, v in _leggi_json("dati/siti_manuali.json", {}).items()
+                         if not k.startswith("_")})
+        for i in a.id:
+            if i in az:
+                diagnosi(az[i], siti_uff.get(i))
+        return
     fine = time.monotonic() + a.minuti * 60
 
     aziende = _leggi_json(AZIENDE_FILE, {}).get("aziende", [])

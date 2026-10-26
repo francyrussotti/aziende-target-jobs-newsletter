@@ -15,6 +15,10 @@ on:
       aziende:
         description: "Solo questi ID, separati da spazio (vuoto = tutte)"
         default: ""
+      diagnosi:
+        description: "Solo diagnosi (stampa cosa vede per gli ID indicati, non salva)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -43,7 +47,7 @@ jobs:
         run: |
           ARGS=""
           for i in $AZIENDE; do ARGS="$ARGS --id $i"; done
-          python -u scopri_fonti.py ${{ inputs.solo_focus && '--focus' || '' }} $ARGS
+          python -u scopri_fonti.py ${{ inputs.solo_focus && '--focus' || '' }} ${{ inputs.diagnosi && '--diagnosi' || '' }} $ARGS
       - name: Commit fonti
         if: always()   # salva anche i risultati parziali
         run: |
