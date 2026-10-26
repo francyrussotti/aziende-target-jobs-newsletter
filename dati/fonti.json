@@ -50,14 +50,6 @@
     "trovata": "2026-10-26"
    }
   ],
-  "association-de-coordination-technique-pour-l-industrie-agroalimentaire": [
-   {
-    "tipo": "pagina",
-    "url": "https://www.actia-asso.eu",
-    "verifica": "pagina carriere del sito www.actia-asso.eu",
-    "trovata": "2026-10-26"
-   }
-  ],
   "association-europeenne-des-expositions-scientifiques-techniques-et-industrielles": [
    {
     "tipo": "pagina",
@@ -71,6 +63,14 @@
     "tipo": "pagina",
     "url": "https://www.groupe-traces.eu/category/emploi/",
     "verifica": "pagina carriere del sito www.groupe-traces.eu",
+    "trovata": "2026-10-26"
+   }
+  ],
+  "athens-technology-center-anonymi-viomichaniki-emporiki-kai-techniki-etaireia-efarmogon-ypsilis-technologias": [
+   {
+    "tipo": "workable",
+    "slug": "athens-technology-center-1",
+    "verifica": "linkato da atc.gr",
     "trovata": "2026-10-26"
    }
   ],
@@ -90,14 +90,6 @@
     "trovata": "2026-10-26"
    }
   ],
-  "axelera-association-chimie-environnement-lyon-et-rhone-alpes": [
-   {
-    "tipo": "pagina",
-    "url": "https://www.axelera.org/fr/offres-d-emploi-du-reseau",
-    "verifica": "pagina carriere del sito www.axelera.org",
-    "trovata": "2026-10-26"
-   }
-  ],
   "basf-se": [
    {
     "tipo": "pagina",
@@ -111,14 +103,6 @@
     "tipo": "pagina",
     "url": "https://www.bayfor.org/de/aktuelles/stellenangebote.html",
     "verifica": "pagina carriere del sito www.bayfor.org",
-    "trovata": "2026-10-26"
-   }
-  ],
-  "belgisch-laboratorium-van-elektriciteitsindustrie": [
-   {
-    "tipo": "pagina",
-    "url": "https://www.laborelec.com/jobs_open_positions/",
-    "verifica": "pagina carriere del sito www.laborelec.com",
     "trovata": "2026-10-26"
    }
   ],
@@ -175,14 +159,6 @@
     "tipo": "pagina",
     "url": "https://www.cemosa.es/empleo/",
     "verifica": "pagina carriere del sito www.cemosa.es",
-    "trovata": "2026-10-26"
-   }
-  ],
-  "civitta-eesti": [
-   {
-    "tipo": "pagina",
-    "url": "https://civitta.com/career/consultant/",
-    "verifica": "pagina carriere del sito civitta.com",
     "trovata": "2026-10-26"
    }
   ],
@@ -264,6 +240,14 @@
     "trovata": "2026-10-26"
    }
   ],
+  "epia-solarpower-europe": [
+   {
+    "tipo": "pagina",
+    "url": "https://www.solarpowereurope.org/about/careers",
+    "verifica": "pagina carriere del sito www.solarpowereurope.org",
+    "trovata": "2026-10-26"
+   }
+  ],
   "equinor-energy": [
    {
     "tipo": "workday",
@@ -285,14 +269,6 @@
     "tipo": "pagina",
     "url": "https://www.eticas.ai/careers",
     "verifica": "pagina carriere del sito www.eticas.ai",
-    "trovata": "2026-10-26"
-   }
-  ],
-  "eura": [
-   {
-    "tipo": "pagina",
-    "url": "https://eura-ag.factorialhr.de/",
-    "verifica": "pagina carriere del sito www.eura-ag.com",
     "trovata": "2026-10-26"
    }
   ],
@@ -331,8 +307,8 @@
   "european-network-of-transmission-system-operators-for-electricity-aisbl": [
    {
     "tipo": "pagina",
-    "url": "https://www.teamtailor.com/jobs",
-    "verifica": "linkato dalla pagina carriere https://careers.entsoe.eu/",
+    "url": "https://careers.entsoe.eu/",
+    "verifica": "pagina carriere del sito www.entsoe.eu",
     "trovata": "2026-10-26"
    }
   ],
@@ -443,14 +419,6 @@
     "tipo": "workable",
     "slug": "innova",
     "verifica": "nome identico 'innova', nessun annuncio da controllare",
-    "trovata": "2026-10-26"
-   }
-  ],
-  "inova-innovation-services": [
-   {
-    "tipo": "recruitee",
-    "slug": "inovabusiness",
-    "verifica": "linkato dalla pagina carriere https://inova.business/pessoas/",
     "trovata": "2026-10-26"
    }
   ],
@@ -597,13 +565,19 @@
     "url": "https://pdmfc.teamtailor.com/jobs",
     "verifica": "linkato da www.pdmfc.com",
     "trovata": "2026-10-26"
-   }
-  ],
-  "polymeris": [
+   },
    {
     "tipo": "pagina",
-    "url": "https://www.polymeris.fr/bourse-a-l-emploi.html",
-    "verifica": "pagina carriere del sito www.polymeris.fr",
+    "url": "https://pdmfc.factorialhr.pt/",
+    "verifica": "linkato da www.pdmfc.com",
+    "trovata": "2026-10-26"
+   }
+  ],
+  "pfizer": [
+   {
+    "tipo": "pagina",
+    "url": "https://www.pfizer.co.uk/careers",
+    "verifica": "pagina carriere del sito www.pfizer.co.uk",
     "trovata": "2026-10-26"
    }
   ],
@@ -784,27 +758,11 @@
     "trovata": "2026-10-26"
    }
   ],
-  "ubimet": [
-   {
-    "tipo": "recruitee",
-    "slug": "ubimet",
-    "verifica": "nome 'UBIMET GmbH' + annunci in AT/DE",
-    "trovata": "2026-10-26"
-   }
-  ],
   "ucb-biopharma": [
    {
     "tipo": "pagina",
     "url": "https://careers.ucb.com/global/en",
     "verifica": "pagina carriere del sito www.ucb.com",
-    "trovata": "2026-10-26"
-   }
-  ],
-  "uicn-bureau-de-representation-aupres-de-l-union-europeenne-aisbl": [
-   {
-    "tipo": "pagina",
-    "url": "https://hrms.iucn.org/iresy/index.cfm?event=vac.showOpenList",
-    "verifica": "pagina carriere del sito iucn.org",
     "trovata": "2026-10-26"
    }
   ],
@@ -902,7 +860,7 @@
    }
   ]
  },
- "controllate3": {
+ "controllate4": {
   "2-0-lca-consultants": "2026-10-26",
   "21c-consultancy": "2026-10-26",
   "28digital": "2026-10-26",
