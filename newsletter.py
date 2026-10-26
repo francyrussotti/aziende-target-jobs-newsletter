@@ -384,8 +384,8 @@ def genera_html(nuove, aziende, fonti, stat, problemi, n_fonti, max_per_azienda=
                    "azienda e sezione: le altre sono nel link «vedi tutte»."
                    if any(sum(1 for o in nuove if o["azienda"] == a and o["luogo"] == l) > max_per_azienda
                           for a, l in {(o["azienda"], o["luogo"]) for o in nuove}) else "")
-    nota_lingua = (f"Escluse {stat['lingua']} offerte che chiedono lingue che non parli (tedesco, "
-                   "olandese…); «francese fluente» segnala quelle che chiedono il francese. "
+    nota_lingua = (f"Escluse {stat['lingua']} offerte scritte in lingue che non parli (francese, tedesco…) "
+                   "o che le chiedono; «francese fluente» segnala gli annunci in inglese che chiedono anche il francese. "
                    if stat.get("lingua") else "Offerte con «francese fluente»: chiedono il francese. "
                    if any(o.get("francese") for o in nuove) else "")
     return f"""<!DOCTYPE html>

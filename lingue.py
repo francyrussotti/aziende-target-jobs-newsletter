@@ -2,12 +2,13 @@
 Filtro lingua: esclude le offerte che chiedono una lingua che Fra non parla.
 
 Fra parla italiano, inglese e spagnolo; francese di base. Si esclude un'offerta se:
-- il testo dell'annuncio è scritto in una lingua non parlata (es. tutto in tedesco), oppure
+- il testo dell'annuncio è scritto in una lingua non parlata, francese compreso (es. tutto in
+  tedesco o tutto in francese; senza descrizione si guarda il titolo), oppure
 - chiede esplicitamente una lingua non parlata ("fluent German", "Deutsch fließend",
   "néerlandais courant"…), salvo quando è facoltativa ("a plus", "un atout") o in
   alternativa a una lingua parlata ("English or German").
-Il francese NON esclude (Parigi è la priorità): se l'offerta chiede francese fluente
-viene solo segnalata nell'email.
+Un annuncio in inglese che chiede ANCHE francese fluente non si esclude: è segnalato
+nell'email (deciso dall'utente: esclusi solo gli annunci tutti in francese).
 Senza testo (descrizione non leggibile) l'offerta resta: meglio un annuncio in più
 che uno buono perso.
 """
@@ -101,16 +102,32 @@ RE_TITOLO_TEDESCO = re.compile(r"(?i)\((?:m|w|d|f|x|div)\s*/\s*(?:m|w|d|f|x|div)
                                r"|\b(werkstudent\w*|praktikant\w*|sachbearbeiter\w*|mitarbeiter\w*)\b")
 
 
+# Titolo in francese (usato solo se manca la descrizione): almeno 2 indizi francesi
+# e nessuna parola inglese tipica. "(H/F)" da solo non basta: si usa anche negli
+# annunci in inglese pubblicati in Francia.
+RE_INDIZI_FR = re.compile(
+    r"(?i)\b(de|des|du|d'|en|et|pour|au|aux|le|la|les|ing[ée]nieur\w*|charg[ée]e?|chef|responsable|"
+    r"stagiaire|stage|alternan\w*|apprenti\w*|technicien\w*|d[ée]veloppeur\w*|conseill[eè]re?|"
+    r"gestionnaire|commerciale?|directeur|directrice|cdi|cdd|h/f|f/h)\b|[éèêàçùû]")
+RE_INDIZI_EN = re.compile(
+    r"(?i)\b(engineer\w*|manager|intern\w*|developer|officer|lead|head|senior|junior|analyst|"
+    r"specialist|the|and|of|for|with)\b")
+
+
+def titolo_francese(titolo):
+    return len(RE_INDIZI_FR.findall(titolo or "")) >= 2 and not RE_INDIZI_EN.search(titolo or "")
+
+
 def lingua_testo(testo):
     """Codice della lingua in cui è scritto il testo (it/en/fr/es/de/nl/pt) o ""
     se il testo è troppo corto o misto."""
     parole = [p.lower() for p in RE_PAROLA.findall(testo or "")]
-    if len(parole) < 60:
+    if len(parole) < 40:
         return ""
     conta = {k: sum(1 for p in parole if p in s) for k, s in _LISTE.items()}
     ordine = sorted(conta, key=conta.get, reverse=True)
     primo, secondo = ordine[0], ordine[1]
-    if conta[primo] < 10 or conta[primo] < 1.5 * max(conta[secondo], 1):
+    if conta[primo] < 8 or conta[primo] < 1.5 * max(conta[secondo], 1):
         return ""
     return primo
 
@@ -146,7 +163,9 @@ def valuta(titolo, testo):
     if RE_TITOLO_TEDESCO.search(titolo or ""):
         return True, "annuncio in tedesco", False
     scritta = lingua_testo(testo)
-    if scritta and scritta not in PARLATE | SEGNALATE:
+    if not (testo or "").strip() and titolo_francese(titolo):
+        scritta = "fr"
+    if scritta and scritta not in PARLATE:
         return True, f"annuncio in {NOMI[scritta]}", False
     richieste = lingue_richieste(f"{titolo}\n{testo or ''}")
     escluse = sorted(richieste - SEGNALATE)

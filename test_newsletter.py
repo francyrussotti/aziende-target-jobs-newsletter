@@ -762,9 +762,25 @@ class TestFiltroLingua(unittest.TestCase):
         self.assertFalse(self.v("A", "We are a German company with offices in Paris. You are curious.")[0])
         self.assertFalse(self.v("Pre-sales", "You will polish our documents, fluent English required.")[0])
 
-    def test_francese_solo_segnalato(self):
-        self.assertEqual(self.v("Ingénieur", "Maîtrise du français et de l'anglais indispensable."),
+    def test_francese_richiesto_in_annuncio_inglese_segnalato(self):
+        self.assertEqual(self.v("Project Engineer", "Fluent French and English are required."),
                          (False, "", True))
+
+    def test_annuncio_tutto_in_francese_escluso(self):
+        fr = ("Nous recherchons un ingénieur pour notre équipe à Paris. Vous serez en charge de la gestion "
+              "des projets avec nos clients et de la coordination des équipes. Vous avez une expérience dans "
+              "le domaine et vous aimez travailler en équipe. Nous vous offrons un environnement stimulant "
+              "avec des perspectives d'évolution au sein du groupe et des avantages.")
+        self.assertEqual(self.v("Ingénieur projet", fr)[:2], (True, "annuncio in francese"))
+
+    def test_titolo_francese_senza_descrizione(self):
+        self.assertTrue(self.v("Ingénieur Conception mécanique – CDI – Pessac (H/F)")[0])
+        self.assertTrue(self.v("Chef de projet innovation")[0])
+        self.assertFalse(self.v("Software Engineer (H/F)")[0])
+        self.assertFalse(self.v("Business Developer")[0])
+        # con una descrizione in inglese conta la descrizione, non il titolo
+        en = " ".join(["You will work with the team on the projects and the clients of our company."] * 5)
+        self.assertFalse(self.v("Chargé de projet (H/F)", en)[0])
 
     def test_annuncio_scritto_in_tedesco(self):
         de = ("Wir suchen eine engagierte Person für unser Team in München. Du bist verantwortlich für "
@@ -776,7 +792,7 @@ class TestFiltroLingua(unittest.TestCase):
 
     def test_filtra_lingue(self):
         nuove = [{"azienda": "a", "titolo": "PM", "testo": "Fluent German required."},
-                 {"azienda": "a", "titolo": "Chef de projet", "testo": "Français courant exigé."},
+                 {"azienda": "a", "titolo": "Chef de projet", "testo": "Fluent French is required."},
                  {"azienda": "a", "titolo": "Analyst", "testo": "", "dettaglio": "x"},
                  {"azienda": "a", "titolo": "Engineer", "url": "https://x/1", "dettaglio": "d"}]
         stat = {}

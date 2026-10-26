@@ -49,7 +49,9 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
   francese di base. Esclusa un'offerta scritta in un'altra lingua (es. tedesco, titoli "(m/w/d)")
   o che CHIEDE una lingua non parlata (fluent/native/courant/fließend… entro 60 caratteri dal nome
   della lingua), salvo se facoltativa ("a plus", "un atout", "titolo preferenziale") o in alternativa
-  a una parlata ("English or German"). Il francese non esclude: chip «francese fluente» nell'email.
+  a una parlata ("English or German"). Annunci TUTTI IN FRANCESE esclusi (chiesto dall'utente 26/10;
+  senza descrizione si guarda il titolo: `titolo_francese`, "(H/F)" da solo non basta); un annuncio
+  in inglese che chiede anche francese fluente resta con la chip «francese fluente».
   Senza descrizione leggibile l'offerta resta. Descrizioni: già nell'elenco per lever/greenhouse
   (content=true)/workable (details=true)/ashby/recruitee/personio XML; per Workday e SmartRecruiters
   dall'API di dettaglio, per le pagine dalla pagina dell'annuncio, solo per le offerte da mostrare
