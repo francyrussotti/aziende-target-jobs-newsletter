@@ -114,8 +114,11 @@ def fonte_da_url(url):
         lingua = [x for x in parti[:1] if re.fullmatch(r"[a-z]{2}-[A-Z]{2}", x)]
         if sito:
             return {"tipo": "workday", "url": f"https://{host}/" + "/".join(lingua + sito)}
-    if host.endswith(".teamtailor.com") or host.endswith("bamboohr.com") or host.endswith("join.com"):
-        return {"tipo": "pagina", "url": f"{p.scheme}://{host}/" + ("jobs" if "teamtailor" in host else "")}
+    # Pagine aziendali su altri portali: solo con il sottodominio dell'azienda
+    # (www.teamtailor.com/jobs è il sito di Teamtailor, non di un cliente)
+    m = re.match(r"^([\w-]+)\.(teamtailor\.com|bamboohr\.com|factorialhr\.\w+)$", host)
+    if m and m.group(1) not in ("www", "app", "career", "careers", "api"):
+        return {"tipo": "pagina", "url": f"https://{host}/" + ("jobs" if "teamtailor" in host else "")}
     return None
 
 
@@ -148,7 +151,18 @@ def sembra_pagina_lavoro(html):
 def sembra_articolo(url):
     """/join-us-at-the-10th-insme-annual-meeting/ è un articolo, non la pagina carriere."""
     ultimo = [p for p in urlparse(url).path.split("/") if p][-1:] or [""]
-    return len(re.split(r"[-_]", ultimo[0])) > 5
+    return len(re.split(r"[-_]", re.sub(r"\.\w+$", "", ultimo[0]))) > 3
+
+
+RE_BACHECA_RETE = re.compile(r"(?i)(r[ée]seau|network|membres?|members?|adh[ée]rents?|bourse|soci[i]?\b|"
+                             r"partner-jobs|jobs-in-the-sector|job-board)")
+
+
+def bacheca_di_rete(url):
+    """Bacheche con gli annunci delle aziende socie di un cluster/associazione
+    ("offres d'emploi du réseau", "bourse à l'emploi"): non sono annunci
+    dell'azienda in lista."""
+    return bool(RE_BACHECA_RETE.search(urlparse(url).path))
 
 PERCORSI_COMUNI = ["careers", "jobs", "lavora-con-noi", "carrieres", "recrutement", "nous-rejoindre",
                    "join-us", "work-with-us", "en/careers", "it/lavora-con-noi", "fr/recrutement",
@@ -175,7 +189,7 @@ def link_carriere(html, base):
         if urlparse(href).netloc.replace("www.", "") != host:
             continue
         testo = a.get_text(" ", strip=True)[:60]
-        if sembra_articolo(href):
+        if sembra_articolo(href) or bacheca_di_rete(href):
             continue
         if RE_CARRIERE.search(urlparse(href).path) or (testo and RE_CARRIERE.search(testo)):
             # Preferisci i link più "parlanti" e con percorso corto
@@ -203,7 +217,8 @@ def trova_fonti_sito(sito):
             h, fin = _html(url)
         except tf.FonteErrore:
             continue
-        if not RE_CARRIERE.search(urlparse(fin).path + " " + url):   # redirect alla home
+        # Conta l'indirizzo FINALE: se la pagina carriere rimanda alla home non vale
+        if not RE_CARRIERE.search(urlparse(fin).netloc + urlparse(fin).path) or bacheca_di_rete(fin):
             continue
         # La pagina carriere spesso rimanda a sua volta al portale
         portali, _ = link_carriere(h, fin)

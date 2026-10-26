@@ -24,11 +24,13 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
 - `siti.py`: siti ufficiali dai dati CORDIS (`dati/siti.json`) e ricerca della pagina carriere / portale linkato.
 - `scopri_fonti.py`: ricerca fonti (workflow `scopri-fonti.yml`, lunedì), max 40 minuti per run
   (in pratica ~11 minuti per 1040 aziende), salva a intervalli, riparte dalle aziende non ancora
-  controllate (`controllate3` in `dati/fonti.json`). A ogni controllo le fonti di un'azienda si
+  controllate (`controllate4` in `dati/fonti.json`). A ogni controllo le fonti di un'azienda si
   sostituiscono. Regole di accettazione:
   - portale linkato dal sito ufficiale (CORDIS) → accettato;
-  - pagina carriere del sito → solo se contiene lessico da annunci (`siti.sembra_pagina_lavoro`)
-    e non è un articolo; mai "opportunities"/"talent"/"join us" da soli;
+  - pagina carriere del sito → solo se contiene lessico da annunci (`siti.sembra_pagina_lavoro`),
+    non è un articolo (>3 parole nell'ultimo pezzo dell'URL), non è una bacheca della rete/soci
+    (`siti.bacheca_di_rete`) e l'indirizzo FINALE (dopo i redirect) è ancora una pagina carriere;
+    mai "opportunities"/"talent"/"join us" da soli;
   - portale trovato per slug → nome con TUTTE le parole distintive + annunci in un paese
     dell'azienda; senza annunci solo se il nome è identico parola per parola;
   - nome solo compatibile (più corto) → `da_verificare` (non usato: controllare a mano e
@@ -54,7 +56,13 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
       sede solo "France" mostrata a parte, link con parametri volatili, WTTJ 403 → browser,
       sedi non indicate solo per aziende Parigi/Italia, email del lunedì se ci sono fonti rotte,
       workflow newsletter non lancia più la ricerca (sforava il timeout). 42 test.
-- [ ] 3ª ricerca fonti con le regole nuove; rileggere TUTTO l'elenco nel log (anche ❔ da verificare).
+- [x] 3ª ricerca (run su 19b620a): 107 aziende con fonte, 3 da verificare. Riletta tutta: errori
+      residui corretti (Actia → home dopo redirect; Axelera/Polymeris bacheche dei soci;
+      ENTSO-E → www.teamtailor.com; Euronovia → articolo). 45 test.
+- [ ] 4ª ricerca (controllate4); rileggere di nuovo TUTTO l'elenco.
+- [ ] Da verificare a mano con `prova-fonti` (opzione "dubbi"): Saint-Gobain (smartrecruiters
+      saintgobain), Magellan Circle Italy (smartrecruiters magellan), Avantium (greenhouse avantium).
+      Se i titoli/sedi confermano → `fonti_manuali.json` con nota.
 - [ ] Prova fonti su tutte le fonti trovate; correggere quelle rotte o sbagliate.
 - [ ] Prima newsletter reale (workflow "🎯 Newsletter Aziende Target") e controllo dell'email
       (dimensione, sezioni, link).

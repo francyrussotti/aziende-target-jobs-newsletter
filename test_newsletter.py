@@ -499,5 +499,27 @@ class TestErroriRicercaReale(unittest.TestCase):
             self.assertEqual(siti.trova_fonti_sito("https://rete.fr/")[0]["url"], "https://rete.fr/nous-rejoindre/")
 
 
+class TestErroriTerzaRicerca(unittest.TestCase):
+    def test_bacheche_di_rete_e_teamtailor(self):
+        import siti
+        self.assertTrue(siti.bacheca_di_rete("https://www.axelera.org/fr/offres-d-emploi-du-reseau"))
+        self.assertTrue(siti.bacheca_di_rete("https://www.polymeris.fr/bourse-a-l-emploi.html"))
+        self.assertFalse(siti.bacheca_di_rete("https://www.cls.fr/carrieres/"))
+        self.assertIsNone(siti.fonte_da_url("https://www.teamtailor.com/jobs"))
+        self.assertEqual(siti.fonte_da_url("https://torrecid.teamtailor.com/jobs/123"),
+                         {"tipo": "pagina", "url": "https://torrecid.teamtailor.com/jobs"})
+
+    def test_articolo(self):
+        import siti
+        self.assertTrue(siti.sembra_articolo("https://euronovia.eu/recrutement-apprenti-financements-europeens/"))
+        self.assertFalse(siti.sembra_articolo("https://www.laborelec.com/jobs_open_positions/"))
+
+    def test_carriere_che_rimanda_alla_home(self):
+        import siti
+        home = '<a href="/careers">Careers</a>'
+        with mock.patch.object(siti, "_html", side_effect=lambda u: (home, "https://www.actia-asso.eu/")):
+            self.assertEqual(siti.trova_fonti_sito("https://www.actia-asso.eu/"), [])
+
+
 if __name__ == "__main__":
     unittest.main()

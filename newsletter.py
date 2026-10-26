@@ -427,11 +427,15 @@ def oggetto(nuove):
 #  Main
 # ------------------------------------------------------------
 
-def prova(solo_ids=None):
+def prova(solo_ids=None, dubbi=False):
     """Legge le fonti e stampa cosa trova, senza email e senza toccare lo
-    storico. Serve a verificare fonti nuove o sospette (workflow prova-fonti)."""
+    storico. Serve a verificare fonti nuove o sospette (workflow prova-fonti).
+    dubbi=True legge invece i candidati "da_verificare" (per deciderli a mano)."""
     aziende = carica_aziende()
-    fonti = carica_fonti(aziende)
+    if dubbi:
+        fonti = {k: v for k, v in _leggi_json(FONTI_FILE, {}).get("da_verificare", {}).items() if k in aziende}
+    else:
+        fonti = carica_fonti(aziende)
     if solo_ids:
         fonti = {k: v for k, v in fonti.items() if k in solo_ids}
     print(f"🧪 PROVA FONTI: {len(fonti)} aziende\n")
@@ -447,7 +451,7 @@ def prova(solo_ids=None):
             o["luogo"] = tf.luogo(o)
             conta[o["luogo"]] = conta.get(o["luogo"], 0) + 1
         print(f"   ✅ {len(offerte)} offerte · " + ", ".join(f"{k} {v}" for k, v in sorted(conta.items())))
-        for o in [o for o in offerte if o["luogo"] in SEZIONI_MOSTRATE][:5]:
+        for o in ([o for o in offerte if o["luogo"] in SEZIONI_MOSTRATE] or offerte)[:5]:
             print(f"      - {o['titolo'][:70]} | {o['location'][:30]} | {o['data']} | {o['url'][:80]}")
     print(f"\n🧪 {ok} fonti funzionanti su {sum(len(v) for v in fonti.values())}")
 
@@ -455,7 +459,7 @@ def prova(solo_ids=None):
 def main():
     if "--prova" in sys.argv:
         ids = [a for a in sys.argv[1:] if not a.startswith("--")]
-        return prova(set(ids) or None)
+        return prova(set(ids) or None, dubbi="--dubbi" in sys.argv)
     oggi = datetime.now().strftime("%Y-%m-%d")
     print(f"\n🎯 NEWSLETTER AZIENDE TARGET  {datetime.now():%d/%m/%Y %H:%M}\n")
     try:
