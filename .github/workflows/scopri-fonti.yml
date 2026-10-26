@@ -2,10 +2,14 @@ name: 🔎 Aziende Target - cerca fonti
 
 # Cerca per ogni azienda della lista un portale di selezione con API pubblica
 # (scopri_fonti.py) e aggiorna dati/fonti.json. Una volta a settimana
-# o a mano (es. dopo aver aggiornato dati/aziende.json).
+# o a mano. Quando cambia dati/aziende.json (routine giornaliera che importa la
+# lista dalla pagina) aggiorna i siti CORDIS e cerca solo le aziende nuove.
 on:
   schedule:
     - cron: "13 2 * * 1"
+  push:
+    branches: [main]
+    paths: [dati/aziende.json]
   workflow_dispatch:
     inputs:
       solo_focus:
@@ -51,14 +55,18 @@ jobs:
       - name: Install Playwright system deps
         if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: sudo $(which playwright) install-deps chromium
-      - name: Siti ufficiali da CORDIS (solo se mancano)
-        run: if [ ! -f dati/siti.json ]; then python -u siti.py; fi
+      - name: Siti ufficiali da CORDIS (se mancano o se è cambiata la lista)
+        run: |
+          if [ ! -f dati/siti.json ]; then python -u siti.py
+          elif [ "${{ github.event_name }}" = "push" ]; then python -u siti.py || echo "⚠️ CORDIS non raggiunto: siti invariati"
+          fi
       - name: Ricerca
         env:
           AZIENDE: ${{ inputs.aziende }}
         run: |
           ARGS=""
           for i in $AZIENDE; do ARGS="$ARGS --id $i"; done
+          if [ "${{ github.event_name }}" = "push" ]; then ARGS="$ARGS --nuove"; fi
           python -u scopri_fonti.py ${{ inputs.solo_focus && '--focus' || '' }} ${{ inputs.diagnosi && '--diagnosi' || '' }} $ARGS
       - name: Commit fonti
         if: always()   # salva anche i risultati parziali

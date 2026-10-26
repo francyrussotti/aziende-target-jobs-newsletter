@@ -39,6 +39,12 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
     dell'azienda (senza annunci → da_verificare, anche se il nome è identico);
   - nome solo compatibile (più corto) → `da_verificare` (non usato: controllare a mano e
     spostare in `fonti_manuali.json` se giusto).
+- Lista aziende sempre allineata alla pagina: la routine claude.ai "Aziende target newsletter:
+  importa lista" (ogni giorno 07:13 Roma, dopo l'aggiornamento della pagina delle 06:47) legge
+  l'artifact, lancia `importa_aziende.py` (rifiuta se sparisce >20% della lista) e fa push di
+  `dati/aziende.json` solo se cambia. Il push avvia `scopri-fonti.yml`: siti CORDIS aggiornati +
+  `scopri_fonti.py --nuove` (solo aziende mai controllate). Le aziende uscite spariscono subito
+  dalla newsletter (`carica_fonti` ignora gli ID fuori lista).
 - `dati/fonti_manuali.json` vince su `dati/fonti.json`; `dati/siti_manuali.json` corregge i siti
   CORDIS vecchi (vince su `dati/siti.json`). Workflow ricerca: input "aziende" per rifarla su pochi ID.
 - Prima lettura di una fonte: portale strutturato → tutte le offerte aperte in focus ("già aperta");
@@ -119,5 +125,8 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
       Dalle prossime run solo le offerte nuove.
 - [x] Ricerca REGOLE=7 con browser per WTTJ (run 40369605324): 97 aziende con fonte; WTTJ trova
       Artelys (nuova) e CS Group; prioritarie con fonte ancora 8/54.
+- [x] EMAIL_DESTINATARIO era sbagliato (mail non arrivata a francy.russotti@gmail.com): corretto
+      dall'utente, seen.json azzerato (cb310ba) e newsletter reinviata.
+- [x] Aggiornamento automatico della lista aziende (routine + push → ricerca solo nuove). 63 test.
 - [ ] Aziende prioritarie (Parigi/Italia, classe A o open innovation) ancora senza fonte:
       elencarle per l'utente.

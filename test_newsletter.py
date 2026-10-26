@@ -585,6 +585,27 @@ class TestScopriFonti(unittest.TestCase):
         self.assertEqual(d["fonti"], {})
 
 
+    def test_solo_nuove(self):
+        self.lancia([{"tipo": "lever", "slug": "acme", "verifica": "x"}])   # "a" controllata
+        with open(self.p("aziende.json"), "w") as f:
+            json.dump({"aziende": [{"id": "a", "n": "Acme", "p": "FR", "k": "PAR"},
+                                   {"id": "b", "n": "Beta", "p": "FR", "k": "PAR"}]}, f)
+        cercate = []
+        with mock.patch.object(self.sf, "siti") as finto_siti, \
+             mock.patch.object(self.sf.tf, "scopri", side_effect=lambda az: cercate.append(az["id"]) or []), \
+             mock.patch.object(sys, "argv", ["scopri_fonti.py", "--nuove"]):
+            finto_siti.SITI_FILE = self.p("siti.json")
+            self.sf.main()
+        self.assertEqual(cercate, ["b"])
+
+
+class TestImportaAziende(unittest.TestCase):
+    def test_differenze(self):
+        import importa_aziende as ia
+        nuove, uscite = ia.differenze({"a": "A", "b": "B"}, [{"id": "b"}, {"id": "c"}])
+        self.assertEqual((nuove, uscite), (["c"], ["a"]))
+
+
 class TestErroriProvaCompleta(unittest.TestCase):
     """Dalla prova di tutte le fonti del 26/10/2026 (102 fonti, 3090 offerte)."""
 

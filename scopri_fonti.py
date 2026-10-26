@@ -21,6 +21,7 @@ Uso:
     python scopri_fonti.py              # tutte le aziende, entro 40 minuti
     python scopri_fonti.py --focus      # solo Parigi / Italia / open innovation / classe A
     python scopri_fonti.py --id novaspace --id euroquality
+    python scopri_fonti.py --nuove      # solo le aziende mai controllate
 """
 import argparse
 import json
@@ -102,6 +103,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--diagnosi", action="store_true", help="solo stampa, per gli --id indicati")
     ap.add_argument("--focus", action="store_true")
+    ap.add_argument("--nuove", action="store_true", help="solo aziende mai controllate (es. appena entrate in lista)")
     ap.add_argument("--id", action="append", default=[])
     ap.add_argument("--thread", type=int, default=16)
     ap.add_argument("--minuti", type=float, default=40)
@@ -136,11 +138,15 @@ def main():
     da_cercare = [x for x in aziende if x["id"] not in manuali]
     if a.id:
         da_cercare = [x for x in da_cercare if x["id"] in a.id]
+    elif a.nuove:
+        da_cercare = [x for x in da_cercare if x["id"] not in controllate]
     elif a.focus:
         da_cercare = [x for x in da_cercare if x.get("k") or x.get("o") or x.get("c") == "A"]
     # Prima le mai controllate, poi le controllate da più tempo; a parità, le prioritarie
     da_cercare.sort(key=lambda x: (controllate.get(x["id"], ""), not x.get("k"), -(x.get("s") or 0)))
     print(f"🔎 Cerco fonti per {len(da_cercare)} aziende (max {a.minuti:.0f} minuti)…")
+    if not da_cercare:
+        return                                   # niente da fare: fonti.json non si tocca
 
     oggi = datetime.now().strftime("%Y-%m-%d")
     fatte = trovate_oggi = 0
