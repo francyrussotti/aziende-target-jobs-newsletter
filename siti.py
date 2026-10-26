@@ -191,8 +191,8 @@ def link_carriere(html, base):
         if urlparse(href).netloc.replace("www.", "") != host:
             continue
         testo = a.get_text(" ", strip=True)[:60]
-        if sembra_articolo(href) or bacheca_di_rete(href):
-            continue
+        if sembra_articolo(href) or bacheca_di_rete(href) or not urlparse(href).path.strip("/"):
+            continue                    # (la home non è mai la pagina carriere: Engie)
         if RE_CARRIERE.search(urlparse(href).path) or (testo and RE_CARRIERE.search(testo)):
             # Preferisci i link più "parlanti" e con percorso corto
             punti = (2 if RE_CARRIERE.search(urlparse(href).path) else 0) + (1 if RE_CARRIERE.search(testo) else 0)

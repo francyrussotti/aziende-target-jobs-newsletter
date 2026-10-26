@@ -15,5 +15,9 @@
  "erdyn-consultants": {
   "url": "https://www.erdyn.com/",
   "nota": "CORDIS: erdyn.fr irraggiungibile. erdyn.com indicato come sito ufficiale (craft.co, ricerca web del 26/10)"
+ },
+ "bpifrance": {
+  "url": "https://www.bpifrance.fr/",
+  "nota": "CORDIS: oseo.fr (Oseo è confluita in Bpifrance nel 2013; oseo.fr non ha più contenuti, diagnosi 26/10)"
  }
 }

@@ -15,7 +15,6 @@ import os
 import re
 import sys
 import smtplib
-import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
@@ -138,21 +137,10 @@ def eta_giorni(data):
 #  Raccolta
 # ------------------------------------------------------------
 
-_lock_browser = threading.Lock()
-_browser_originale = tf._html_con_browser
-
-
-def _browser_seriale(url):
-    # Playwright: un browser alla volta anche se le fonti girano in parallelo
-    with _lock_browser:
-        return _browser_originale(url)
-
-
 def raccogli(aziende, fonti):
     """[(id azienda, fonte, offerte | None, errore)] con ogni fonte letta una
     volta sola: se due aziende della lista condividono un portale (stesso
     gruppo), le offerte vanno alla prima per priorità."""
-    tf._html_con_browser = _browser_seriale
     compiti, viste = [], set()
     for aid in sorted(fonti, key=lambda i: priorita(aziende[i])):
         for f in fonti[aid]:
@@ -172,7 +160,6 @@ def raccogli(aziende, fonti):
 
     with ThreadPoolExecutor(max_workers=8) as ex:
         risultati = list(ex.map(uno, compiti))
-    tf._html_con_browser = _browser_originale
     return risultati
 
 

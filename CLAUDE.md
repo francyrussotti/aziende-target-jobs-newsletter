@@ -95,7 +95,15 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
       sede ricavata dal titolo se manca ("… Rome Italy"); titoli ripetuti/"More Details" puliti. 56 test.
 - [x] Modalità diagnosi (scopri_fonti.py --diagnosi, workflow opzione "diagnosi"): lanciata sulle
       42 aziende prioritarie senza fonte (run su c15474f) → leggere e aggiungere fonti manuali.
-- [ ] 3ª prova di tutte le fonti (verifica correzioni), poi prima newsletter.
+- [x] 3ª prova di TUTTE le fonti (run 40368146801): 105/109, 0 errori, 2848 offerte; PAR 939
+      (era 755: Thales 832, Valeo 49, CS Group 13, UTAC 22 grazie ai comuni IDF), IT 70, ND 76 puliti.
+- [x] Diagnosi 42 prioritarie (run 40367058375, letta per intero): WTTJ risponde HTTP 202 (anti-bot)
+      a ogni richiesta diretta → la ricerca su WTTJ non funzionava mai. RINA/Engineering: pagina
+      carriere in JavaScript; Engie: scelta la home come pagina carriere (bug); Bpifrance: CORDIS
+      ha oseo.fr; Euronovia: annunci come articoli; Meta Group: pagine carriere → home;
+      19 senza sito in CORDIS. Corretto: WTTJ nella ricerca con il browser (solo FR del focus
+      Parigi), home mai pagina carriere, siti_manuali Bpifrance → bpifrance.fr. REGOLE=7. 59 test.
+- [ ] Ricerca REGOLE=7 (con browser per WTTJ) e rilettura; prova delle fonti nuove.
 - [ ] Prima newsletter reale (workflow "🎯 Newsletter Aziende Target") e controllo dell'email
       (dimensione, sezioni, link).
 - [ ] Aziende prioritarie (Parigi/Italia, classe A o open innovation) ancora senza fonte:

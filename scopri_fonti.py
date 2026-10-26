@@ -37,7 +37,7 @@ SALVA_OGNI = 40   # aziende
 # Versione delle regole di accettazione: se cambia, l'elenco riparte da zero.
 # Con la stessa versione le fonti già confermate restano anche se un sito una
 # volta non risponde (una fonte che smette di funzionare la segnala la newsletter).
-REGOLE = 6
+REGOLE = 7
 
 
 def salva(fonti, da_verificare, controllate, oggi, irraggiungibili=None):

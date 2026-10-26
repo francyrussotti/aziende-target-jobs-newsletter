@@ -13,6 +13,7 @@ Ogni lettore restituisce una lista di offerte nel formato comune:
 e solleva FonteErrore se la fonte non risponde (≠ "0 offerte").
 """
 import re
+import threading
 import unicodedata
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta, timezone
@@ -472,13 +473,18 @@ def estrai_link_annunci(html, url, filtro=None):
     return out
 
 
+_BROWSER_LOCK = threading.Lock()
+
+
 def _html_con_browser(url):
+    """HTML dopo l'esecuzione del JavaScript (WTTJ risponde 202 anti-bot alle
+    richieste dirette). Un browser alla volta anche con più thread."""
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
         return None
     try:
-        with sync_playwright() as p:
+        with _BROWSER_LOCK, sync_playwright() as p:
             b = p.chromium.launch()
             pg = b.new_page(user_agent=HEADERS["User-Agent"])
             pg.goto(url, timeout=45000, wait_until="domcontentloaded")
@@ -752,6 +758,7 @@ def _prova(tipo, slug, azienda):
     controllare si accetta solo il nome identico."""
     rapido = dict(rapida=True, timeout=8)
     nome, paesi = azienda["n"], (azienda.get("p") or "").split(",")
+    offerte_pronte = None
     try:
         if tipo == "greenhouse":
             loro = _json(f"https://boards-api.greenhouse.io/v1/boards/{slug}", **rapido).get("name", "")
@@ -772,10 +779,12 @@ def _prova(tipo, slug, azienda):
             testi = [j.get("descriptionPlain", "") for j in (b.get("jobs") or [])[:30]]
             loro = nome if testo_cita_nome(nome, testi) else ""
         elif tipo == "wttj":
-            html = _get(f"https://www.welcometothejungle.com/fr/companies/{slug}",
-                        headers={"Accept": "text/html"}, **rapido).text
-            m = re.search(r"<title>(.*?)</title>", html, re.S | re.I)
-            loro = re.split(r"\s[\|:–-]\s", (m.group(1) if m else "").strip())[0]
+            # Con il browser: alle richieste dirette WTTJ risponde 202 (pagina anti-bot)
+            html = _html_con_browser(f"https://www.welcometothejungle.com/fr/companies/{slug}/jobs")
+            if not html:
+                return None
+            loro = next((n for n in nomi_pagina_wttj(html) if nome_corrisponde(nome, n)), "")
+            offerte_pronte = _wttj_estrai(slug, html)
         else:
             return None
         if not loro or not nome_corrisponde(nome, loro):
@@ -783,7 +792,7 @@ def _prova(tipo, slug, azienda):
         f = {"tipo": "lever" if tipo == "lever-eu" else tipo, "slug": slug}
         if tipo == "lever-eu":
             f["eu"] = True
-        offerte = leggi_fonte(f)
+        offerte = offerte_pronte if offerte_pronte is not None else leggi_fonte(f)
         nei_paesi = bool(offerte) and annunci_nei_paesi(offerte, paesi)
         forte = nome_forte(nome, loro)
         if forte and nei_paesi:
@@ -803,6 +812,22 @@ def _prova(tipo, slug, azienda):
         return None
 
 
+def nomi_pagina_wttj(html):
+    """Nomi candidati dell'azienda in una pagina WTTJ: titolo, og:title, h1."""
+    from bs4 import BeautifulSoup
+    soup = BeautifulSoup(html, "lxml")
+    grezzi = [soup.title.get_text() if soup.title else ""]
+    grezzi += [m.get("content", "") for m in soup.find_all("meta", property="og:title")]
+    grezzi += [h.get_text(" ", strip=True) for h in soup.find_all("h1")[:2]]
+    nomi = []
+    for g in grezzi:
+        g = re.sub(r"(?i)^(offres d.emploi|jobs?|emplois?)\s*(chez|at|[-:])?\s*", "", g.strip())
+        for pezzo in re.split(r"\s[\|:–-]\s", g):
+            if pezzo.strip() and "welcome to the jungle" not in pezzo.lower():
+                nomi.append(pezzo.strip())
+    return list(dict.fromkeys(nomi))
+
+
 TIPI_SCOPERTA = ["greenhouse", "lever", "lever-eu", "workable", "smartrecruiters", "ashby", "recruitee"]
 
 
@@ -810,10 +835,15 @@ def scopri(azienda: dict) -> list:
     """Fonti per un'azienda della lista, provando gli slug sui portali. WTTJ solo
     per le aziende con sede in Francia. Le fonti con "da_verificare" non vanno
     nella newsletter finché non le conferma una persona."""
-    tipi = TIPI_SCOPERTA + (["wttj"] if "FR" in (azienda.get("p") or "").split(",") else [])
+    # WTTJ richiede il browser (lento): solo aziende francesi del focus Parigi
+    francese = "FR" in (azienda.get("p") or "").split(",")
+    tipi = TIPI_SCOPERTA + (["wttj"] if francese and "PAR" in (azienda.get("k") or "") else [])
     trovate, usati = [], set()
     for tipo in tipi:
-        for slug in slug_candidati(azienda["n"]):
+        slugs = slug_candidati(azienda["n"])
+        if tipo == "wttj":                    # su WTTJ gli slug hanno i trattini
+            slugs = [x for x in slugs if "-" in x or len(parole(azienda["n"])) == 1][:2]
+        for slug in slugs:
             f = _prova(tipo, slug, azienda)
             if f and f["tipo"] not in usati:
                 trovate.append(f)

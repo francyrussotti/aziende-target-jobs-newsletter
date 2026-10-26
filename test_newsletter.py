@@ -660,5 +660,35 @@ class TestSecondaProvaCompleta(unittest.TestCase):
                              ["Head of Asia Pacific"])
 
 
+class TestDiagnosi(unittest.TestCase):
+    """Dalla diagnosi delle 42 aziende prioritarie senza fonte (26/10/2026)."""
+
+    def test_wttj_con_browser_e_nome_dalla_pagina(self):
+        html = """<html><head><title>Hello Tomorrow : offres d'emploi | Welcome to the Jungle</title></head>
+                  <body><h1>Hello Tomorrow</h1>
+                  <a href="/fr/companies/hello-tomorrow/jobs/consultant_paris">Consultant deep tech</a></body></html>"""
+        self.assertIn("Hello Tomorrow", tf.nomi_pagina_wttj(html))
+        with mock.patch.object(tf, "_html_con_browser", return_value=html):
+            f = tf._prova("wttj", "hello-tomorrow", {"n": "Hello Tomorrow", "p": "FR"})
+        self.assertEqual((f["tipo"], f["slug"]), ("wttj", "hello-tomorrow"))
+        self.assertNotIn("da_verificare", f)
+        altra = html.replace("Hello Tomorrow", "Goodbye Yesterday")
+        with mock.patch.object(tf, "_html_con_browser", return_value=altra):
+            self.assertIsNone(tf._prova("wttj", "hello-tomorrow", {"n": "Hello Tomorrow", "p": "FR"}))
+
+    def test_wttj_solo_per_aziende_di_parigi(self):
+        provati = []
+        with mock.patch.object(tf, "_prova", side_effect=lambda t, s, a: provati.append(t)):
+            tf.scopri({"n": "Acme Lyon", "p": "FR", "k": ""})
+            self.assertNotIn("wttj", provati)
+            tf.scopri({"n": "Acme Paris", "p": "FR", "k": "PAR"})
+            self.assertIn("wttj", provati)
+
+    def test_home_non_e_pagina_carriere(self):
+        import siti
+        html = '<a href="https://www.engie.com/">Carrières</a><a href="/fr/carrieres">Nous rejoindre</a>'
+        self.assertEqual(siti.link_carriere(html, "https://www.engie.com/")[1], "https://www.engie.com/fr/carrieres")
+
+
 if __name__ == "__main__":
     unittest.main()
