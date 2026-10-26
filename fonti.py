@@ -209,26 +209,34 @@ def _workday_data(testo):
     return (oggi - timedelta(days=int(m.group(1)))).strftime("%Y-%m-%d") if m else ""
 
 
-# Facet di Workday da selezionare (paesi/città del focus): riduce migliaia di
-# annunci nel mondo a quelli in Francia e Italia. Il filtro fine è comunque locale.
-WORKDAY_FACET_RE = re.compile(r"\b(france|italy|italia|paris|ile[- ]de[- ]france|île[- ]de[- ]france)\b", re.I)
+# Facet di Workday: si selezionano i PAESI del focus (Francia, Italia), non le
+# singole sedi: un filtro per sede ("Paris 9ème") perderebbe il resto dell'Île-de-France.
+# Il filtro fine (Parigi/IDF, Italia, remoto) è comunque locale.
+WORKDAY_PAESI_RE = re.compile(r"^\s*(france|italy|italia|italie|frankreich|italien)\s*$", re.I)
 
 
 def _workday_facet(facets):
-    """{facetParameter: [id, ...]} dei valori che corrispondono al focus."""
-    scelti = {}
+    """{facetParameter: [id, ...]} con i valori "Francia"/"Italia" del primo
+    facet di tipo paese trovato. Vuoto se il sito non ha un facet per paese
+    (si leggono allora tutti gli annunci, fino a MAX_OFFERTE_FONTE)."""
+    trovati = {}
 
     def visita(param, valori):
         for v in valori or []:
             if v.get("values"):                       # gruppo annidato
                 visita(v.get("facetParameter") or param, v["values"])
-            elif v.get("id") and WORKDAY_FACET_RE.search(v.get("descriptor") or ""):
-                scelti.setdefault(param, []).append(v["id"])
+            elif v.get("id") and WORKDAY_PAESI_RE.match(v.get("descriptor") or ""):
+                trovati.setdefault(param, []).append(v["id"])
 
     for f in facets or []:
         if re.search(r"(?i)location|country|pays", f.get("facetParameter", "")):
             visita(f.get("facetParameter"), f.get("values"))
-    return scelti
+    if not trovati:
+        return {}
+    # Preferisci il parametro che parla di paese; altrimenti quello con più valori
+    param = next((p for p in trovati if re.search(r"(?i)country|pays", p)),
+                 max(trovati, key=lambda p: len(trovati[p])))
+    return {param: trovati[param]}
 
 
 def workday(url, **_):
@@ -292,6 +300,9 @@ def wttj(slug, **_):
     return out
 
 
+RE_SPONTANEA = re.compile(r"(?i)(spontan|open[- ]application|talent[- ]pool|candidature[- ]libre)")
+
+
 def _wttj_estrai(slug, html):
     from bs4 import BeautifulSoup
     soup = BeautifulSoup(html, "lxml")
@@ -301,7 +312,7 @@ def _wttj_estrai(slug, html):
         if f"/companies/{slug}/jobs/" not in href:
             continue
         o = _wttj_da_link(slug, href, a.get_text(" ", strip=True)[:160])
-        if o["url"] in visti or "spontaneous" in o["url"] or "candidature-spontanee" in o["url"]:
+        if o["url"] in visti or RE_SPONTANEA.search(o["url"] + " " + o["titolo"]):
             continue
         visti.add(o["url"])
         out.append(o)

@@ -116,10 +116,20 @@ class TestLettori(unittest.TestCase):
         self.assertEqual(o[0]["url"], "https://thales.wd3.myworkdayjobs.com/fr-FR/Careers/job/0")
         self.assertEqual(o[0]["data"], giorni_fa(2))
 
+    def test_workday_preferisce_il_paese_alle_sedi(self):
+        facets = [{"facetParameter": "locations", "values": [
+                      {"id": "p9", "descriptor": "PARIS 9ème"}, {"id": "vz", "descriptor": "Vélizy"}]},
+                  {"facetParameter": "Location_Country", "values": [
+                      {"id": "fr", "descriptor": "France"}, {"id": "it", "descriptor": "Italy"}]}]
+        self.assertEqual(tf._workday_facet(facets), {"Location_Country": ["fr", "it"]})
+        self.assertEqual(tf._workday_facet([{"facetParameter": "locations", "values": [
+            {"id": "p9", "descriptor": "PARIS 9ème"}]}]), {})
+
     def test_wttj(self):
         html = """<a href="/fr/companies/hello-tomorrow/jobs/deep-tech-intern_paris_HT_V1">Deep Tech Intern</a>
                   <a href="/fr/companies/hello-tomorrow/jobs/deep-tech-intern_paris_HT_V1">doppione</a>
                   <a href="/fr/companies/hello-tomorrow/jobs/spontaneous-application_paris">Spontanea</a>
+                  <a href="/fr/companies/hello-tomorrow/jobs/rejoins-nous_paris">Candidature spontanée chez nous</a>
                   <a href="/fr/companies/altra/jobs/x_paris">Altra azienda</a>"""
         o = tf._wttj_estrai("hello-tomorrow", html)
         self.assertEqual(len(o), 1)
@@ -190,12 +200,28 @@ class TestSelezione(ConCartella):
         offerte = [self.offerta("recente", data=giorni_fa(3)), self.offerta("vecchia", data=giorni_fa(60)),
                    self.offerta("senza-data"), self.offerta("madrid", loc="Madrid", data=giorni_fa(1))]
         nuove, stat = tn.seleziona(az, [("acme-par", fonte, offerte, None)], seen, giorni_fa(0))
-        self.assertEqual([o["titolo"] for o in nuove], ["recente"])
-        self.assertEqual((stat["vecchie"], stat["iniziali"], stat["fuori_focus"]), (1, 1, 1))
-        # Run successiva: le offerte note non tornano, una nuova senza data sì
-        nuove, _ = tn.seleziona(az, [("acme-par", fonte, offerte + [self.offerta("nuova")], None)],
-                                seen, giorni_fa(0))
+        # Prima lettura di un portale: tutte le aperte in focus, segnate "già aperta"
+        self.assertEqual([o["titolo"] for o in nuove], ["recente", "vecchia", "senza-data"])
+        self.assertTrue(all(o["gia_aperta"] for o in nuove))
+        self.assertEqual(stat["fuori_focus"], 1)
+        # Run successiva: le note non tornano; una nuova sì, una nuova ma vecchia no
+        nuove, stat = tn.seleziona(az, [("acme-par", fonte, offerte + [
+            self.offerta("nuova"), self.offerta("ripubblicata", data=giorni_fa(90))], None)], seen, giorni_fa(0))
         self.assertEqual([o["titolo"] for o in nuove], ["nuova"])
+        self.assertNotIn("gia_aperta", nuove[0])
+        self.assertEqual(stat["vecchie"], 1)
+
+    def test_pagina_generica_prima_lettura_silenziosa(self):
+        az = tn.carica_aziende()
+        fonte = {"tipo": "pagina", "url": "https://acme.fr/careers"}
+        seen = {"ids": {}, "fonti": [], "storico": []}
+        nuove, stat = tn.seleziona(az, [("acme-par", fonte, [self.offerta("link", loc="")], None)],
+                                   seen, giorni_fa(0))
+        self.assertEqual((nuove, stat["iniziali"]), ([], 1))
+        nuove, _ = tn.seleziona(az, [("acme-par", fonte, [self.offerta("link", loc=""),
+                                                         self.offerta("annuncio", loc="")], None)],
+                                seen, giorni_fa(0))
+        self.assertEqual([o["titolo"] for o in nuove], ["annuncio"])
 
     def test_oblio(self):
         seen = {"ids": {"vecchio": giorni_fa(200), "recente": giorni_fa(5)}, "fonti": [], "storico": []}
@@ -264,6 +290,35 @@ class TestFileReali(unittest.TestCase):
             self.assertIn(k, ids)
             for f in fonti:
                 self.assertIn(f["tipo"], tf.LETTORI)
+
+
+class TestSiti(unittest.TestCase):
+    def test_fonte_da_url(self):
+        import siti
+        self.assertEqual(siti.fonte_da_url("https://jobs.lever.co/novaspace/abc"),
+                         {"tipo": "lever", "slug": "novaspace"})
+        self.assertEqual(siti.fonte_da_url("https://pno-group-europe.jobs.personio.com/job/1"),
+                         {"tipo": "personio", "slug": "pno-group-europe", "dominio": "jobs.personio.com"})
+        self.assertEqual(siti.fonte_da_url("https://www.welcometothejungle.com/fr/companies/lgi/jobs"),
+                         {"tipo": "wttj", "slug": "lgi"})
+        self.assertEqual(siti.fonte_da_url("https://thales.wd3.myworkdayjobs.com/fr-FR/Careers/job/x"),
+                         {"tipo": "workday", "url": "https://thales.wd3.myworkdayjobs.com/fr-FR/Careers"})
+        self.assertIsNone(siti.fonte_da_url("https://www.linkedin.com/company/x"))
+
+    def test_id_come_nella_lista(self):
+        import siti
+        csv_testo = ("name;organizationURL\nEUROQUALITY SAS;www.euroquality.fr\n"
+                     "EUROQUALITY;http://www.euroquality.fr/chi-siamo\nALTRA SRL;altra.it\n")
+        self.assertEqual(siti.siti_da_cordis(csv_testo, {"euroquality"}),
+                         {"euroquality": "https://www.euroquality.fr/"})
+
+    def test_link_carriere(self):
+        import siti
+        html = """<nav><a href="/fr/nous-rejoindre">Nous rejoindre</a><a href="/contact">Contact</a></nav>
+                  <footer><a href="https://jobs.lever.co/acme">Jobs</a></footer>"""
+        portali, carriere = siti.link_carriere(html, "https://acme.fr/")
+        self.assertEqual(portali, [{"tipo": "lever", "slug": "acme"}])
+        self.assertEqual(carriere, "https://acme.fr/fr/nous-rejoindre")
 
 
 if __name__ == "__main__":

@@ -29,6 +29,7 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
 import fonti as tf
+import siti
 from newsletter import AZIENDE_FILE, FONTI_FILE, FONTI_MANUALI_FILE, _leggi_json
 
 SALVA_OGNI = 40   # aziende
@@ -40,7 +41,7 @@ def salva(fonti, controllate, oggi):
         json.dump({"aggiornato": oggi, "nota": "File generato da scopri_fonti.py: per "
                    "correggere una fonte usa dati/fonti_manuali.json",
                    "fonti": dict(sorted(fonti.items())),
-                   "controllate": dict(sorted(controllate.items()))},
+                   "controllate2": dict(sorted(controllate.items()))},
                   f, ensure_ascii=False, indent=1)
         f.write("\n")
     os.replace(tmp, FONTI_FILE)
@@ -60,7 +61,9 @@ def main():
     manuali = _leggi_json(FONTI_MANUALI_FILE, {})
     vecchio = _leggi_json(FONTI_FILE, {})
     fonti = {k: v for k, v in vecchio.get("fonti", {}).items() if k in ids}   # solo aziende in lista
-    controllate = {k: v for k, v in vecchio.get("controllate", {}).items() if k in ids}
+    # "controllate2": controllo che include il sito ufficiale (dati/siti.json)
+    controllate = {k: v for k, v in vecchio.get("controllate2", {}).items() if k in ids}
+    siti_uff = _leggi_json(siti.SITI_FILE, {})
 
     da_cercare = [x for x in aziende if x["id"] not in manuali]
     if a.id:
@@ -77,7 +80,10 @@ def main():
     def uno(az):
         if time.monotonic() > fine:
             return az, None                       # tempo scaduto: resta per il prossimo run
-        return az, tf.scopri(az)
+        # 1) dal sito ufficiale (verificato per costruzione); 2) slug sui portali
+        dal_sito = siti.trova_fonti_sito(siti_uff[az["id"]]) if az["id"] in siti_uff else []
+        tipi_trovati = {f["tipo"] for f in dal_sito}
+        return az, dal_sito + [f for f in tf.scopri(az) if f["tipo"] not in tipi_trovati]
 
     with ThreadPoolExecutor(max_workers=a.thread) as ex:
         for az, trovate in ex.map(uno, da_cercare):
@@ -95,7 +101,7 @@ def main():
                 if set(unite) - prima:
                     trovate_oggi += 1
                     print(f"   ✅ {az['n']}: " + ", ".join(
-                        f"{f['tipo']}:{f['slug']} ({f['verifica']})" for f in trovate), flush=True)
+                        f"{tf.chiave_fonte(f)} ({f.get('verifica', '')})" for f in trovate), flush=True)
             if fatte % SALVA_OGNI == 0:
                 salva(fonti, controllate, oggi)
                 print(f"   … {fatte}/{len(da_cercare)} controllate", flush=True)

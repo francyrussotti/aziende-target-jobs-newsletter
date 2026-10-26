@@ -171,8 +171,8 @@ def raccogli(aziende, fonti):
 
 def seleziona(aziende, risultati, seen, oggi):
     """Decide cosa mostrare. Restituisce (nuove, statistiche).
-    - Fonte mai vista prima: si mostrano solo le offerte con data recente;
-      le altre (o senza data) diventano lo "stato iniziale" in silenzio.
+    - Fonte mai vista prima: portale strutturato → si mostrano tutte le offerte
+      aperte (etichetta "già aperta"); pagina generica → stato iniziale silenzioso.
     - Dopo: si mostra ogni offerta nuova, salvo se datata > MAX_GIORNI_NUOVA."""
     nuove, stat = [], {"trovate": 0, "fuori_focus": 0, "vecchie": 0, "iniziali": 0}
     fonti_note = set(seen["fonti"])
@@ -193,11 +193,17 @@ def seleziona(aziende, risultati, seen, oggi):
             if gia:
                 continue
             eta = eta_giorni(o.get("data"))
+            if prima_volta:
+                # Prima lettura: le pagine generiche diventano lo stato iniziale
+                # (senza date un annuncio non si distingue da un link qualunque);
+                # dai portali strutturati si mostrano tutte le offerte aperte.
+                if f.get("tipo") == "pagina":
+                    stat["iniziali"] += 1
+                    continue
+                nuove.append({**o, "azienda": aid, "gia_aperta": True})
+                continue
             if eta is not None and eta > MAX_GIORNI_NUOVA:
                 stat["vecchie"] += 1
-                continue
-            if prima_volta and eta is None:
-                stat["iniziali"] += 1
                 continue
             nuove.append({**o, "azienda": aid})
         seen["fonti"].append(k)
@@ -287,6 +293,8 @@ def genera_html(nuove, aziende, fonti, stat, problemi, n_fonti):
                 meta = [esc(x) for x in (o.get("location"), _quando(o.get("data"))) if x]
                 meta += [f'<span style="padding:0 6px;border:1px solid {linea};border-radius:9px;'
                          f'font-size:11px;">{e}</span>' for e in etichette(o["titolo"])]
+                if o.get("gia_aperta"):
+                    meta.append(f'<span style="color:{chiaro};">già aperta</span>')
                 voci += f"""
             <tr><td style="padding:9px 0 9px 12px;border-left:2px solid {linea};">
               <a href="{esc(o.get('url') or '#')}" style="{serif}font-size:16px;line-height:1.35;
@@ -318,8 +326,12 @@ def genera_html(nuove, aziende, fonti, stat, problemi, n_fonti):
           <strong>Fonti da controllare</strong>{righe}</div></td></tr>"""
 
     totale = len(nuove)
+    aperte = sum(1 for o in nuove if o.get("gia_aperta"))
     titolo = (f"{totale} nuov{'a offerta' if totale == 1 else 'e offerte'}" if totale
               else "Nessuna offerta nuova")
+    if aperte:
+        titolo = (f"{totale} offerte" + (f", di cui {aperte} già aperte" if aperte < totale
+                                          else " già aperte"))
     aziende_con_fonte = len(fonti)
     return f"""<!DOCTYPE html>
 <html lang="it"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -378,8 +390,8 @@ def oggetto(nuove):
     n = len(nuove)
     par = sum(o["luogo"] == "PAR" for o in nuove)
     it = sum(o["luogo"] == "IT" for o in nuove)
-    return (f"🎯 Aziende Target {datetime.now():%d/%m/%Y} — {n} nuov{'a' if n == 1 else 'e'} "
-            f"(Parigi {par} · Italia {it})")
+    tipo = "offerte" if any(o.get("gia_aperta") for o in nuove) else f"nuov{'a' if n == 1 else 'e'}"
+    return f"🎯 Aziende Target {datetime.now():%d/%m/%Y} — {n} {tipo} (Parigi {par} · Italia {it})"
 
 
 # ------------------------------------------------------------
