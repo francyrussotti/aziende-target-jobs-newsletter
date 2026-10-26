@@ -1,6 +1,6 @@
 {
  "aggiornato": "2026-10-26",
- "regole": 6,
+ "regole": 7,
  "nota": "File generato da scopri_fonti.py: per correggere o confermare una fonte usa dati/fonti_manuali.json. 'da_verificare' = candidati dubbi (nome solo compatibile), NON usati.",
  "fonti": {
   "acteon": [
@@ -48,6 +48,12 @@
     "tipo": "pagina",
     "url": "https://www.artelys.com/careers/",
     "verifica": "pagina carriere del sito www.artelys.com",
+    "trovata": "2026-10-26"
+   },
+   {
+    "tipo": "wttj",
+    "slug": "artelys",
+    "verifica": "nome 'Artelys' + annunci in FR",
     "trovata": "2026-10-26"
    }
   ],
@@ -721,14 +727,6 @@
     "trovata": "2026-10-26"
    }
   ],
-  "ubimet": [
-   {
-    "tipo": "recruitee",
-    "slug": "ubimet",
-    "verifica": "nome 'UBIMET GmbH' + annunci in AT/DE",
-    "trovata": "2026-10-26"
-   }
-  ],
   "ucb-biopharma": [
    {
     "tipo": "pagina",
@@ -843,20 +841,6 @@
     "slug": "agorize",
     "da_verificare": "nome identico 'Agorize' ma nessun annuncio per controllare il paese"
    }
-  ],
-  "polis": [
-   {
-    "tipo": "workable",
-    "slug": "polis",
-    "da_verificare": "nome identico 'Polis' ma nessun annuncio per controllare il paese"
-   }
-  ],
-  "surf": [
-   {
-    "tipo": "workable",
-    "slug": "surf",
-    "da_verificare": "nome identico 'Surf' ma nessun annuncio per controllare il paese"
-   }
   ]
  },
  "siti_irraggiungibili": {
@@ -866,7 +850,6 @@
   "airbus-defence-and-space": "http://www.astrium.eads.net/",
   "amphos-21-consulting": "https://www.amphos21.com/",
   "anaptyxiaki-etaireia-dimou-trikkaion-anaptyxiaki-anonymi-etaireia-ota": "https://www.e-trikala.gr/",
-  "asociacion-cluster-food-i": "https://www.clusterfoodmasi.es/",
   "asociacion-de-industrias-de-conocimiento-y-tecnologia-gaia-euskalherriko-ezagutza-eta-teknologia-industrien-elkartea": "http://www.gaia.es/",
   "association-europeenne-des-fournisseurs-automobiles": "http://www.clepa.be/",
   "association-of-european-science-technology-transfer-professionals": "http://www.astp.net/",
@@ -880,13 +863,11 @@
   "bouygues-construction": "http://www.bouygues-construction.com/",
   "centre-europeen-de-recherche-et-deformation-avancee-en-calcul-scientifique": "http://www.cerfacs.fr/",
   "collins-aerospace-ireland": "http://www.utrc.utc.com/",
-  "deep-blue": "http://www.dblue.it/",
   "demo-consultants": "http://www.demobv.nl/",
   "dnv": "http://www.dnv.com/",
   "ebos-technologies": "http://www.ebos.com.cy/",
   "empresarios-agrupados-internacional": "http://www.empre.es/",
   "enco": "http://www.enco-consulting.it/",
-  "etra-investigacion-y-desarrollo": "https://www.grupoetra.com/",
   "eurogeosurveys-egs": "http://www.eurogeosurveys.org/",
   "europa-media-szolgaltato-non-profit-kft": "https://www.europamedia.org/",
   "european-aquaculture-society": "http://www.easonline.org/",
@@ -894,7 +875,6 @@
   "european-dynamics-advanced-information-technology-and-telecommunication-systems": "http://www.eurodyn.com/",
   "european-network-of-living-labs-ivzw": "http://www.openlivinglabs.eu/",
   "european-regions-research-and-innovation-network": "https://www.errin.eu/",
-  "european-x-ray-free-electron-laserfacility": "http://www.xfel.eu/",
   "framatome": "http://www.de.areva.com/",
   "fundacio-privada-parc-de-recerca": "http://parc.uab.cat/",
   "gioumpitek-meleti-schediasmos-ylopoiisi-kai-polisi-ergon-pliroforikis-etaireia-periorismenis-efthynis": "https://www.ubitech.eu/",
@@ -905,7 +885,6 @@
   "ifau": "http://www.ifau.dk/",
   "impact-hub": "https://www.impacthub.net/",
   "ingenieria-y-economia-del-transporte-sme-mp": "http://www.ineco.es/",
-  "innceinnmat": "https://www.ceinnmat.com/",
   "inrae-transfert": "http://www.inra-transfert.fr/",
   "international-federation-of-organic-agriculture-movements-european-union-regional-group": "https://www.ifoam-eu.org/",
   "iris-technology-solutions-sociedad-limitada": "http://www.iris.cat/",
@@ -930,7 +909,6 @@
   "q-plan-international-advisors": "http://www.qplanng.gr/",
   "quantis": "http://www.quantis-intl.com/",
   "regionalis-informacios-es-fejleszto-tudaskozpont-korlatolt-felelossegu-tarsasag": "http://www.rcisd.eu/",
-  "rete-ferroviaria-italiana": "http://www.rfi.it/",
   "ricardo-aea": "http://www.ricardo-aea.com/",
   "rsk-adas": "https://www.adas.uk/",
   "safran-electronics-defense": "https://www.safran-group.com/",
