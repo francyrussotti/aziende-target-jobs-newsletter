@@ -621,5 +621,44 @@ class TestErroriProvaCompleta(unittest.TestCase):
         self.assertEqual(o[0]["url"], "https://naturland-e-v.jobs.personio.de/job/111")
 
 
+class TestSecondaProvaCompleta(unittest.TestCase):
+    """Dalla seconda prova di tutte le fonti (105 funzionanti, log letto per intero)."""
+
+    def test_comuni_ile_de_france(self):
+        for loc in ["Le Plessis Robinson", "Linas, IDF, France", "Brétigny-sur-Orge", "Les Mureaux",
+                    "Montigny-le-Bretonneux", "92350 Le Plessis-Robinson", "Clamart"]:
+            self.assertEqual(tf.luogo({"titolo": "x", "location": loc}), "PAR", loc)
+        self.assertEqual(tf.luogo({"titolo": "x", "location": "Toulouse"}), "ALTRO")
+
+    def test_operat_solo_come_mestiere(self):
+        self.assertFalse(tf.RE_TITOLO_LAVORO.search("Operations"))
+        self.assertTrue(tf.RE_TITOLO_LAVORO.search("Opérateur de production F/H"))
+
+    def test_sede_dal_titolo(self):
+        self.assertEqual(tf.luogo({"titolo": "R&D Project Manager Rome Italy", "location": ""}), "IT")
+        self.assertEqual(tf.luogo({"titolo": "Chargé de mission – Paris", "location": ""}), "PAR")
+
+    def test_link_non_annunci(self):
+        html = """<a href="/careers/operations/">Operations</a>
+          <a href="/privacy.pdf">Data Privacy Notice for employees, workers, directors and consultants</a>
+          <a href="/meet-nils">Meet Nils Libert, Associate Scientist in R&D</a>
+          <a href="/careers/pupils/">Pupils Find your apprenticeship with a future. read more</a>
+          <a href="/careers/fellowships">SYNYO Fellowships</a>
+          <a href="/jobs?search=Engineer">Engineer</a>
+          <a href="/careers/trainee">Trainee controller recruitment now open</a>
+          <a href="/jobs/rd-pm">R&D Project Manager R&D Project Manager Rome Italy More Details</a>"""
+        o = tf.estrai_link_annunci(html, "https://x.eu/careers")
+        self.assertEqual([x["titolo"] for x in o], ["R&D Project Manager Rome Italy"])
+
+    def test_candidature_generiche_escluse_da_ogni_fonte(self):
+        offerte = [tf._offerta("Spontaneous Application", "u1"), tf._offerta("Open application", "u2"),
+                   tf._offerta("¡Únete a nuestro equipo!/ Join our team!", "u3"),
+                   tf._offerta("Join Johnson Matthey Royston!", "u5"),
+                   tf._offerta("Head of Asia Pacific", "u4")]
+        with mock.patch.dict(tf.LETTORI, {"recruitee": lambda **_: offerte}):
+            self.assertEqual([o["titolo"] for o in tf.leggi_fonte({"tipo": "recruitee", "slug": "uitp"})],
+                             ["Head of Asia Pacific"])
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -85,7 +85,17 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
 - [x] siti_manuali.json: RINA (2 voci) → rina.org, Engie → engie.com, Erdyn → erdyn.com.
       Irraggiungibili prioritari senza correzione: INRAE Transfert (inra-transfert.fr), Tinexta
       Innovation Hub (warrantgroup.eu) → da segnalare all'utente.
-- [ ] Ricerca sugli ID corretti, poi prova di TUTTE le fonti (log per intero).
+- [x] Ricerca mirata su RINA/Engie/Erdyn con siti corretti: siti raggiunti, nessuna pagina
+      carriere leggibile (grandi gruppi con portali propri) → senza fonte.
+- [x] 2ª prova di TUTTE le fonti (run 40366859472, letta per intero, 357 righe): 105/109 funzionanti,
+      0 errori, 2878 offerte (PAR 755, IT 68, remoto 19, ND 96 invece di 376). Falle corrette:
+      comuni IDF mancanti (CS Group a Le Plessis-Robinson finiva in "altre sedi") → elenco comuni +
+      codici postali; link non-annuncio residui ("Operations", privacy, "Meet …", programmi,
+      ricerche ?search=) → RE_NON_ANNUNCIO; candidature spontanee/"Join…" escluse da ogni fonte;
+      sede ricavata dal titolo se manca ("… Rome Italy"); titoli ripetuti/"More Details" puliti. 56 test.
+- [x] Modalità diagnosi (scopri_fonti.py --diagnosi, workflow opzione "diagnosi"): lanciata sulle
+      42 aziende prioritarie senza fonte (run su c15474f) → leggere e aggiungere fonti manuali.
+- [ ] 3ª prova di tutte le fonti (verifica correzioni), poi prima newsletter.
 - [ ] Prima newsletter reale (workflow "🎯 Newsletter Aziende Target") e controllo dell'email
       (dimensione, sezioni, link).
 - [ ] Aziende prioritarie (Parigi/Italia, classe A o open innovation) ancora senza fonte:

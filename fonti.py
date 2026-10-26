@@ -374,12 +374,40 @@ RE_TITOLO_LAVORO = re.compile(
     r"lead|charg[ée]e?|responsable|responsabile|chef de projet|stage|stagiaire|intern|internship|"
     r"tirocin\w*|alternan\w*|apprenti\w*|trainee|junior|senior|expert\w*|esperto|advisor|adviser|"
     r"conseill\w*|administrat\w*|accountant|comptable|contabile|controller|architect\w*|designer|"
-    r"operator|op[ée]rat\w*|economist|[ée]conomiste|economista|lawyer|juriste|recruiter|"
+    r"operator|op[ée]rat(?:eur|rice)|operatore|economist|[ée]conomiste|economista|lawyer|juriste|recruiter|"
     r"secr[ée]tair\w*|segretari\w*|postdoc\w*|ph\.?d|doctora\w*|dottorat\w*|fellow\w*|supervisor|"
     r"auditor|editor|planner|mitarbeiter\w*|referent\w*|sachbearbeiter\w*|berater\w*|leiter\w*|"
     r"praktik\w*|werkstudent\w*|becari[oa]|programmer|data scientist|buyer|acheteu\w*|"
     r"impiegat\w*|addett\w*|project officer|policy officer)\b|"
     r"\b[hf]\s*/\s*[hf]\b|\bm\s*/\s*[fw](?:\s*/\s*[dx])?\b|\(\s*[mfwd](?:\s*/\s*[mfwdx]){1,3}\s*\))", re.I)
+
+# Candidature generiche: non sono offerte (tutte le fonti)
+RE_CANDIDATURA_GENERICA = re.compile(
+    r"(?i)(^join\b|spontan|open application|candidature (?:libre|ouverte)|talent pool|vivier|"
+    r"join (?:our|the) team|join us|work with us|[úu]nete a|lavora con noi|rejoignez[- ]nous|"
+    r"candidatura spontanea|initiativbewerbung)")
+# Nelle pagine carriere: link a programmi, presentazioni, privacy, ricerche
+RE_NON_ANNUNCIO = re.compile(
+    r"(?i)(\bprogram(?:me)?s?\b|\bmeet\b|privacy|notice|\bpupils?\b|sch[üu]ler|"
+    r"\bstudents?\b|recruitment (?:is )?now open|our business|creating meaningful|"
+    r"^operations$|fellowships|^apprenticeships?$|interns and apprentices|"
+    r"internship for pupils|find your|discover|d[ée]couvr|why join|life at|our people|"
+    r"\bfaq\b|how to apply|alternance et le stage chez)")
+# Coda da togliere ai titoli presi da link ("… More Details", "… Lire")
+RE_CODA_TITOLO = re.compile(r"(?i)\s*(more details|read more|learn more|lire( la suite)?|en savoir plus|"
+                            r"scopri di più|leggi( di più)?|mehr erfahren|details|voir l.offre)\s*$")
+
+
+def pulisci_titolo(t):
+    t = RE_CODA_TITOLO.sub("", re.sub(r"\s+", " ", t or "").strip())
+    parole_t = t.split()
+    # "R&D Project Manager R&D Project Manager Rome Italy" → una volta sola
+    for n in range(len(parole_t) // 2, 0, -1):
+        if parole_t[:n] == parole_t[n:2 * n]:
+            t = " ".join(parole_t[n:])
+            break
+    return t
+
 
 # Parametri che cambiano a ogni visita: tolti dall'URL, altrimenti lo stesso
 # annuncio sembrerebbe nuovo ogni giorno.
@@ -435,7 +463,9 @@ def estrai_link_annunci(html, url, filtro=None):
                 continue
         elif not su_ats and not RE_LINK_ANNUNCIO.search(urlparse(href).path + "?" + urlparse(href).query):
             continue
-        if href in visti or href.startswith("mailto:") or not RE_TITOLO_LAVORO.search(testo):
+        testo = pulisci_titolo(testo)
+        if (href in visti or href.startswith("mailto:") or "search=" in href
+                or not RE_TITOLO_LAVORO.search(testo) or RE_NON_ANNUNCIO.search(testo)):
             continue
         visti.add(href)
         out.append(_offerta(testo, href))
@@ -470,7 +500,8 @@ def leggi_fonte(fonte: dict) -> list:
     if tipo not in LETTORI:
         raise FonteErrore(f"tipo di fonte sconosciuto: {tipo}")
     parametri = {k: v for k, v in fonte.items() if k not in ("tipo", "nota", "verifica", "trovata")}
-    return LETTORI[tipo](**parametri)
+    return [o for o in LETTORI[tipo](**parametri)
+            if o.get("titolo") and not RE_CANDIDATURA_GENERICA.search(o["titolo"])]
 
 
 def chiave_fonte(fonte: dict) -> str:
@@ -495,7 +526,16 @@ RE_PARIGI = re.compile(
     r"ch[âa]tillon|bagneux|arcueil|gentilly|marne[- ]la[- ]vall[ée]e|noisy|roissy|orly|rungis|"
     r"[ée]vry|trappes|plaisir|les ulis|orsay|gif[- ]sur[- ]yvette|colombes|bezons|"
     r"saint[- ]quentin[- ]en[- ]yvelines|hauts[- ]de[- ]seine|yvelines|essonne|val[- ]de[- ]marne|"
-    r"seine[- ]saint[- ]denis|val[- ]d'oise)\b", re.I)
+    r"seine[- ]saint[- ]denis|val[- ]d'oise|seine[- ]et[- ]marne|le plessis[- ]robinson|clamart|"
+    r"antony|sceaux|fontenay[- ]aux[- ]roses|vanves|s[èe]vres|chaville|villejuif|vitry|cachan|"
+    r"kremlin[- ]bic[êe]tre|charenton|maisons[- ]alfort|cr[ée]teil|saint[- ]maur|nogent|"
+    r"fontenay[- ]sous[- ]bois|rosny|bobigny|pantin|aubervilliers|le bourget|villepinte|tremblay|"
+    r"argenteuil|asni[èe]res|bois[- ]colombes|la garenne|saint[- ]germain[- ]en[- ]laye|chatou|"
+    r"croissy|le pecq|marly|louveciennes|bougival|jouy[- ]en[- ]josas|buc|saint[- ]cyr[- ]l.[ée]cole|"
+    r"montigny[- ]le[- ]bretonneux|coigni[èe]res|maurepas|les mureaux|poissy|mantes|limours|"
+    r"br[ée]tigny|linas|montlh[ée]ry|wissous|villebon|courtab(?:oe|œ)uf|corbeil|melun|meaux|"
+    r"champs[- ]sur[- ]marne|torcy|lognes|serris|chessy|bussy|pontoise|"
+    r"(?:75|77|78|91|92|93|94|95)\d{3})\b", re.I)
 RE_ITALIA = re.compile(
     r"\b(ital(y|ia|ie|ien)|milan[oe]?|rom[ae]|turin|torino|genova|genoa|bologna|firenze|florence|"
     r"napoli|naples|padova|padua|venezia|venice|mestre|verona|bari|pisa|trento|trieste|bergamo|"
@@ -521,6 +561,9 @@ def luogo(o: dict) -> str:
     "Paris / Milano" finisce sotto Parigi. "France" senza città → FR (può
     essere Parigi: si mostra a parte)."""
     loc, paese = o.get("location") or "", (o.get("paese") or "").upper()
+    if not loc and not paese:
+        # Pagine carriere: la sede è spesso nel testo del link ("… Rome Italy")
+        loc = " ".join(m.group(0) for r in (RE_PARIGI, RE_ITALIA) for m in r.finditer(o.get("titolo") or ""))
     if RE_PARIGI.search(loc):
         return "PAR"
     if paese == "IT" or RE_ITALIA.search(loc):
