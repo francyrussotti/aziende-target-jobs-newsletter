@@ -114,6 +114,19 @@ RE_INDIZI_EN = re.compile(
     r"specialist|the|and|of|for|with)\b")
 
 
+# Titolo chiaramente in spagnolo o italiano (lingue parlate): l'offerta resta anche se la
+# descrizione sembra francese (es. PNO "Experto/a Técnico/a … Documentación de Proyectos",
+# descrizione con testo di gruppo in francese).
+RE_INDIZI_ES_IT = re.compile(
+    r"(?i)\b(y|el|los|las|del|para|con|por|t[ée]cnic[oa](?:/a)?|expert[oa](?:/a)?|ingenier[oa]|"
+    r"proyectos?|documentaci[óo]n|gesti[óo]n|desarrollador\w*|di|della|dello|degli|per|ingegnere|"
+    r"tecnico|progett\w*|responsabile|addett[oa]|sviluppator\w*|tirocinio)\b|[áíóúñ]")
+
+
+def titolo_parlato(titolo):
+    return len(RE_INDIZI_ES_IT.findall(titolo or "")) >= 2
+
+
 def titolo_francese(titolo):
     return len(RE_INDIZI_FR.findall(titolo or "")) >= 2 and not RE_INDIZI_EN.search(titolo or "")
 
@@ -165,6 +178,8 @@ def valuta(titolo, testo):
     scritta = lingua_testo(testo)
     if not (testo or "").strip() and titolo_francese(titolo):
         scritta = "fr"
+    if scritta == "fr" and titolo_parlato(titolo):
+        scritta = ""
     if scritta and scritta not in PARLATE:
         return True, f"annuncio in {NOMI[scritta]}", False
     richieste = lingue_richieste(f"{titolo}\n{testo or ''}")

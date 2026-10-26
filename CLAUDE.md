@@ -147,5 +147,11 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
       usato per le descrizioni), Personio Technopolis 5, Liber 10/18. Trovato: IDIADA aveva 12
       "remoto" in Brasile → ora remoto solo se Europa o paese non indicato (PAESI_EUROPA,
       RE_FUORI_EUROPA). 70 test.
+- [x] Esclusione annunci in francese verificata (prova-fonti run 40391156251, log letto per intero,
+      735 righe; campione max 30 per fonte): Thales 29/30 esclusi, Valeo 23/30, UTAC 21/26, CS Group
+      12/13, Amplitude 15/15, Artelys 5/9; Novaspace 0/11 (in inglese). Unico errore: PNO "Experto/a
+      Técnico/a … Documentación de Proyectos" (spagnolo) preso per francese → titolo chiaramente
+      spagnolo/italiano (`titolo_parlato`) vince sulla descrizione. Effetto: Parigi da ~940 offerte
+      a qualche decina. 73 test.
 - [ ] Aziende prioritarie (Parigi/Italia, classe A o open innovation) ancora senza fonte:
       elencarle per l'utente.

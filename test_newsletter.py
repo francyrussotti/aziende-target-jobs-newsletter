@@ -773,6 +773,15 @@ class TestFiltroLingua(unittest.TestCase):
               "avec des perspectives d'évolution au sein du groupe et des avantages.")
         self.assertEqual(self.v("Ingénieur projet", fr)[:2], (True, "annuncio in francese"))
 
+    def test_titolo_spagnolo_con_descrizione_francese_resta(self):
+        fr = ("Nous recherchons un ingénieur pour notre équipe à Paris. Vous serez en charge de la gestion "
+              "des projets avec nos clients et de la coordination des équipes. Vous avez une expérience dans "
+              "le domaine et vous aimez travailler en équipe. Nous vous offrons un environnement stimulant "
+              "avec des perspectives d'évolution au sein du groupe et des avantages.")
+        self.assertFalse(self.v("Experto/a Técnico/a Freelance – Documentación de Proyectos", fr)[0])
+        self.assertTrue(self.v("Chef de projet (H/F)", fr)[0])
+        self.assertTrue(self.v("Technicien de Maintenance H/F", fr)[0])
+
     def test_titolo_francese_senza_descrizione(self):
         self.assertTrue(self.v("Ingénieur Conception mécanique – CDI – Pessac (H/F)")[0])
         self.assertTrue(self.v("Chef de projet innovation")[0])
