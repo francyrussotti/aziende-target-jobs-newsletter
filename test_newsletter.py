@@ -806,5 +806,14 @@ class TestFiltroLingua(unittest.TestCase):
             self.assertEqual(tf.descrizione(o), "Fluent German")
 
 
+class TestRemotoFuoriEuropa(unittest.TestCase):
+    def test_remoto_brasile_non_mostrato(self):
+        self.assertEqual(tf.luogo({"titolo": "Engineer", "location": "Belo Horizonte, MG, Brazil",
+                                   "paese": "BR", "remoto": True}), "ALTRO")
+        self.assertEqual(tf.luogo({"titolo": "Engineer", "location": "Remote - USA", "remoto": True}), "ALTRO")
+        self.assertEqual(tf.luogo({"titolo": "Engineer", "location": "Remote", "paese": "ES", "remoto": True}), "REMOTO")
+        self.assertEqual(tf.luogo({"titolo": "Engineer", "location": "", "remoto": True}), "REMOTO")
+
+
 if __name__ == "__main__":
     unittest.main()

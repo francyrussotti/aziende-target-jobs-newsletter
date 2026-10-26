@@ -138,6 +138,12 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
 - [x] EMAIL_DESTINATARIO era sbagliato (mail non arrivata a francy.russotti@gmail.com): corretto
       dall'utente, seen.json azzerato (cb310ba) e newsletter reinviata.
 - [x] Aggiornamento automatico della lista aziende (routine + push → ricerca solo nuove). 63 test.
-- [ ] Filtro lingua: da verificare con prova-fonti (lingua=true) sulle fonti reali e leggere le esclusioni.
+- [x] Filtro lingua verificato (prova-fonti run 40386672034, log letto per intero, 708 righe): nessun
+      falso positivo; escluse giuste 7 GSI (annunci in tedesco) e 7 IDIADA (Brasile, portoghese);
+      descrizioni lette per Thales/Valeo (Workday), UTAC/IDIADA (SmartRecruiters), Lever, Personio
+      PNO, pagine. Senza descrizione (tenute): WTTJ (CS Group 13, Artelys 9: serve il browser, non
+      usato per le descrizioni), Personio Technopolis 5, Liber 10/18. Trovato: IDIADA aveva 12
+      "remoto" in Brasile → ora remoto solo se Europa o paese non indicato (PAESI_EUROPA,
+      RE_FUORI_EUROPA). 70 test.
 - [ ] Aziende prioritarie (Parigi/Italia, classe A o open innovation) ancora senza fonte:
       elencarle per l'utente.

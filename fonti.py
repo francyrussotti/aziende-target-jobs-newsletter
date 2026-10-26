@@ -615,6 +615,15 @@ SEZIONI = [("PAR", "Parigi e Île-de-France"), ("IT", "Italia"), ("REMOTO", "Da 
            ("FR", "Francia, città non indicata"), ("ND", "Sede non indicata"), ("ALTRO", "Altre sedi")]
 
 
+PAESI_EUROPA = set("AT BE BG HR CY CZ DK EE FI FR DE GR EL HU IE IT LV LT LU MT NL PL PT RO SK SI ES SE "
+                   "GB UK CH NO IS LI".split())
+RE_FUORI_EUROPA = re.compile(
+    r"(?i)\b(brazil|brasil|united states|usa|u\.s\.|canada|mexico|m[ée]xico|argentina|chile|colombia|"
+    r"peru|india|china|japan|singapore|australia|new zealand|south africa|morocco|maroc|tunisia|tunisie|"
+    r"egypt|turkey|t[üu]rkiye|israel|uae|emirates|saudi|qatar|korea|taiwan|vietnam|thailand|malaysia|"
+    r"indonesia|philippines|latam|north america|apac|americas)\b")
+
+
 def luogo(o: dict) -> str:
     """PAR / IT / REMOTO / FR / ND / ALTRO. Parigi vince su tutto: un annuncio
     "Paris / Milano" finisce sotto Parigi. "France" senza città → FR (può
@@ -628,6 +637,9 @@ def luogo(o: dict) -> str:
     if paese == "IT" or RE_ITALIA.search(loc):
         return "IT"
     if o.get("remoto") or RE_REMOTO.search(loc) or RE_REMOTO_TITOLO.search(o.get("titolo") or ""):
+        # Remoto "dal Brasile" o "dagli USA" non serve: solo Europa o paese non indicato
+        if (paese and paese not in PAESI_EUROPA) or RE_FUORI_EUROPA.search(loc):
+            return "ALTRO"
         return "REMOTO"
     if not loc and not paese:
         return "ND"
