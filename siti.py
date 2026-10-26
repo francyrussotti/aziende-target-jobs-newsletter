@@ -169,8 +169,10 @@ PERCORSI_COMUNI = ["careers", "jobs", "lavora-con-noi", "carrieres", "recrutemen
                    "fr/carrieres", "en/jobs", "about/careers", "company/careers"]
 
 
-def _html(url):
-    r = tf._get(url, rapida=True, timeout=12, headers={"Accept": "text/html"})
+def _html(url, rapida=True):
+    """rapida=True: un solo tentativo (indirizzi provati "a caso"); la home
+    dell'azienda invece si apre con i tentativi ripetuti (sito lento ≠ sito assente)."""
+    r = tf._get(url, rapida=rapida, timeout=12 if rapida else 20, headers={"Accept": "text/html"})
     return r.text, getattr(r, "url", url) or url
 
 
@@ -200,13 +202,14 @@ def link_carriere(html, base):
 
 
 def trova_fonti_sito(sito):
-    """Fonti trovate a partire dal sito ufficiale. Lista vuota se nulla.
+    """Fonti trovate a partire dal sito ufficiale: lista (vuota se nulla), None
+    se il sito non risponde.
     Un portale linkato dal sito è verificato per costruzione; una pagina
     carriere si tiene solo se parla davvero di lavoro (sembra_pagina_lavoro)."""
     try:
-        html, finale = _html(sito)
+        html, finale = _html(sito, rapida=False)
     except tf.FonteErrore:
-        return []
+        return None                     # sito irraggiungibile (≠ "nessuna pagina carriere")
     portali, carriere = link_carriere(html, finale)
     nota = f"linkato da {urlparse(finale).netloc}"
     candidate = [carriere] if carriere else [urljoin(finale, p) for p in PERCORSI_COMUNI]

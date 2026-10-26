@@ -40,7 +40,7 @@ SALVA_OGNI = 40   # aziende
 REGOLE = 6
 
 
-def salva(fonti, da_verificare, controllate, oggi):
+def salva(fonti, da_verificare, controllate, oggi, irraggiungibili=None):
     tmp = FONTI_FILE + ".tmp"
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump({"aggiornato": oggi, "regole": REGOLE, "nota": "File generato da scopri_fonti.py: per "
@@ -48,6 +48,7 @@ def salva(fonti, da_verificare, controllate, oggi):
                    "'da_verificare' = candidati dubbi (nome solo compatibile), NON usati.",
                    "fonti": dict(sorted(fonti.items())),
                    "da_verificare": dict(sorted(da_verificare.items())),
+                   "siti_irraggiungibili": dict(sorted((irraggiungibili or {}).items())),
                    "controllate": dict(sorted(controllate.items()))},
                   f, ensure_ascii=False, indent=1)
         f.write("\n")
@@ -90,18 +91,31 @@ def main():
 
     def uno(az):
         if time.monotonic() > fine:
-            return az, None                       # tempo scaduto: resta per il prossimo run
+            return az, None, None                 # tempo scaduto: resta per il prossimo run
         # 1) dal sito ufficiale (verificato per costruzione); 2) slug sui portali
-        dal_sito = siti.trova_fonti_sito(siti_uff[az["id"]]) if az["id"] in siti_uff else []
+        if az["id"] in siti_uff:
+            dal_sito = siti.trova_fonti_sito(siti_uff[az["id"]])
+            esito = "irraggiungibile" if dal_sito is None else ("con fonte" if dal_sito else "senza pagina carriere")
+            dal_sito = dal_sito or []
+        else:
+            dal_sito, esito = [], None
         tipi_trovati = {f["tipo"] for f in dal_sito}
         return az, dal_sito + [f for f in tf.scopri(az)
-                               if f["tipo"] not in tipi_trovati or "da_verificare" in f]
+                               if f["tipo"] not in tipi_trovati or "da_verificare" in f], esito
 
     da_verificare = {k: v for k, v in vecchio.get("da_verificare", {}).items() if tenere(k)}
+    irraggiungibili = {k: v for k, v in vecchio.get("siti_irraggiungibili", {}).items() if tenere(k)}
+    esiti_siti = {}
     with ThreadPoolExecutor(max_workers=a.thread) as ex:
-        for az, trovate in ex.map(uno, da_cercare):
+        for az, trovate, esito in ex.map(uno, da_cercare):
             if trovate is None:
                 continue
+            if esito:
+                esiti_siti[esito] = esiti_siti.get(esito, 0) + 1
+                if esito == "irraggiungibile":
+                    irraggiungibili[az["id"]] = siti_uff[az["id"]]
+                else:
+                    irraggiungibili.pop(az["id"], None)
             fatte += 1
             controllate[az["id"]] = oggi
             buone = [f for f in trovate if "da_verificare" not in f]
@@ -126,11 +140,17 @@ def main():
             for f in dubbie:
                 print(f"   ❔ {az['n']} [{az['id']}]: {tf.chiave_fonte(f)} ({f['da_verificare']})", flush=True)
             if fatte % SALVA_OGNI == 0:
-                salva(fonti, da_verificare, controllate, oggi)
+                salva(fonti, da_verificare, controllate, oggi, irraggiungibili)
                 print(f"   … {fatte}/{len(da_cercare)} controllate", flush=True)
 
-    salva(fonti, da_verificare, controllate, oggi)
+    salva(fonti, da_verificare, controllate, oggi, irraggiungibili)
     restano = len(da_cercare) - fatte
+    provati = sum(esiti_siti.values())
+    if provati:
+        print(f"\n🌐 Siti ufficiali provati: {provati} · raggiunti {provati - esiti_siti.get('irraggiungibile', 0)}"
+              f" · con pagina carriere o portale {esiti_siti.get('con fonte', 0)}"
+              f" · senza {esiti_siti.get('senza pagina carriere', 0)}"
+              f" · irraggiungibili {esiti_siti.get('irraggiungibile', 0)} (elenco in fonti.json)")
     print(f"\n💾 {fatte} aziende controllate, {trovate_oggi} con fonte nuova · "
           f"{len(fonti)} aziende con fonte in totale"
           + (f" · {restano} da controllare al prossimo run" if restano else ""))

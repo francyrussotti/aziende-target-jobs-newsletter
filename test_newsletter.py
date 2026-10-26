@@ -494,10 +494,10 @@ class TestErroriRicercaReale(unittest.TestCase):
         home = '<a href="/nous-rejoindre/">Nous rejoindre</a>'
         adesione = "<p>Adhérer au réseau : cotisation annuelle des membres</p>"
         pagine = {"https://rete.fr/": home, "https://rete.fr/nous-rejoindre/": adesione}
-        with mock.patch.object(siti, "_html", side_effect=lambda u: (pagine[u], u)):
+        with mock.patch.object(siti, "_html", side_effect=lambda u, **_: (pagine[u], u)):
             self.assertEqual(siti.trova_fonti_sito("https://rete.fr/"), [])
         pagine["https://rete.fr/nous-rejoindre/"] = "<p>Nous recrutons : stage et CDI, postuler ici</p>"
-        with mock.patch.object(siti, "_html", side_effect=lambda u: (pagine[u], u)):
+        with mock.patch.object(siti, "_html", side_effect=lambda u, **_: (pagine[u], u)):
             self.assertEqual(siti.trova_fonti_sito("https://rete.fr/")[0]["url"], "https://rete.fr/nous-rejoindre/")
 
 
@@ -516,10 +516,15 @@ class TestErroriTerzaRicerca(unittest.TestCase):
         self.assertTrue(siti.sembra_articolo("https://euronovia.eu/recrutement-apprenti-financements-europeens/"))
         self.assertFalse(siti.sembra_articolo("https://www.laborelec.com/jobs_open_positions/"))
 
+    def test_sito_irraggiungibile_non_e_senza_carriere(self):
+        import siti
+        with mock.patch.object(siti, "_html", side_effect=tf.FonteErrore("timeout")):
+            self.assertIsNone(siti.trova_fonti_sito("https://lento.eu/"))
+
     def test_carriere_che_rimanda_alla_home(self):
         import siti
         home = '<a href="/careers">Careers</a>'
-        with mock.patch.object(siti, "_html", side_effect=lambda u: (home, "https://www.actia-asso.eu/")):
+        with mock.patch.object(siti, "_html", side_effect=lambda u, **_: (home, "https://www.actia-asso.eu/")):
             self.assertEqual(siti.trova_fonti_sito("https://www.actia-asso.eu/"), [])
 
 
@@ -529,7 +534,7 @@ class TestErroriQuartaRicerca(unittest.TestCase):
         home = "<p>Accueil</p>"
         articolo = "<p>Nous recrutons un apprenti : candidature, CV, contrat</p>"
 
-        def finto(u):
+        def finto(u, **_):
             if u.rstrip("/") == "https://euronovia.eu":
                 return home, "https://euronovia.eu/"
             return articolo, "https://euronovia.eu/recrutement-apprenti-financements-europeens/"
