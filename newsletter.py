@@ -386,7 +386,35 @@ def oggetto(nuove):
 #  Main
 # ------------------------------------------------------------
 
+def prova(solo_ids=None):
+    """Legge le fonti e stampa cosa trova, senza email e senza toccare lo
+    storico. Serve a verificare fonti nuove o sospette (workflow prova-fonti)."""
+    aziende = carica_aziende()
+    fonti = carica_fonti(aziende)
+    if solo_ids:
+        fonti = {k: v for k, v in fonti.items() if k in solo_ids}
+    print(f"🧪 PROVA FONTI: {len(fonti)} aziende\n")
+    ok = 0
+    for aid, f, offerte, err in sorted(raccogli(aziende, fonti), key=lambda r: priorita(aziende[r[0]])):
+        print(f"■ {aziende[aid]['n']} [{aid}] · {tf.chiave_fonte(f)}")
+        if err:
+            print(f"   ❌ {err}")
+            continue
+        ok += 1
+        conta = {}
+        for o in offerte:
+            o["luogo"] = tf.luogo(o)
+            conta[o["luogo"]] = conta.get(o["luogo"], 0) + 1
+        print(f"   ✅ {len(offerte)} offerte · " + ", ".join(f"{k} {v}" for k, v in sorted(conta.items())))
+        for o in [o for o in offerte if o["luogo"] in SEZIONI_MOSTRATE][:5]:
+            print(f"      - {o['titolo'][:70]} | {o['location'][:30]} | {o['data']} | {o['url'][:80]}")
+    print(f"\n🧪 {ok} fonti funzionanti su {sum(len(v) for v in fonti.values())}")
+
+
 def main():
+    if "--prova" in sys.argv:
+        ids = [a for a in sys.argv[1:] if not a.startswith("--")]
+        return prova(set(ids) or None)
     oggi = datetime.now().strftime("%Y-%m-%d")
     print(f"\n🎯 NEWSLETTER AZIENDE TARGET  {datetime.now():%d/%m/%Y %H:%M}\n")
     try:

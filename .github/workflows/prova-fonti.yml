@@ -1,0 +1,37 @@
+name: 🧪 Prova fonti
+
+# Legge le fonti e scrive nel log cosa trova (numero di offerte, sedi, esempi).
+# Nessuna email, nessuna modifica allo storico. Utile dopo aver aggiunto
+# fonti in dati/fonti_manuali.json.
+on:
+  workflow_dispatch:
+    inputs:
+      aziende:
+        description: "ID delle aziende separati da spazio (vuoto = tutte)"
+        default: ""
+  push:
+    paths: ["dati/fonti_manuali.json"]
+
+permissions:
+  contents: read
+
+jobs:
+  prova:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('requirements.txt') }}
+      - run: pip install -r requirements.txt
+      - run: playwright install chromium
+      - if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: sudo $(which playwright) install-deps chromium
+      - run: python -u newsletter.py --prova ${{ inputs.aziende }}
