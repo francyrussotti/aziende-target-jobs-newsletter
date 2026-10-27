@@ -857,5 +857,14 @@ class TestRemotoFuoriEuropa(unittest.TestCase):
         self.assertEqual(tf.luogo({"titolo": "Engineer", "location": "", "remoto": True}), "REMOTO")
 
 
+class TestEmailSenzaNovita(unittest.TestCase):
+    def test_oggetto_e_corpo(self):
+        stat = {"trovate": 2849, "fuori_focus": 1818, "vecchie": 0, "iniziali": 0, "lingua": 14}
+        self.assertIn("nessuna offerta nuova (14 escluse per lingua)", tn.oggetto_vuoto(stat, []))
+        html = tn.genera_html([], {"a": {"id": "a", "n": "Acme"}}, {"a": []}, stat, [], 1)
+        self.assertIn("Nessuna offerta nuova", html)
+        self.assertIn("Escluse 14 offerte", html)
+
+
 if __name__ == "__main__":
     unittest.main()

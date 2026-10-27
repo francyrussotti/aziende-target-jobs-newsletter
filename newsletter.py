@@ -483,6 +483,16 @@ def invia_email(html_body, oggetto_email):
     return "errore"
 
 
+def oggetto_vuoto(stat, problemi):
+    extra = []
+    if stat.get("lingua"):
+        extra.append(f"{stat['lingua']} escluse per lingua")
+    if problemi:
+        extra.append(f"{len(problemi)} fonti da controllare")
+    return (f"🎯 Aziende Target {datetime.now():%d/%m/%Y} — nessuna offerta nuova"
+            + (f" ({', '.join(extra)})" if extra else ""))
+
+
 def oggetto(nuove):
     n = len(nuove)
     par = sum(o["luogo"] == "PAR" for o in nuove)
@@ -582,14 +592,14 @@ def main():
     rete_ko = errori > len(risultati) / 2
 
     stato_invio = "nessuna"
-    controllo_settimanale = datetime.now().weekday() == 0 and problemi
-    if nuove or controllo_settimanale:
+    # Email ogni giorno, anche senza offerte nuove (chiesto dall'utente 27/10), così si
+    # vede che la newsletter è partita. Non se la rete è caduta: "nessuna novità"
+    # sarebbe falso (la run fallisce e GitHub lo segnala).
+    if nuove or not rete_ko:
         html = componi_email(nuove, aziende, fonti, stat, problemi, len(risultati))
-        ogg = oggetto(nuove) if nuove else \
-            f"🎯 Aziende Target {datetime.now():%d/%m/%Y} — nessuna novità, {len(problemi)} fonti da controllare"
-        stato_invio = invia_email(html, ogg)
+        stato_invio = invia_email(html, oggetto(nuove) if nuove else oggetto_vuoto(stat, problemi))
     else:
-        print("📭 Nessuna offerta nuova: email non inviata")
+        print("📭 Nessuna offerta nuova e fonti non raggiungibili: email non inviata")
 
     if stato_invio in ("ok", "nessuna") and not rete_ko:
         seen["ultima_run"] = oggi

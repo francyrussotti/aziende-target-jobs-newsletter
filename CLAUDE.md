@@ -21,7 +21,7 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
 
 ## Come funziona
 
-- `newsletter.py`: run giornaliera (workflow `newsletter.yml`). `--prova [id…]` = solo lettura, nessuna email.
+- `newsletter.py`: run giornaliera (workflow `newsletter.yml`), email ogni giorno (anche "nessuna offerta nuova"). `--prova [id…]` = solo lettura, nessuna email.
 - `fonti.py`: lettori dei portali (lever, greenhouse, workable, smartrecruiters, ashby, recruitee,
   personio, workday, wttj, pagina) + classificazione sede (PAR/IT/REMOTO/ND/ALTRO) + scoperta per slug.
 - `siti.py`: siti ufficiali dai dati CORDIS (`dati/siti.json`) e ricerca della pagina carriere / portale linkato.
@@ -162,5 +162,8 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
 - [x] Newsletter 27/10 (run 40482357879): 2849 offerte lette, 14 nuove in focus, tutte Thales in
       francese → escluse; nessuna email (nessuna novità). Run da sveglia.txt (40482443687) fermata
       subito ("già fatta"): riserva funzionante.
+- [x] Email ogni giorno anche senza offerte nuove (chiesto dall'utente 27/10): oggetto "nessuna
+      offerta nuova (N escluse per lingua, M fonti da controllare)"; non inviata solo se la rete è
+      caduta (>metà fonti in errore → run fallita). 75 test.
 - [ ] Aziende prioritarie (Parigi/Italia, classe A o open innovation) ancora senza fonte:
       elencarle per l'utente.
