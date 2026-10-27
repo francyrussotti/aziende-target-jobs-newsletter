@@ -159,5 +159,8 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
       a qualche decina. 73 test.
 - [x] 27/10: routine importa lista OK (invariata, nessun commit); newsletter NON partita (cron
       GitHub mai scattati) → lanciata a mano + riserva sveglia.txt via routine. 74 test.
+- [x] Newsletter 27/10 (run 40482357879): 2849 offerte lette, 14 nuove in focus, tutte Thales in
+      francese → escluse; nessuna email (nessuna novità). Run da sveglia.txt (40482443687) fermata
+      subito ("già fatta"): riserva funzionante.
 - [ ] Aziende prioritarie (Parigi/Italia, classe A o open innovation) ancora senza fonte:
       elencarle per l'utente.
