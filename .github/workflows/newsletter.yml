@@ -8,6 +8,12 @@ on:
     # Il secondo è di riserva: se la prima run è già andata, si ferma subito.
     - cron: "37 4 * * *"
     - cron: "37 6 * * *"
+  # Riserva ai cron di GitHub (in questo repo non sono mai partiti): la routine
+  # claude.ai delle 07:13 aggiorna dati/sveglia.txt ogni mattina e il push avvia
+  # la newsletter. Se la run di oggi è già fatta, si ferma subito (nessun doppio invio).
+  push:
+    branches: [main]
+    paths: [dati/sveglia.txt]
   workflow_dispatch:
     inputs:
       forza:

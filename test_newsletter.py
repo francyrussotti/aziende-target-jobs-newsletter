@@ -600,6 +600,23 @@ class TestScopriFonti(unittest.TestCase):
 
 
 class TestImportaAziende(unittest.TestCase):
+    def test_solo_data_cambiata_file_invariato(self):
+        import importa_aziende as ia
+        az = [{"id": f"a{i}", "n": f"Azienda {i}", "s": 50} for i in range(60)]
+        with tempfile.TemporaryDirectory() as d:
+            out, html = os.path.join(d, "aziende.json"), os.path.join(d, "p.html")
+            def pagina(data):
+                with open(html, "w") as f:
+                    f.write('<script type="application/json" id="dati">'
+                            + json.dumps({"generato": data, "aziende": az}) + "</script>")
+            pagina("26/10/2026")
+            with mock.patch.object(sys, "argv", ["x", "--html", html, "--out", out]):
+                ia.main()
+                prima = open(out).read()
+                pagina("27/10/2026")
+                ia.main()
+            self.assertEqual(open(out).read(), prima)
+
     def test_differenze(self):
         import importa_aziende as ia
         nuove, uscite = ia.differenze({"a": "A", "b": "B"}, [{"id": "b"}, {"id": "c"}])

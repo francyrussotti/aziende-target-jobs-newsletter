@@ -70,6 +70,15 @@ def main():
     if prima and len(uscite) > MAX_USCITE * len(prima) and not a.forza:
         sys.exit(f"Uscirebbero {len(uscite)} aziende su {len(prima)}: pagina sospetta, file non scritto "
                  "(usa --forza se è giusto)")
+    try:
+        vecchie = json.load(open(a.out, encoding="utf-8")).get("aziende", [])
+    except (OSError, ValueError):
+        vecchie = None
+    if vecchie == aziende:
+        # Cambia solo la data della pagina: il file resta com'è (nessun commit,
+        # nessuna ricerca fonti avviata per niente)
+        print(f"Lista invariata ({len(aziende)} aziende): file non modificato")
+        return
     with open(a.out, "w", encoding="utf-8") as f:
         # Una riga per azienda: diff git leggibili quando la lista cambia
         f.write('{"generato": %s, "aziende": [\n' % json.dumps(dati.get("generato")))

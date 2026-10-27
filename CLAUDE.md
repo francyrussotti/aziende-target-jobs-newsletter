@@ -45,6 +45,10 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
   `dati/aziende.json` solo se cambia. Il push avvia `scopri-fonti.yml`: siti CORDIS aggiornati +
   `scopri_fonti.py --nuove` (solo aziende mai controllate). Le aziende uscite spariscono subito
   dalla newsletter (`carica_fonti` ignora gli ID fuori lista).
+- Avvio giornaliero: i cron di newsletter.yml (4:37/6:37 UTC) NON sono mai partiti (repo nuovo;
+  nessuna run "schedule" al 27/10). Riserva: la routine delle 07:13 Roma scrive la data in
+  `dati/sveglia.txt` e fa push → newsletter.yml parte sul push di quel file. Doppio avvio innocuo
+  (`ultima_run` == oggi → stop). importa_aziende.py non riscrive il file se cambia solo la data.
 - Filtro lingua (`lingue.py`, chiesto dall'utente 26/10): Fra parla italiano, inglese, spagnolo,
   francese di base. Esclusa un'offerta scritta in un'altra lingua (es. tedesco, titoli "(m/w/d)")
   o che CHIEDE una lingua non parlata (fluent/native/courant/fließend… entro 60 caratteri dal nome
@@ -153,5 +157,7 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
       Técnico/a … Documentación de Proyectos" (spagnolo) preso per francese → titolo chiaramente
       spagnolo/italiano (`titolo_parlato`) vince sulla descrizione. Effetto: Parigi da ~940 offerte
       a qualche decina. 73 test.
+- [x] 27/10: routine importa lista OK (invariata, nessun commit); newsletter NON partita (cron
+      GitHub mai scattati) → lanciata a mano + riserva sveglia.txt via routine. 74 test.
 - [ ] Aziende prioritarie (Parigi/Italia, classe A o open innovation) ancora senza fonte:
       elencarle per l'utente.
