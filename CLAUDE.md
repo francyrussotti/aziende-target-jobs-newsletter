@@ -23,7 +23,7 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
 
 - `newsletter.py`: run giornaliera (workflow `newsletter.yml`), email ogni giorno (anche "nessuna offerta nuova"). `--prova [id…]` = solo lettura, nessuna email.
 - `fonti.py`: lettori dei portali (lever, greenhouse, workable, smartrecruiters, ashby, recruitee,
-  personio, workday, wttj, pagina) + classificazione sede (PAR/IT/REMOTO/ND/ALTRO) + scoperta per slug.
+  personio, workday, wttj, pagina) + classificazione sede (PAR/IT/REMOTO/FR/EU/ND/ALTRO) + scoperta per slug.
 - `siti.py`: siti ufficiali dai dati CORDIS (`dati/siti.json`) e ricerca della pagina carriere / portale linkato.
 - `scopri_fonti.py`: ricerca fonti (workflow `scopri-fonti.yml`, lunedì), max 40 minuti per run
   (in pratica ~11 minuti per 1040 aziende), salva a intervalli, riparte dalle aziende non ancora
@@ -165,5 +165,10 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
 - [x] Email ogni giorno anche senza offerte nuove (chiesto dall'utente 27/10): oggetto "nessuna
       offerta nuova (N escluse per lingua, M fonti da controllare)"; non inviata solo se la rete è
       caduta (>metà fonti in errore → run fallita). 75 test.
+- [x] Sezione "Altre sedi in Europa" (EU, chiesto dall'utente 28/10): tf.luogo → EU se paese europeo
+      (PAESI_EUROPA) o città/paese in RE_EUROPA (Toulouse, Lyon, Munich, Brussels…); fuori Europa
+      (RE_FUORI_EUROPA o paese extra-UE) → ALTRO, nascosto. Scelta utente: solo le offerte NUOVE, mai
+      le già aperte: al primo giro dopo l'introduzione (seen["zone"] senza "EU") e alla prima lettura
+      di una fonte le EU si segnano come viste in silenzio. Filtro lingua attivo anche qui. 78 test.
 - [ ] Aziende prioritarie (Parigi/Italia, classe A o open innovation) ancora senza fonte:
       elencarle per l'utente.

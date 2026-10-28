@@ -42,7 +42,10 @@ GIORNI_OBLIO = 90
 MAX_PER_AZIENDA = 12
 # Sezioni mostrate: le offerte in "ALTRO" (fuori da Parigi/Italia, non da
 # remoto) si contano ma non si mostrano. Obiettivo: Parigi, poi Italia.
-SEZIONI_MOSTRATE = {"PAR", "IT", "REMOTO", "FR", "ND"}
+SEZIONI_MOSTRATE = {"PAR", "IT", "REMOTO", "FR", "EU", "ND"}
+# Sezioni mostrate prima che esistesse "EU" (28/10): le storiche avevano già lo storico.
+# Una sezione nuova parte in silenzio: le offerte già aperte si segnano come viste.
+ZONE_STORICHE = ["PAR", "IT", "REMOTO", "FR", "ND"]
 # Gmail taglia i messaggi oltre ~102 KB ("[Messaggio troncato]"): si riducono
 # le offerte mostrate per azienda finché l'email sta sotto questo limite.
 MAX_EMAIL_BYTES = 95_000
@@ -172,8 +175,9 @@ def seleziona(aziende, risultati, seen, oggi):
     - Fonte mai vista prima: portale strutturato → si mostrano tutte le offerte
       aperte (etichetta "già aperta"); pagina generica → stato iniziale silenzioso.
     - Dopo: si mostra ogni offerta nuova, salvo se datata > MAX_GIORNI_NUOVA."""
-    nuove, stat = [], {"trovate": 0, "fuori_focus": 0, "vecchie": 0, "iniziali": 0}
+    nuove, stat = [], {"trovate": 0, "fuori_focus": 0, "vecchie": 0, "iniziali": 0, "zona_nuova": 0}
     fonti_note = set(seen["fonti"])
+    zone_note = set(seen.get("zone") or ZONE_STORICHE)
     for aid, f, offerte, err in risultati:
         if offerte is None:
             continue
@@ -192,12 +196,17 @@ def seleziona(aziende, risultati, seen, oggi):
             seen["ids"][i] = oggi
             if gia:
                 continue
+            if o["luogo"] not in zone_note and not prima_volta:
+                # Sezione appena aggiunta: le offerte già aperte non si mandano (scelta dell'utente)
+                stat["zona_nuova"] += 1
+                continue
             eta = eta_giorni(o.get("data"))
             if prima_volta:
                 # Prima lettura: le pagine generiche diventano lo stato iniziale
                 # (senza date un annuncio non si distingue da un link qualunque);
                 # dai portali strutturati si mostrano tutte le offerte aperte.
-                if f.get("tipo") == "pagina":
+                # Resto d'Europa: mai le offerte già aperte, solo le nuove (scelta dell'utente)
+                if f.get("tipo") == "pagina" or o["luogo"] == "EU":
                     stat["iniziali"] += 1
                     continue
                 if eta is not None and eta > MAX_GIORNI_GIA_APERTA:
@@ -210,6 +219,7 @@ def seleziona(aziende, risultati, seen, oggi):
                 continue
             nuove.append({**o, "azienda": aid})
         seen["fonti"].append(k)
+    seen["zone"] = sorted(SEZIONI_MOSTRATE)
     # Stessa offerta da due portali dello stesso gruppo: una sola volta
     uniche, viste = [], set()
     for o in nuove:
@@ -397,7 +407,7 @@ def genera_html(nuove, aziende, fonti, stat, problemi, n_fonti, max_per_azienda=
     <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;">
       <tr><td style="padding:24px 32px 18px;border-bottom:2px solid {ink};">
         <div style="{sans}font-size:12px;font-weight:700;letter-spacing:3px;color:{accento};">AZIENDE TARGET EUROPA</div>
-        <div style="{sans}font-size:12px;color:{grigio};">{oggi} · Parigi, Italia, da remoto</div>
+        <div style="{sans}font-size:12px;color:{grigio};">{oggi} · Parigi, Italia, da remoto, resto d'Europa</div>
         <div style="margin-top:16px;{serif}font-size:30px;line-height:1.15;color:{ink};">{titolo}</div>
         <div style="margin-top:12px;{sans}font-size:14px;line-height:1.7;">{sommario}</div>
       </td></tr>{avviso}{corpo}
@@ -405,7 +415,7 @@ def genera_html(nuove, aziende, fonti, stat, problemi, n_fonti, max_per_azienda=
           {sans}font-size:11px;line-height:1.6;color:{chiaro};">
         Solo aziende della lista Aziende Target Europa ({len(aziende)} aziende, {aziende_con_fonte} con una
         fonte di annunci, {n_fonti} fonti lette). {stat['trovate']} offerte lette oggi, di cui
-        {stat['fuori_focus']} fuori da Parigi/Italia/remoto (non mostrate).
+        {stat['fuori_focus']} fuori Europa o senza sede (non mostrate).
         {nota_lingua}Livello (Stage, Junior…) dedotto dal titolo.{nota_taglio}</div></td></tr>
     </table>
   </td></tr>
@@ -584,7 +594,8 @@ def main():
         tf.chiave_fonte(f): (len(o) if o is not None else None) for _, f, o, _ in risultati}})
     print(f"\n📊 {stat['trovate']} offerte · {len(nuove)} nuove da mostrare · "
           f"{stat['fuori_focus']} fuori focus · {stat['vecchie']} vecchie · "
-          f"{stat['iniziali']} stato iniziale (prima lettura della fonte)")
+          f"{stat['iniziali']} stato iniziale (prima lettura della fonte)"
+          + (f" · {stat['zona_nuova']} già aperte in Europa segnate come viste (sezione nuova)" if stat.get("zona_nuova") else ""))
     for a, k, m in problemi:
         print(f"   🟠 {aziende[a]['n']} [{k}]: {m}")
 

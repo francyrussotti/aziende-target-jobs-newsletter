@@ -89,7 +89,7 @@ class TestLuogo(unittest.TestCase):
         self.assertEqual(self.caso("Milano, Lombardia"), "IT")
         self.assertEqual(self.caso("Rome"), "IT")
         self.assertEqual(self.caso("", paese="IT"), "IT")
-        self.assertEqual(self.caso("Toulouse, France"), "ALTRO")
+        self.assertEqual(self.caso("Toulouse, France"), "EU")
         self.assertEqual(self.caso("Madrid", remoto=True), "REMOTO")
         self.assertEqual(self.caso("Europe - Remote"), "REMOTO")
         self.assertEqual(self.caso(""), "ND")
@@ -245,7 +245,8 @@ class TestSelezione(ConCartella):
         # Prima lettura di un portale: tutte le aperte in focus, segnate "già aperta"
         self.assertEqual([o["titolo"] for o in nuove], ["recente", "vecchia", "senza-data"])
         self.assertTrue(all(o["gia_aperta"] for o in nuove))
-        self.assertEqual((stat["fuori_focus"], stat["vecchie"]), (1, 1))
+        # Madrid (resto d'Europa): già aperta → segnata come vista, non mandata
+        self.assertEqual((stat["fuori_focus"], stat["vecchie"], stat["iniziali"]), (0, 1, 1))
         # Run successiva: le note non tornano; una nuova sì, una nuova ma vecchia no
         nuove, stat = tn.seleziona(az, [("acme-par", fonte, offerte + [
             self.offerta("nuova"), self.offerta("ripubblicata", data=giorni_fa(90))], None)], seen, giorni_fa(0))
@@ -369,13 +370,13 @@ class TestFalleCorrette(ConCartella):
     """Una prova per ogni falla trovata nella revisione del 26/10/2026."""
 
     def test_remote_sensing_non_e_da_remoto(self):
-        self.assertEqual(tf.luogo({"titolo": "Remote Sensing Engineer", "location": "Toulouse"}), "ALTRO")
+        self.assertEqual(tf.luogo({"titolo": "Remote Sensing Engineer", "location": "Toulouse"}), "EU")
         self.assertEqual(tf.luogo({"titolo": "Data Analyst (Remote)", "location": "Madrid"}), "REMOTO")
 
     def test_solo_francia_e_sezione_a_parte(self):
         self.assertEqual(tf.luogo({"titolo": "x", "location": "France"}), "FR")
         self.assertEqual(tf.luogo({"titolo": "x", "location": "", "paese": "FR"}), "FR")
-        self.assertEqual(tf.luogo({"titolo": "x", "location": "Toulouse, France"}), "ALTRO")
+        self.assertEqual(tf.luogo({"titolo": "x", "location": "Toulouse, France"}), "EU")
         self.assertEqual(tf.luogo({"titolo": "x", "location": "Paris, France"}), "PAR")
 
     def test_link_stabili_e_parole_intere(self):
@@ -666,7 +667,7 @@ class TestSecondaProvaCompleta(unittest.TestCase):
         for loc in ["Le Plessis Robinson", "Linas, IDF, France", "Brétigny-sur-Orge", "Les Mureaux",
                     "Montigny-le-Bretonneux", "92350 Le Plessis-Robinson", "Clamart"]:
             self.assertEqual(tf.luogo({"titolo": "x", "location": loc}), "PAR", loc)
-        self.assertEqual(tf.luogo({"titolo": "x", "location": "Toulouse"}), "ALTRO")
+        self.assertEqual(tf.luogo({"titolo": "x", "location": "Toulouse"}), "EU")
 
     def test_operat_solo_come_mestiere(self):
         self.assertFalse(tf.RE_TITOLO_LAVORO.search("Operations"))
@@ -864,6 +865,30 @@ class TestEmailSenzaNovita(unittest.TestCase):
         html = tn.genera_html([], {"a": {"id": "a", "n": "Acme"}}, {"a": []}, stat, [], 1)
         self.assertIn("Nessuna offerta nuova", html)
         self.assertIn("Escluse 14 offerte", html)
+
+
+class TestSezioneEuropa(unittest.TestCase):
+    def test_luogo_europa(self):
+        self.assertEqual(tf.luogo({"titolo": "x", "location": "Munich, Germany"}), "EU")
+        self.assertEqual(tf.luogo({"titolo": "x", "location": "Brussels"}), "EU")
+        self.assertEqual(tf.luogo({"titolo": "x", "location": "", "paese": "ES"}), "EU")
+        self.assertEqual(tf.luogo({"titolo": "x", "location": "Belo Horizonte, MG, Brazil"}), "ALTRO")
+        self.assertEqual(tf.luogo({"titolo": "x", "location": "Bangalore", "paese": "IN"}), "ALTRO")
+        self.assertEqual(tf.luogo({"titolo": "x", "location": "Paris / Munich"}), "PAR")
+
+    def test_prima_volta_della_sezione_in_silenzio(self):
+        aziende = {"a": {"id": "a", "n": "Acme", "k": "PAR"}}
+        f = {"tipo": "lever", "slug": "acme"}
+        seen = {"ids": {}, "fonti": [tf.chiave_fonte(f)], "storico": []}      # fonte già nota, "zone" assente
+        offerte = [{"titolo": "Berlin job", "location": "Berlin, Germany", "url": "u1", "data": giorni_fa(1)},
+                   {"titolo": "Paris job", "location": "Paris", "url": "u2", "data": giorni_fa(1)}]
+        nuove, stat = tn.seleziona(aziende, [("a", f, [dict(o) for o in offerte], None)], seen, giorni_fa(0))
+        self.assertEqual([o["titolo"] for o in nuove], ["Paris job"])
+        self.assertEqual(stat["zona_nuova"], 1)
+        self.assertIn("EU", seen["zone"])
+        offerte.append({"titolo": "Madrid job", "location": "Madrid", "url": "u3", "data": giorni_fa(0)})
+        nuove, _ = tn.seleziona(aziende, [("a", f, [dict(o) for o in offerte], None)], seen, giorni_fa(0))
+        self.assertEqual([o["titolo"] for o in nuove], ["Madrid job"])
 
 
 if __name__ == "__main__":

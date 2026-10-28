@@ -612,7 +612,31 @@ RE_FRANCIA = re.compile(r"\b(france|francia|frankreich|fr)\b", re.I)
 
 # Sezioni della newsletter, in ordine di priorità
 SEZIONI = [("PAR", "Parigi e Île-de-France"), ("IT", "Italia"), ("REMOTO", "Da remoto"),
-           ("FR", "Francia, città non indicata"), ("ND", "Sede non indicata"), ("ALTRO", "Altre sedi")]
+           ("FR", "Francia, città non indicata"), ("EU", "Altre sedi in Europa"),
+           ("ND", "Sede non indicata"), ("ALTRO", "Fuori Europa")]
+
+# Paesi e città europee (per la sezione "Altre sedi in Europa"); fuori Europa resta nascosto
+RE_EUROPA = re.compile(
+    r"(?i)\b(france|francia|frankreich|spain|espa[ñn]a|spagna|espagne|spanien|portugal|portogallo|"
+    r"germany|deutschland|germania|allemagne|austria|[öo]sterreich|autriche|switzerland|schweiz|suisse|"
+    r"svizzera|belgium|belgique|belgi[eë]|belgio|netherlands|nederland|the netherlands|pays[- ]bas|"
+    r"paesi bassi|holland|luxembourg|lussemburgo|ireland|irlanda|irlande|united kingdom|uk|england|"
+    r"scotland|wales|great britain|regno unito|royaume[- ]uni|denmark|danmark|danimarca|sweden|sverige|"
+    r"svezia|norway|norge|norvegia|finland|suomi|finlandia|iceland|poland|polska|polonia|pologne|"
+    r"czech republic|czechia|[čc]esko|repubblica ceca|slovakia|slovensko|hungary|magyarorsz[áa]g|"
+    r"ungheria|romania|rom[âa]nia|roumanie|bulgaria|greece|hellas|grecia|gr[èe]ce|croatia|hrvatska|"
+    r"slovenia|slovenija|estonia|latvia|lithuania|malta|cyprus|cipro|monaco|serbia|"
+    r"madrid|barcelona|barcellona|valencia|sevilla|seville|bilbao|zaragoza|m[áa]laga|lisbon|lisboa|"
+    r"porto|berlin|berlino|munich|m[üu]nchen|monaco di baviera|hamburg|frankfurt|cologne|k[öo]ln|"
+    r"stuttgart|d[üu]sseldorf|darmstadt|bremen|dresden|vienna|wien|z[üu]rich|geneva|gen[èe]ve|ginevra|"
+    r"lausanne|basel|bern|brussels|bruxelles|brussel|bruxelas|antwerp|antwerpen|ghent|gent|leuven|li[èe]ge|"
+    r"amsterdam|rotterdam|the hague|den haag|eindhoven|delft|utrecht|leiden|noordwijk|dublin|london|"
+    r"londra|londres|manchester|cambridge|oxford|edinburgh|bristol|copenhagen|k[øo]benhavn|stockholm|"
+    r"gothenburg|g[öo]teborg|oslo|helsinki|warsaw|warszawa|krak[óo]w|prague|praha|praga|budapest|"
+    r"bucharest|bucure[șs]ti|sofia|athens|athina|atene|zagreb|ljubljana|tallinn|riga|vilnius|"
+    r"lyon|toulouse|marseille|bordeaux|nantes|lille|nice|sophia[- ]antipolis|grenoble|montpellier|"
+    r"strasbourg|rennes|brest|cannes|aix[- ]en[- ]provence|pessac|m[ée]rignac|valence|valbonne|"
+    r"elancourt|cholet|toulon|orl[ée]ans|tours|dijon|rouen|caen|le mans|angers|clermont[- ]ferrand)\b")
 
 
 PAESI_EUROPA = set("AT BE BG HR CY CZ DK EE FI FR DE GR EL HU IE IT LV LT LU MT NL PL PT RO SK SI ES SE "
@@ -646,6 +670,10 @@ def luogo(o: dict) -> str:
     resto = re.sub(r"[\s,;/|()\-]+", "", RE_FRANCIA.sub("", loc))
     if (RE_FRANCIA.search(loc) or paese == "FR") and not resto:
         return "FR"
+    if RE_FUORI_EUROPA.search(loc) or (paese and paese not in PAESI_EUROPA):
+        return "ALTRO"
+    if paese in PAESI_EUROPA or RE_EUROPA.search(loc):
+        return "EU"
     return "ALTRO"
 
 
