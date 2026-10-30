@@ -45,10 +45,15 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
   `dati/aziende.json` solo se cambia. Il push avvia `scopri-fonti.yml`: siti CORDIS aggiornati +
   `scopri_fonti.py --nuove` (solo aziende mai controllate). Le aziende uscite spariscono subito
   dalla newsletter (`carica_fonti` ignora gli ID fuori lista).
-- Avvio giornaliero: i cron di newsletter.yml (4:37/6:37 UTC) NON sono mai partiti (repo nuovo;
-  nessuna run "schedule" al 27/10). Riserva: la routine delle 07:13 Roma scrive la data in
-  `dati/sveglia.txt` e fa push → newsletter.yml parte sul push di quel file. Doppio avvio innocuo
-  (`ultima_run` == oggi → stop). importa_aziende.py non riscrive il file se cambia solo la data.
+- Avvio giornaliero: i cron di newsletter.yml (4:37/6:37 UTC) partono dal 27/10 ma con 6-7 ore di
+  ritardo (10:45-13:41 UTC). Avvio vero: routine claude.ai "Aziende target: lista + sveglia (sessione
+  principale)" (trig_01WAZjZfJeBe18QMBVQ47gBc, 07:13 Roma) che arriva in QUESTA sessione
+  (session_01W6X5HWY5pof66GCZnVaYRs, l'unica con permesso di push): importa la lista, scrive
+  `dati/sveglia.txt`, push → newsletter.yml parte sul push. Doppio avvio innocuo (`ultima_run` ==
+  oggi → stop). importa_aziende.py non riscrive il file se cambia solo la data.
+  NB: la routine precedente (sessione nuova a ogni avvio) non poteva fare push (403, repo non tra le
+  fonti) → 28-30/10 newsletter solo dai cron in ritardo. Una sessione figlia con il repo come fonte
+  (session_01BhWxVLezMn2ihjzEVfMZKD) rifiuta i push chiesti da un'altra sessione: non usarla.
 - Filtro lingua (`lingue.py`, chiesto dall'utente 26/10): Fra parla italiano, inglese, spagnolo,
   francese di base. Esclusa un'offerta scritta in un'altra lingua (es. tedesco, titoli "(m/w/d)")
   o che CHIEDE una lingua non parlata (fluent/native/courant/fließend… entro 60 caratteri dal nome
@@ -170,5 +175,7 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
       (RE_FUORI_EUROPA o paese extra-UE) → ALTRO, nascosto. Scelta utente: solo le offerte NUOVE, mai
       le già aperte: al primo giro dopo l'introduzione (seen["zone"] senza "EU") e alla prima lettura
       di una fonte le EU si segnano come viste in silenzio. Filtro lingua attivo anche qui. 78 test.
+- [x] 30/10: "fail" = notifiche della routine (push 403 dal 28/10). Newsletter 28-29/10 arrivate tardi
+      (cron in ritardo), 30/10 avviata a mano (ef2ce93, 11 nuove). Routine spostata in questa sessione.
 - [ ] Aziende prioritarie (Parigi/Italia, classe A o open innovation) ancora senza fonte:
       elencarle per l'utente.
