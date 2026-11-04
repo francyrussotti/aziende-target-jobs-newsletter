@@ -40,7 +40,7 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
   - nome solo compatibile (più corto) → `da_verificare` (non usato: controllare a mano e
     spostare in `fonti_manuali.json` se giusto).
 - Lista aziende sempre allineata alla pagina: la routine claude.ai "Aziende target newsletter:
-  importa lista" (ogni giorno 07:13 Roma, dopo l'aggiornamento della pagina delle 06:47) legge
+  importa lista" (ogni giorno 07:13 Roma; dal 1/11 la pagina si aggiorna solo il lunedì alle 06:47) legge
   l'artifact, lancia `importa_aziende.py` (rifiuta se sparisce >20% della lista) e fa push di
   `dati/aziende.json` solo se cambia. Il push avvia `scopri-fonti.yml`: siti CORDIS aggiornati +
   `scopri_fonti.py --nuove` (solo aziende mai controllate). Le aziende uscite spariscono subito
