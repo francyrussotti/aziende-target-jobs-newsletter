@@ -21,7 +21,7 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
 
 ## Come funziona
 
-- `newsletter.py`: run giornaliera (workflow `newsletter.yml`), email ogni giorno (anche "nessuna offerta nuova"). `--prova [id…]` = solo lettura, nessuna email.
+- `newsletter.py`: run SETTIMANALE (workflow `newsletter.yml`, lunedì; dal 10/11/2026, chiesto dall'utente perché da settimane non c'erano novità), una email a settimana (anche "nessuna offerta nuova"). Una sola run per settimana ISO (`seen["ultima_settimana"]`, `run_gia_fatta`): un doppio avvio nella stessa settimana si ferma; `forza` la ignora. Le offerte nuove della settimana si accumulano in `seen.json` e escono tutte insieme. `--prova [id…]` = solo lettura, nessuna email.
 - `fonti.py`: lettori dei portali (lever, greenhouse, workable, smartrecruiters, ashby, recruitee,
   personio, workday, wttj, pagina) + classificazione sede (PAR/IT/REMOTO/FR/EU/ND/ALTRO) + scoperta per slug.
 - `siti.py`: siti ufficiali dai dati CORDIS (`dati/siti.json`) e ricerca della pagina carriere / portale linkato.
@@ -45,12 +45,12 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
   `dati/aziende.json` solo se cambia. Il push avvia `scopri-fonti.yml`: siti CORDIS aggiornati +
   `scopri_fonti.py --nuove` (solo aziende mai controllate). Le aziende uscite spariscono subito
   dalla newsletter (`carica_fonti` ignora gli ID fuori lista).
-- Avvio giornaliero: i cron di newsletter.yml (4:37/6:37 UTC) partono dal 27/10 ma con 6-7 ore di
+- Avvio settimanale (dal 10/11/2026, ogni lunedì): i cron di newsletter.yml (lunedì 4:37/6:37 UTC) partono ma con 6-7 ore di
   ritardo (10:45-13:41 UTC). Avvio vero: routine claude.ai "Aziende target: lista + sveglia (sessione
-  principale)" (trig_01WAZjZfJeBe18QMBVQ47gBc, 07:13 Roma) che arriva in QUESTA sessione
+  principale)" (trig_01WAZjZfJeBe18QMBVQ47gBc, solo il lunedì 07:13 Roma dal 10/11/2026; prima ogni giorno) che arriva in QUESTA sessione
   (session_01W6X5HWY5pof66GCZnVaYRs, l'unica con permesso di push): importa la lista, scrive
-  `dati/sveglia.txt`, push → newsletter.yml parte sul push. Doppio avvio innocuo (`ultima_run` ==
-  oggi → stop). importa_aziende.py non riscrive il file se cambia solo la data.
+  `dati/sveglia.txt`, push → newsletter.yml parte sul push. Doppio avvio innocuo (stessa settimana ISO
+  → stop). importa_aziende.py non riscrive il file se cambia solo la data.
   NB: la routine precedente (sessione nuova a ogni avvio) non poteva fare push (403, repo non tra le
   fonti) → 28-30/10 newsletter solo dai cron in ritardo. Una sessione figlia con il repo come fonte
   (session_01BhWxVLezMn2ihjzEVfMZKD) rifiuta i push chiesti da un'altra sessione: non usarla.
@@ -177,5 +177,6 @@ Parigi (priorità massima), poi Italia. Lingua: italiano.
       di una fonte le EU si segnano come viste in silenzio. Filtro lingua attivo anche qui. 78 test.
 - [x] 30/10: "fail" = notifiche della routine (push 403 dal 28/10). Newsletter 28-29/10 arrivate tardi
       (cron in ritardo), 30/10 avviata a mano (ef2ce93, 11 nuove). Routine spostata in questa sessione.
+- [x] 10/11: newsletter e run SETTIMANALI (lunedì) invece che giornaliere, chiesto dall'utente (nessuna novità da settimane). Cron di newsletter.yml e routine solo il lunedì; `ultima_settimana` impedisce il doppio invio. 80 test. Costo: un'offerta aperta e chiusa nella stessa settimana non si vede mai.
 - [ ] Aziende prioritarie (Parigi/Italia, classe A o open innovation) ancora senza fonte:
       elencarle per l'utente.

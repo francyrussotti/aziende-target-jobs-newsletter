@@ -1,23 +1,23 @@
 name: 🎯 Newsletter Aziende Target
 
 # Offerte di lavoro delle aziende della lista "Aziende Target Europa"
-# (dati/aziende.json). Email solo quando ci sono offerte nuove.
+# (dati/aziende.json). Una email a settimana, il lunedì (dal 10/11/2026: da settimane non c'erano novità).
 on:
   schedule:
     # Orari in UTC, non allo scoccare dell'ora (GitHub ritarda i cron delle :00).
-    # Il secondo è di riserva: se la prima run è già andata, si ferma subito.
-    - cron: "37 4 * * *"
-    - cron: "37 6 * * *"
-  # Riserva ai cron di GitHub (in questo repo non sono mai partiti): la routine
-  # claude.ai delle 07:13 aggiorna dati/sveglia.txt ogni mattina e il push avvia
-  # la newsletter. Se la run di oggi è già fatta, si ferma subito (nessun doppio invio).
+    # Il secondo è di riserva: se la run della settimana è già andata, si ferma subito.
+    - cron: "37 4 * * 1"
+    - cron: "37 6 * * 1"
+  # Riserva ai cron di GitHub (in questo repo arrivano con ore di ritardo): la routine
+  # claude.ai del lunedì alle 07:13 (Roma) aggiorna dati/sveglia.txt e il push avvia
+  # la newsletter. Se la run della settimana è già fatta, si ferma subito (nessun doppio invio).
   push:
     branches: [main]
     paths: [dati/sveglia.txt]
   workflow_dispatch:
     inputs:
       forza:
-        description: "Esegui anche se la run di oggi è già stata fatta"
+        description: "Esegui anche se la run di questa settimana è già stata fatta"
         type: boolean
         default: false
 

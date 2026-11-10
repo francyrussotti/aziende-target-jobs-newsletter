@@ -493,6 +493,21 @@ def invia_email(html_body, oggetto_email):
     return "errore"
 
 
+def settimana_iso(data):
+    """Settimana ISO di una data 'AAAA-MM-GG', es. '2026-W46' (la newsletter è settimanale dal 10/11/2026)."""
+    iso = datetime.strptime(data, "%Y-%m-%d").isocalendar()
+    return f"{iso[0]}-W{iso[1]:02d}"
+
+
+def run_gia_fatta(seen, oggi, forza=False):
+    """Una sola run (e una sola email) per settimana: un doppio avvio nella stessa settimana si ferma subito.
+    Gli storici precedenti, con solo 'ultima_run', valgono come la settimana di quella data."""
+    if forza:
+        return False
+    ultima = seen.get("ultima_settimana") or (settimana_iso(seen["ultima_run"]) if seen.get("ultima_run") else None)
+    return ultima == settimana_iso(oggi)
+
+
 def oggetto_vuoto(stat, problemi):
     extra = []
     if stat.get("lingua"):
@@ -564,8 +579,8 @@ def main():
         print(f"❌ {e}\n   Run interrotta: senza storico tutte le offerte risulterebbero nuove.")
         sys.exit(1)
     forza = os.environ.get("NEWSLETTER_FORZA", "").strip().lower() in ("1", "true", "yes", "si", "sì")
-    if not forza and seen.get("ultima_run") == oggi:
-        print(f"✅ Run di oggi ({oggi}) già fatta: niente da fare.")
+    if run_gia_fatta(seen, oggi, forza):
+        print(f"✅ Run della settimana {settimana_iso(oggi)} già fatta: niente da fare.")
         return
 
     aziende = carica_aziende()
@@ -603,8 +618,8 @@ def main():
     rete_ko = errori > len(risultati) / 2
 
     stato_invio = "nessuna"
-    # Email ogni giorno, anche senza offerte nuove (chiesto dall'utente 27/10), così si
-    # vede che la newsletter è partita. Non se la rete è caduta: "nessuna novità"
+    # Email a ogni run (una a settimana dal 10/11/2026, chiesto dall'utente: da settimane non c'erano
+    # novità), anche senza offerte nuove, così si vede che la newsletter è partita. Non se la rete è caduta: "nessuna novità"
     # sarebbe falso (la run fallisce e GitHub lo segnala).
     if nuove or not rete_ko:
         html = componi_email(nuove, aziende, fonti, stat, problemi, len(risultati))
@@ -614,6 +629,7 @@ def main():
 
     if stato_invio in ("ok", "nessuna") and not rete_ko:
         seen["ultima_run"] = oggi
+        seen["ultima_settimana"] = settimana_iso(oggi)
         salva_seen(seen)
         print(f"💾 Storico salvato ({len(seen['ids'])} offerte)")
     else:
