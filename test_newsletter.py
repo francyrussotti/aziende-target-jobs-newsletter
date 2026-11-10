@@ -891,5 +891,27 @@ class TestSezioneEuropa(unittest.TestCase):
         self.assertEqual([o["titolo"] for o in nuove], ["Madrid job"])
 
 
+class TestSettimanale(unittest.TestCase):
+    """Dal 10/11/2026 una run (e una email) a settimana."""
+
+    def test_settimana_iso(self):
+        self.assertEqual(tn.settimana_iso("2026-11-09"), "2026-W46")      # lunedì
+        self.assertEqual(tn.settimana_iso("2026-11-15"), "2026-W46")      # domenica
+        self.assertEqual(tn.settimana_iso("2026-11-16"), "2026-W47")
+        self.assertEqual(tn.settimana_iso("2026-12-31"), "2026-W53")
+
+    def test_stessa_settimana_si_ferma(self):
+        seen = {"ultima_run": "2026-11-09", "ultima_settimana": "2026-W46"}
+        self.assertTrue(tn.run_gia_fatta(seen, "2026-11-09"))             # doppio avvio dello stesso giorno
+        self.assertTrue(tn.run_gia_fatta(seen, "2026-11-12"))             # stessa settimana, altro giorno
+        self.assertFalse(tn.run_gia_fatta(seen, "2026-11-16"))            # lunedì dopo: si parte
+        self.assertFalse(tn.run_gia_fatta(seen, "2026-11-09", forza=True))
+
+    def test_storico_vecchio_con_solo_ultima_run(self):
+        self.assertTrue(tn.run_gia_fatta({"ultima_run": "2026-11-09"}, "2026-11-11"))
+        self.assertFalse(tn.run_gia_fatta({"ultima_run": "2026-11-09"}, "2026-11-16"))
+        self.assertFalse(tn.run_gia_fatta({"ultima_run": None}, "2026-11-09"))
+
+
 if __name__ == "__main__":
     unittest.main()
