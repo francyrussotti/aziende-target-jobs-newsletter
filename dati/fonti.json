@@ -1,5 +1,5 @@
 {
- "aggiornato": "2026-11-09",
+ "aggiornato": "2026-11-16",
  "regole": 7,
  "nota": "File generato da scopri_fonti.py: per correggere o confermare una fonte usa dati/fonti_manuali.json. 'da_verificare' = candidati dubbi (nome solo compatibile), NON usati.",
  "fonti": {
@@ -153,18 +153,12 @@
     "trovata": "2026-10-26"
    }
   ],
-  "civitta-eesti": [
-   {
-    "tipo": "pagina",
-    "url": "https://civitta.com/career/consultant/",
-    "verifica": "pagina carriere del sito civitta.com",
-    "trovata": "2026-10-26"
-   },
+  "civitta": [
    {
     "tipo": "pagina",
     "url": "https://civitta.com/career/visitor-experience-facilitator/",
     "verifica": "pagina carriere del sito civitta.com",
-    "trovata": "2026-11-09"
+    "trovata": "2026-11-16"
    }
   ],
   "collecte-localisation-satellites": [
@@ -235,6 +229,14 @@
     "url": "https://www.ecoplus.at/karriere",
     "verifica": "pagina carriere del sito www.ecoplus.at",
     "trovata": "2026-10-26"
+   }
+  ],
+  "energy-pool-developpement": [
+   {
+    "tipo": "smartrecruiters",
+    "slug": "ENERGYPOOL",
+    "verifica": "linkato dalla pagina carriere https://energy-pool.com/career",
+    "trovata": "2026-11-16"
    }
   ],
   "eni": [
@@ -493,6 +495,14 @@
     "trovata": "2026-10-26"
    }
   ],
+  "mater-biotech": [
+   {
+    "tipo": "pagina",
+    "url": "https://www.novamont.com/lavora-con-noi",
+    "verifica": "pagina carriere del sito www.novamont.com",
+    "trovata": "2026-11-16"
+   }
+  ],
   "nats-en-route-public-company": [
    {
     "tipo": "pagina",
@@ -515,14 +525,6 @@
     "tipo": "pagina",
     "url": "https://www.nokia.com/careers/",
     "verifica": "pagina carriere del sito www.nokia.com",
-    "trovata": "2026-10-26"
-   }
-  ],
-  "novamont": [
-   {
-    "tipo": "pagina",
-    "url": "https://www.novamont.com/lavora-con-noi",
-    "verifica": "pagina carriere del sito www.novamont.com",
     "trovata": "2026-10-26"
    }
   ],
@@ -580,12 +582,12 @@
     "trovata": "2026-10-26"
    }
   ],
-  "robert-bosch": [
+  "robert-bosch-car-multimedia": [
    {
     "tipo": "pagina",
     "url": "https://www.bosch.com/careers/career-opportunities/",
     "verifica": "pagina carriere del sito www.bosch.com",
-    "trovata": "2026-10-26"
+    "trovata": "2026-11-16"
    }
   ],
   "robotnik-automation": [
@@ -691,6 +693,14 @@
     "dominio": "jobs.personio.com",
     "verifica": "linkato da technopolis-group.com",
     "trovata": "2026-10-26"
+   }
+  ],
+  "tero-monoprosopi": [
+   {
+    "tipo": "pagina",
+    "url": "https://tero.gr/en/jobs",
+    "verifica": "pagina carriere del sito tero.gr",
+    "trovata": "2026-11-16"
    }
   ],
   "thales-alenia-space-france": [
@@ -835,6 +845,13 @@
     "da_verificare": "nome identico 'Bpifrance' ma nessun annuncio per controllare il paese"
    }
   ],
+  "civitta": [
+   {
+    "tipo": "workable",
+    "slug": "civitta",
+    "da_verificare": "nome identico 'Civitta' ma nessun annuncio per controllare il paese"
+   }
+  ],
   "engie": [
    {
     "tipo": "workable",
@@ -861,6 +878,13 @@
     "tipo": "workable",
     "slug": "innova",
     "da_verificare": "nome identico 'innova' ma nessun annuncio per controllare il paese"
+   }
+  ],
+  "mercedes-benz": [
+   {
+    "tipo": "workable",
+    "slug": "mercedes-benz",
+    "da_verificare": "nome identico 'Mercedes Benz' ma nessun annuncio per controllare il paese"
    }
   ],
   "oi-agorize": [
@@ -929,6 +953,7 @@
   "l-m-ericsson": "http://www.efipsans.org/",
   "lama-societa-cooperativa-impresa-sociale": "http://www.agenzialama.eu/",
   "leonardo-societa-per-azioni": "https://www.finmeccanica.com/",
+  "libelium-comunicaciones-distribuidas": "http://www.libelium.com/",
   "maaelu-teadmuskeskus": "http://www.jpbi.ee/",
   "magneti-ljubljana-podjetje-za-proizvodnjo-magnetnih-materialov-dd": "http://www.magneti.si/",
   "netcompany-s-a": "http://www.intrasoft-intl.com/",
@@ -952,6 +977,7 @@
   "sintec": "http://www.sintec-nt.it/",
   "societe-nationale-sncf": "http://www.sncf.fr/",
   "solydera": "http://www.htceramix.ch/",
+  "stellantis-auto": "http://www.psa-peugeot-citroen.com/",
   "stellantis-europe": "http://cww.fiat.com/",
   "stichting-liber": "https://www.libereurope.eu/",
   "stmicroelectronics": "http://www.st.com/",
@@ -982,7 +1008,7 @@
   "acceligence": "2026-11-02",
   "accelopment-schweiz": "2026-11-02",
   "accent-inkubator": "2026-11-09",
-  "acciona-construccion": "2026-11-09",
+  "acciona-construccion-iberia": "2026-11-16",
   "acsa-obras-e-infraestructuras-sau": "2026-11-02",
   "acteon": "2026-11-09",
   "acumenist": "2026-11-02",
@@ -995,6 +1021,7 @@
   "aeroporia-aigaiou-anonymi-aeroporiki-etaireia": "2026-11-02",
   "aerospace-valley": "2026-11-02",
   "agata-comunicacion-cientifica": "2026-11-09",
+  "age-platform-europe": "2026-11-16",
   "agencia-espacial-portuguesa-portugal-space": "2026-11-09",
   "agenzia-spaziale-italiana": "2026-11-09",
   "agricolus-s-r-l": "2026-11-09",
@@ -1055,6 +1082,7 @@
   "asociatia-transilvania-it": "2026-11-09",
   "asociatia-wwf-romania": "2026-11-02",
   "ass-cittadinanzattiva": "2026-11-09",
+  "assemblee-des-regions-europeennes-fruitieres-legumieres-et-horticoles": "2026-11-16",
   "associacio-revolve-mediterraneo": "2026-11-02",
   "association-de-coordination-technique-pour-l-industrie-agroalimentaire": "2026-11-09",
   "association-des-chambres-d-agriculture-de-l-arc-atlantique": "2026-11-09",
@@ -1093,7 +1121,7 @@
   "bable": "2026-11-09",
   "balance-technology-consulting": "2026-11-09",
   "balgarska-asotsiatsia-za-vodorod-gorivni-kletki-i-sahranenie-na-energia": "2026-11-09",
-  "baltic-innovation-agency-ou": "2026-11-09",
+  "baltic-innovation-agency-o": "2026-11-16",
   "basf-se": "2026-11-09",
   "bax-innovation-consulting": "2026-11-09",
   "bayer-aktiengesellschaft": "2026-11-09",
@@ -1128,7 +1156,9 @@
   "booster-labs-s-a-s": "2026-11-09",
   "bouygues-construction": "2026-11-09",
   "bpifrance": "2026-11-09",
+  "brainport-development": "2026-11-16",
   "brg-business-region-goteborg": "2026-11-02",
+  "bridg-ou": "2026-11-16",
   "brockmann-consult": "2026-11-09",
   "bspoke-solutions-private-company": "2026-11-02",
   "bull": "2026-11-09",
@@ -1141,6 +1171,7 @@
   "cambiamo-sociedad-cooperativa-madrilena": "2026-11-02",
   "cap-holding": "2026-11-09",
   "careers-research-and-advisory-centre-crac-the": "2026-11-09",
+  "cariad-se": "2026-11-16",
   "cartago-ventures": "2026-11-09",
   "celabor-scrl": "2026-11-02",
   "celignis": "2026-11-02",
@@ -1157,7 +1188,7 @@
   "ciencia-viva-agencia-nacional-para-a-cultura-cientifica-e-tecnologica": "2026-11-09",
   "citizen-science-global-partnership-csgp-globale-partnerschaft-fuer-buergerwissenschaften-gpbw": "2026-11-02",
   "civipol": "2026-11-09",
-  "civitta-eesti": "2026-11-09",
+  "civitta": "2026-11-16",
   "clerens": "2026-11-09",
   "clic-innovation": "2026-11-09",
   "cluster-industrielle-biotechnologie-ev": "2026-11-09",
@@ -1186,7 +1217,6 @@
   "consulai-consultoria-agro-industriatrial": "2026-11-09",
   "contactica": "2026-11-09",
   "cooperativas-agro-alimentarias-de-espana-u-de-coop-sociedad-cooperativa": "2026-11-09",
-  "cooperative-electrica-do-vale-deste-crl": "2026-11-09",
   "coopernico-cooperativa-de-desenvolvimento-sustentavel-crl": "2026-11-02",
   "core-innovation-and-technology-oe": "2026-11-09",
   "corporation": "2026-11-02",
@@ -1196,7 +1226,6 @@
   "corvus-energy": "2026-11-09",
   "council-of-european-bioregions": "2026-11-02",
   "covestro-deutschland": "2026-11-09",
-  "creative-industry-kosice-no": "2026-11-09",
   "crowdhelix": "2026-11-09",
   "cs-group-france": "2026-11-09",
   "csc-tieteen-tietotekniikan-keskus": "2026-11-09",
@@ -1218,7 +1247,6 @@
   "deep-blue": "2026-11-09",
   "deimos-engineering-and-systems-slu": "2026-11-09",
   "deloitte": "2026-11-09",
-  "deloitte-advisory-s-r-l-societa-benefit": "2026-11-09",
   "deloitte-consulting-societa-benefit": "2026-11-09",
   "delphy": "2026-11-09",
   "demo-consultants": "2026-11-09",
@@ -1253,8 +1281,8 @@
   "ecorys-brussels": "2026-11-09",
   "ecorys-espana": "2026-11-09",
   "ecostack-innovations": "2026-11-09",
+  "ecovibes-p-c": "2026-11-16",
   "edag-engineering": "2026-11-02",
-  "eden-tech": "2026-11-09",
   "edge-in-earth-observation-sciences-monoprosopi": "2026-11-02",
   "egm": "2026-11-02",
   "eidgenoessische-anstalt-fuer-wasserversorgung-abwasserreinigung-und-gewaesserschutz": "2026-11-02",
@@ -1274,11 +1302,13 @@
   "eit-rawmaterials-clc-east-spolka-z-ograniczona-odpowiedzialnoscia": "2026-11-09",
   "eit-urban-mobility-foundation": "2026-11-09",
   "eit-urban-mobility-innovation-hubeast-s-r-o": "2026-11-09",
+  "elava-itameri-saatio-sr": "2026-11-16",
   "electricite-de-france": "2026-11-09",
   "elektro-celje-d-d": "2026-11-02",
   "elektro-ljubljana-podjetje-zadistribucijo-elektricne-energije-d-d": "2026-11-09",
   "eles-doo-operater-kombiniranega-prenosnega-in-distribucijskega-elektroenergetskega-omrezja": "2026-11-09",
   "elliniko-vraveio-epicheirimatikotitas": "2026-11-09",
+  "emac-empresa-municipal-de-ambientede-cascais-em": "2026-11-16",
   "emisia": "2026-11-09",
   "emotion": "2026-11-09",
   "empirica-gesellschaft-fur-kommunikations-und-technologieforschung-mbh": "2026-11-09",
@@ -1291,6 +1321,7 @@
   "energies-2050": "2026-11-02",
   "energy-cities-energie-cites-association": "2026-11-02",
   "energy-efficiency-in-industrial-processes": "2026-11-02",
+  "energy-pool-developpement": "2026-11-16",
   "energy-storage-europe": "2026-11-09",
   "engie": "2026-11-09",
   "engineering-ingegneria-informatica": "2026-11-09",
@@ -1371,6 +1402,7 @@
   "european-passengers-federation-ivzw": "2026-11-09",
   "european-public-health-alliance": "2026-11-02",
   "european-public-health-association": "2026-11-09",
+  "european-regional-and-local-health-authorities": "2026-11-16",
   "european-regions-research-and-innovation-network": "2026-11-09",
   "european-renewable-energies-federation-federation-europeenne-des-energies-renouvelables": "2026-11-09",
   "european-renewable-gas-registry": "2026-11-09",
@@ -1406,6 +1438,7 @@
   "ferrovie-dello-stato-italiane": "2026-11-09",
   "fev-consulting": "2026-11-09",
   "fev-europe": "2026-11-09",
+  "finanziaria-ligure-per-lo-sviluppoeconomico-fi-l-s-e": "2026-11-16",
   "fit-consulting": "2026-11-09",
   "fiware-foundation-ev": "2026-11-09",
   "flanders-food": "2026-11-02",
@@ -1444,6 +1477,7 @@
   "fundatia-adept-transilvania": "2026-11-09",
   "fundingbox-accelerator-sp-zoo": "2026-11-09",
   "fundingbox-communities": "2026-11-09",
+  "futura-technologii-dooel-skopje": "2026-11-16",
   "future-needs-management-consulting": "2026-11-09",
   "fva-di-louis-ferrini-c": "2026-11-09",
   "g-force": "2026-11-09",
@@ -1566,9 +1600,10 @@
   "istituto-di-studi-per-l-integrazione-dei-sistemi-societa-cooperativa": "2026-11-09",
   "its-norge-norsk-forening-for-multimodale-intelligente-transport-systemer-og-tjenester-its-norway": "2026-11-09",
   "itti-sp-zoo": "2026-11-09",
+  "iveco": "2026-11-16",
   "jan-de-nul": "2026-11-02",
   "janssen-cilag": "2026-11-02",
-  "janssen-cilag-950": "2026-11-09",
+  "janssen-cilag-961": "2026-11-16",
   "janssen-pharmaceutica": "2026-11-09",
   "jic-zajmove-sdruzeni-pravnickch-osob": "2026-11-09",
   "jisc-lbg": "2026-11-09",
@@ -1577,6 +1612,7 @@
   "jrc-capital-management-consultancy-research": "2026-11-09",
   "kea-european-affairs": "2026-11-09",
   "kentro-merimnas-oikogeneias-kai-paidiou": "2026-11-02",
+  "ketmarket": "2026-11-16",
   "kic-ie": "2026-11-09",
   "kic-innoenergy-se": "2026-11-09",
   "kielregion": "2026-11-09",
@@ -1600,7 +1636,9 @@
   "latvijas-lauku-konsultaciju-un-izglitibas-centrs": "2026-11-09",
   "leonardo-societa-per-azioni": "2026-11-09",
   "lesprojekt-sluzby": "2026-11-09",
+  "leuven-mindgate": "2026-11-16",
   "levin-sources": "2026-11-09",
+  "libelium-comunicaciones-distribuidas": "2026-11-16",
   "liebherr-electronics-and-drives": "2026-11-02",
   "linq-consulting-and-management": "2026-11-09",
   "lobelia-earth": "2026-11-02",
@@ -1621,9 +1659,12 @@
   "marloconsult": "2026-11-09",
   "martel": "2026-11-02",
   "martel-innovate": "2026-11-09",
+  "mater-biotech": "2026-11-16",
   "materalia": "2026-11-02",
   "mc-shared-services": "2026-11-09",
   "mediterranean-information-office-for-environment-culture-and-sustainable-development-association": "2026-11-09",
+  "medtronic-iberica": "2026-11-16",
+  "mercedes-benz": "2026-11-16",
   "meta": "2026-11-09",
   "meta-group": "2026-11-09",
   "metec-innovation-consulting": "2026-11-09",
@@ -1640,6 +1681,7 @@
   "mreza-savjetodavnih-sluzbi-jugoistocne-europe": "2026-11-09",
   "mtu-australo-alpha-lab": "2026-11-09",
   "mtu-civitta-foundation": "2026-11-02",
+  "multimarine-services": "2026-11-16",
   "multiverse-computing": "2026-11-09",
   "muon-solutions": "2026-11-02",
   "my-energia-oner": "2026-11-09",
@@ -1653,15 +1695,16 @@
   "nemzeti-innovacios-ugynokseg-nonprofit-zrt": "2026-11-02",
   "neovia-innovation": "2026-11-09",
   "netcompany-s-a": "2026-11-09",
+  "neuralio-ou": "2026-11-16",
   "neuropublic-anonymi-etaireia-pliroforikis-kai-epikoinonion": "2026-11-09",
+  "nms-new-mobility-solutions-hamburg": "2026-11-16",
   "nokia-networks-france": "2026-11-09",
   "nokia-solutions-and-networks-and": "2026-11-09",
   "nommon-solutions-and-technologies": "2026-11-09",
   "nordisk-fond-for-milj-og-udvikling": "2026-11-09",
-  "nova-telecommunications-media-single-member": "2026-11-09",
+  "nova-telecommunications-single-member": "2026-11-16",
   "novamechanics": "2026-11-09",
   "novamechanics-monoprosopi": "2026-11-09",
-  "novamont": "2026-11-09",
   "novartis-pharma": "2026-11-02",
   "novo-nordisk-a-s": "2026-11-02",
   "npl-management": "2026-11-09",
@@ -1670,6 +1713,7 @@
   "nxp-semiconductors-netherlands": "2026-11-09",
   "octa-insight": "2026-11-09",
   "odraz-odrzivi-razvoj-zajednice": "2026-11-09",
+  "oesterreichische-bundesforste": "2026-11-16",
   "office-international-de-l-eau": "2026-11-09",
   "oi-agorize": "2026-11-09",
   "open-access-in-the-european-area-through-scholarly-communication": "2026-11-09",
@@ -1714,6 +1758,7 @@
   "prasidentenkonferenz-der-landwirtschaftskammern-osterreichs": "2026-11-09",
   "predictby-research-and-consulting-s-l": "2026-11-09",
   "preferred-by-nature-fmba": "2026-11-09",
+  "preferred-by-nature-spain": "2026-11-16",
   "premotec": "2026-11-02",
   "premotec-poland-sp-z-o-o": "2026-11-02",
   "pricewaterhousecoopers-advisory": "2026-11-09",
@@ -1724,6 +1769,7 @@
   "proagria-keskusten-liitto-ry": "2026-11-09",
   "prospex-institute": "2026-11-02",
   "protisvalor-mediterranee": "2026-11-02",
+  "przedsiebiorstwo-robot-elewacyjnychfasada-sp-zoo": "2026-11-16",
   "ptv-planung-transport-verkehr": "2026-11-02",
   "pwc-advisory-france": "2026-11-09",
   "q-plan-international-advisors": "2026-11-09",
@@ -1759,12 +1805,13 @@
   "rina-consulting": "2026-11-09",
   "rina-consulting-centro-sviluppo-materiali": "2026-11-09",
   "rina-services": "2026-11-09",
-  "robert-bosch": "2026-11-09",
+  "robert-bosch-car-multimedia": "2026-11-16",
   "robotnik-automation": "2026-11-09",
   "rohealth-clusterul-pentru-sanatate-si-bioeconomie": "2026-11-09",
   "rolls-royce-plc": "2026-11-09",
   "rothamsted-research": "2026-11-02",
   "rsk-adas": "2026-11-09",
+  "ruizia": "2026-11-16",
   "rupprecht-consult-forschung-beratung": "2026-11-09",
   "rwe-offshore-wind": "2026-11-09",
   "s-pro-sustainable-projects": "2026-11-09",
@@ -1810,6 +1857,7 @@
   "smart-energy-europe": "2026-11-09",
   "smartlex-societa-di-prodotti-e-servizi-giuridici-interdisciplinari": "2026-11-09",
   "snam": "2026-11-09",
+  "sociedade-afonso-chaves-associacao-de-estudos-acoreanos": "2026-11-16",
   "sociedade-portuguesa-de-inovacao-consultadoria-empresarial-e-fomento-da-inovacao": "2026-11-09",
   "societe-europeenne-de-cardiologie": "2026-11-02",
   "societe-nationale-sncf": "2026-11-09",
@@ -1832,6 +1880,7 @@
   "startup-europe-regions-network": "2026-11-09",
   "statnett-sf": "2026-11-09",
   "steinbeis-2i": "2026-11-09",
+  "stellantis-auto": "2026-11-16",
   "stellantis-europe": "2026-11-09",
   "step-ri-znanstveno-tehnologijskipark-sveucilista-u-rijeci-druzba-zomejeno-odgovornostjo-za-inovacijei-transfer-tehnologi": "2026-11-09",
   "sterreichische-energieagentur-austrian-energy-agency": "2026-11-09",
@@ -1877,16 +1926,18 @@
   "teamit-research-s-l": "2026-11-09",
   "tech-tour-europe": "2026-11-09",
   "tech-tour-global": "2026-11-09",
+  "techconcepts-b-v": "2026-11-16",
   "technopolis-consulting-group-belgium": "2026-11-09",
   "technovative-solutions": "2026-11-09",
   "tecnalia-serbia-doo-beograd": "2026-11-09",
   "telecom-italia-o-tim": "2026-11-09",
-  "telefonica-innovacion-digital": "2026-11-09",
+  "telefonica-investigacion-y-desarrollo": "2026-11-16",
   "telelink-business-services-ead": "2026-11-09",
   "telenor-asa": "2026-11-09",
   "telespazio-france": "2026-11-02",
   "temas-solutions": "2026-11-02",
   "terna-rete-elettrica-nazionale": "2026-11-09",
+  "tero-monoprosopi": "2026-11-16",
   "th-nk-e": "2026-11-02",
   "thales-alenia-space-france": "2026-11-02",
   "thales-alenia-space-italia": "2026-11-09",
@@ -1901,6 +1952,7 @@
   "timelex": "2026-11-02",
   "tinexta-innovation-hub-s-p-a": "2026-11-09",
   "tis-pt-consultores-em-transportes-inovacao-e-sistemas": "2026-11-09",
+  "topsoe": "2026-11-16",
   "topview": "2026-11-09",
   "torrecid": "2026-11-09",
   "totalenergies-onetech": "2026-11-09",
